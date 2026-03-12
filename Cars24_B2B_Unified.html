@@ -33,6 +33,7 @@ const DEALER_TYPES=["NCD","UCD","DSA","Franchise","Independent"];
 const BANK_LIST=["HDFC Bank","ICICI Bank","SBI","Kotak Mahindra","Axis Bank","Bank of Maharashtra","Punjab National Bank","Canara Bank","Bank of Baroda","IndusInd Bank","Yes Bank","IDFC First Bank","Federal Bank","RBL Bank","Union Bank of India"];
 const CAR_MAKES=["Maruti Suzuki","Hyundai","Tata Motors","Honda","Toyota","Kia","Mahindra","Skoda","Volkswagen","Ford","Renault","Nissan","MG Motors","Jeep","BMW","Mercedes-Benz","Audi","Volvo","Other"];
 const CONFIGS_DEFAULT={SPLIT_SAME_APP_GATE:15000,SPLIT_CROSS_APP_GATE:15000,NONGS_RATE:2,NONGS_CAP:10000,NONGS_AUTO_GATE:10000,FINANCE_GATE:15000};
+const COMPANY_CODES=["CSPL","CAPL","CFSPL"];
 
 // ═══════════════════════════════════════════════
 // ALL USERS
@@ -64,11 +65,11 @@ const INIT_COUNTERS=[
   {id:"C004",dealerId:"D003",name:"Autobahn - Ahmedabad",      city:"Ahmedabad",ucmName:"Meena Patel",  ucmMobile:"9811004004",raId:"RA003",status:"Active"},
 ];
 const INIT_APPS=[
-  {id:"APP001",dealerId:"D001",counterId:"C001",raId:"RA001",vehicle:"2022 Hyundai Creta SX 1.5D",  regNo:"DL3CAB1234",quote:925000,serviceCharge:11800,challan:2500, estRefurb:8000, gsType:"GS",    stockIn:true, otherCharges:20000,splitReleased:0,   incentiveReleased:0,status:"Active"},
-  {id:"APP002",dealerId:"D001",counterId:"C002",raId:"RA001",vehicle:"2020 Maruti Swift ZXI+",       regNo:"DL7CQ5678", quote:485000,serviceCharge:6800, challan:0,    estRefurb:12000,gsType:"Non-GS",stockIn:true, otherCharges:8500, splitReleased:8500,incentiveReleased:0,status:"Active"},
-  {id:"APP003",dealerId:"D002",counterId:"C003",raId:"RA002",vehicle:"2021 Tata Nexon XZ+ Dark",    regNo:"UP32AX9012",quote:720000,serviceCharge:9200, challan:1500, estRefurb:6000, gsType:"GS",    stockIn:true, otherCharges:18000,splitReleased:0,   incentiveReleased:0,status:"Active"},
-  {id:"APP004",dealerId:"D003",counterId:"C004",raId:"RA003",vehicle:"2019 Honda City ZX CVT",      regNo:"GJ1BN3456", quote:580000,serviceCharge:7500, challan:3200, estRefurb:15000,gsType:"Non-GS",stockIn:false,otherCharges:11000,splitReleased:0,   incentiveReleased:0,status:"Active"},
-  {id:"APP005",dealerId:"D002",counterId:"C003",raId:"RA002",vehicle:"2022 Kia Seltos HTX+ 1.5P",   regNo:"UP80CK7890",quote:840000,serviceCharge:10500,challan:1200, estRefurb:9000, gsType:"GS",    stockIn:true, otherCharges:15000,splitReleased:5000,incentiveReleased:0,status:"Active"},
+  {id:"APP001",dealerId:"D001",counterId:"C001",raId:"RA001",vehicle:"2022 Hyundai Creta SX 1.5D",  regNo:"DL3CAB1234",quote:925000,serviceCharge:11800,challan:2500, estRefurb:8000, gsType:"GS",    stockIn:true, otherCharges:20000,splitReleased:0,   incentiveReleased:0,status:"Active",inspectionDone:true,inspectionAt:"2026-02-12 10:00",inspectionNotes:"Clean car, minor wear",tokenDone:true,tokenAt:"2026-02-13 14:00",tokenAmount:5000,tokenNotes:"Token received",siDone:true,siAt:"2026-02-14 09:00",siNotes:"SI complete",siOtherCharges:20000,siGsType:"GS"},
+  {id:"APP002",dealerId:"D001",counterId:"C002",raId:"RA001",vehicle:"2020 Maruti Swift ZXI+",       regNo:"DL7CQ5678", quote:485000,serviceCharge:6800, challan:0,    estRefurb:12000,gsType:"Non-GS",stockIn:true, otherCharges:8500, splitReleased:8500,incentiveReleased:0,status:"Active",inspectionDone:true,inspectionAt:"2026-02-16 11:00",inspectionNotes:"Good condition",tokenDone:true,tokenAt:"2026-02-17 10:00",tokenAmount:3000,tokenNotes:"",siDone:true,siAt:"2026-02-18 09:00",siNotes:"",siOtherCharges:8500,siGsType:"Non-GS"},
+  {id:"APP003",dealerId:"D002",counterId:"C003",raId:"RA002",vehicle:"2021 Tata Nexon XZ+ Dark",    regNo:"UP32AX9012",quote:720000,serviceCharge:9200, challan:1500, estRefurb:6000, gsType:"GS",    stockIn:true, otherCharges:18000,splitReleased:0,   incentiveReleased:0,status:"Active",inspectionDone:true,inspectionAt:"2026-02-20 09:00",inspectionNotes:"Minor front bumper",tokenDone:true,tokenAt:"2026-02-21 11:00",tokenAmount:7000,tokenNotes:"Token paid",siDone:true,siAt:"2026-02-22 08:30",siNotes:"SI done",siOtherCharges:18000,siGsType:"GS"},
+  {id:"APP004",dealerId:"D003",counterId:"C004",raId:"RA003",vehicle:"2019 Honda City ZX CVT",      regNo:"GJ1BN3456", quote:580000,serviceCharge:7500, challan:3200, estRefurb:15000,gsType:"Non-GS",stockIn:false,otherCharges:11000,splitReleased:0,   incentiveReleased:0,status:"Active",inspectionDone:true,inspectionAt:"2026-02-28 14:00",inspectionNotes:"Fair tyres, minor rust",tokenDone:false,tokenAt:"",tokenAmount:0,tokenNotes:"",siDone:false,siAt:"",siNotes:"",siOtherCharges:0,siGsType:"Non-GS"},
+  {id:"APP005",dealerId:"D002",counterId:"C003",raId:"RA002",vehicle:"2022 Kia Seltos HTX+ 1.5P",   regNo:"UP80CK7890",quote:840000,serviceCharge:10500,challan:1200, estRefurb:9000, gsType:"GS",    stockIn:true, otherCharges:15000,splitReleased:5000,incentiveReleased:0,status:"Active",inspectionDone:true,inspectionAt:"2026-03-03 10:00",inspectionNotes:"Excellent condition",tokenDone:true,tokenAt:"2026-03-04 12:00",tokenAmount:10000,tokenNotes:"Full token",siDone:true,siAt:"2026-03-05 09:00",siNotes:"SI done",siOtherCharges:15000,siGsType:"GS"},
 ];
 const INIT_LEADS=[
   {id:"L001",raId:"RA001",dealerId:"D001",counterId:"C001",regNo:"DL3CAB1234",make:"Hyundai",model:"Creta",year:"2022",variant:"SX 1.5 Diesel",color:"Titan Grey",km:"28000",fuel:"Diesel",transmission:"Manual",ownership:"1st",accident:"No",accidentDesc:"",flood:"No",tyres:"Good",engine:"No issues",electrical:"No issues",price:925000,status:"App_ID Created",appId:"APP001",createdAt:"2026-02-14 11:30"},
@@ -82,7 +83,7 @@ const INIT_PAYEES=[
   {id:"SAP002",dealerIds:["D002"],raId:"RA002",payeeName:"Amol Yuvraj Patil",pan:"CCIPP5942C",bank:"Bank of Maharashtra",account:"60236471678",ifsc:"MAHB0001022",mobile:"9876500002",sapCode:"SAP-JZ-002",fluxStatus:"Validation_Failed",status:"Active",createdAt:"2026-01-22"},
 ];
 const INIT_OB=[
-  {id:"OB001",raId:"RA001",submittedBy:"RA",dealerName:"Speedway Motors",type:"DSA",oem:"Toyota",oemType:"Franchise Dealer",region:"NDL",city:"Gurgaon",pan:"BGHPS4412C",gst:"29BGHPS4412C1ZT",mobile:"9876543210",email:"info@speedway.in",address:"Sector 18, Gurgaon",bank:"HDFC Bank",account:"50200012345678",ifsc:"HDFC0001234",docs:{gst:"GST-cert.pdf",pan:"PAN.pdf",bank:"stmt.pdf",cancelledCheque:"cheque.pdf",other:""},oemDocs:{franchiseAgreement:"agreement.pdf",oemLetter:"letter.pdf",other:""},status:"Admin Panel Pending",dealerCode:"",submittedAt:"2026-03-07 09:00"},
+  {id:"OB001",raId:"RA001",submittedBy:"RA",dealerName:"Speedway Motors",type:"DSA",oem:"Toyota",companyCode:"CSPL",region:"NDL",city:"Gurgaon",lat:"28.4595",long:"77.0266",pan:"BGHPS4412C",gst:"29BGHPS4412C1ZT",mobile:"9876543210",email:"info@speedway.in",address:"Sector 18, Gurgaon",bank:"HDFC Bank",account:"50200012345678",ifsc:"HDFC0001234",docs:{gst:"GST-cert.pdf",pan:"PAN.pdf",bank:"stmt.pdf",cancelledCheque:"cheque.pdf",other:""},oemDocs:{franchiseAgreement:"agreement.pdf",oemLetter:"letter.pdf",other:""},status:"Admin Panel Pending",dealerCode:"",submittedAt:"2026-03-07 09:00"},
 ];
 const INIT_PR=[
   {id:"PR001",appId:"APP003",raId:"RA002",payeeId:"SAP001",type:"Split",amount:18000,status:"Submitted",createdAt:"2026-03-08 10:22",utr:null,reason:"GS split for stock-in deal",crossDealerFlag:false,bhEdited:false,originalAmount:18000,rejectionReason:null},
@@ -132,6 +133,7 @@ const fieldNav=[
   {id:"dashboard",label:"Home",icon:"🏠"},
   {id:"leads",label:"Leads",icon:"📋"},
   {id:"appids",label:"App_IDs",icon:"🚗"},
+  {id:"stages",label:"Stages",icon:"🎯"},
   {id:"onboarding",label:"Dealers",icon:"🏢"},
   {id:"counter",label:"Counter",icon:"🔗"},
   {id:"sap",label:"SAP",icon:"🏦"},
@@ -140,6 +142,8 @@ const fieldNav=[
 const opsNav=[
   {id:"dashboard",label:"Dashboard",icon:"▦"},
   {id:"payout",label:"Raise Payout",icon:"💸",roles:["TM"]},
+  {id:"stages",label:"Stages",icon:"🎯",roles:["TM","Central Ops","Business Head"]},
+  {id:"override",label:"Ctr Override",icon:"🔄",roles:["TM","Central Ops","Business Head"]},
   {id:"onboarding",label:"Onboarding",icon:"🏢",badge:"ob"},
   {id:"counter",label:"Counter",icon:"🔗",badge:"ctr"},
   {id:"sap",label:"SAP",icon:"🏦",badge:"sap"},
@@ -275,7 +279,14 @@ function OnboardingModuleRA({user,shared}){
     {step===2&&<Card><ST>OEM & Dealer Type</ST>
       <Alrt type="info">OEM tagging processed by Central Ops ONLY after dealer code is confirmed.</Alrt>
       <G2><Sel label="Dealer Type" value={form.type} onChange={v=>f("type",v)} options={DEALER_TYPES} placeholder="Select..." required/><Sel label="OEM Brand" value={form.oem} onChange={v=>f("oem",v)} options={OEM_BRANDS} placeholder="Select OEM..." required/></G2>
-      <Sel label="Dealer Categorisation" value={form.oemType} onChange={v=>f("oemType",v)} options={["Franchise Dealer","Authorised Service Centre","Multi-Brand Dealer","Independent Dealer"]} placeholder="Select..." required/>
+      <Sel label="Company Code" value={form.companyCode} onChange={v=>f("companyCode",v)} options={COMPANY_CODES} placeholder="Select company code..." required/>
+      <ST>Dealer Location</ST>
+      <div style={{display:"flex",gap:8,marginBottom:8}}>
+        <Btn v={form.latMode==="auto"?"primary":"secondary"} sm onClick={()=>{f("latMode","auto");if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>{f("lat",pos.coords.latitude.toFixed(6));f("long",pos.coords.longitude.toFixed(6));},()=>alert("Location access denied"));}}}>📍 Auto-detect</Btn>
+        <Btn v={form.latMode==="manual"?"primary":"secondary"} sm onClick={()=>f("latMode","manual")}>✏️ Enter manually</Btn>
+      </div>
+      {(form.latMode==="manual"||form.lat)&&<G2><Fld label="Latitude" value={form.lat} onChange={v=>f("lat",v)} placeholder="e.g. 28.6139" required={form.latMode==="manual"}/><Fld label="Longitude" value={form.long} onChange={v=>f("long",v)} placeholder="e.g. 77.2090" required={form.latMode==="manual"}/></G2>}
+      {form.lat&&form.long&&<div style={{background:"#ECFDF5",border:"1px solid #BBF7D0",borderRadius:7,padding:"6px 10px",marginBottom:8,fontSize:11,color:"#065F46",fontWeight:700}}>📍 {form.lat}, {form.long}</div>}
       <ST>OEM Documents (Mandatory)</ST>
       <FileInput label="Franchise Agreement / Appointment Letter" value={oemDocs.franchiseAgreement} onChange={v=>setOemDocs(p=>({...p,franchiseAgreement:v}))} required/>
       <FileInput label="OEM Authorization Letter" value={oemDocs.oemLetter} onChange={v=>setOemDocs(p=>({...p,oemLetter:v}))} required/>
@@ -283,7 +294,7 @@ function OnboardingModuleRA({user,shared}){
       <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(1)}>← Back</Btn><Btn disabled={!form.type||!form.oem||!form.oemType||!oemDocs.franchiseAgreement||!oemDocs.oemLetter} onClick={()=>setStep(3)}>Review →</Btn></div>
     </Card>}
     {step===3&&<Card><ST>Review & Submit</ST>
-      {[["Dealer",form.dealerName],["Region",form.region],["City",form.city],["Type",form.type],["OEM",form.oem],["PAN",form.pan],["Bank",form.bank],["GST Doc",docs.gst],["PAN Doc",docs.pan],["Franchise Agr.",oemDocs.franchiseAgreement],["OEM Letter",oemDocs.oemLetter]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}
+      {[["Dealer",form.dealerName],["Region",form.region],["City",form.city],["Type",form.type],["OEM",form.oem],["Company Code",form.companyCode],["Lat",form.lat||"—"],["Long",form.long||"—"],["PAN",form.pan],["Bank",form.bank],["GST Doc",docs.gst],["PAN Doc",docs.pan],["Franchise Agr.",oemDocs.franchiseAgreement],["OEM Letter",oemDocs.oemLetter]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}
       <Alrt type="warning">Submitting triggers auto-email to Admin Panel team AND adds to Ops Panel queue.</Alrt>
       <div style={{display:"flex",justifyContent:"space-between",marginTop:10}}><Btn v="secondary" onClick={()=>setStep(2)}>← Edit</Btn><Btn v="success" icon="✓" onClick={submit}>Submit</Btn></div>
     </Card>}
@@ -452,7 +463,7 @@ function OnboardingModuleOps({user,shared}){
     <StepBar steps={["Dealer Info","Bank & Docs","OEM Details","Review"]} cur={step}/>
     {step===0&&<Card><ST>Dealer Information</ST><Fld label="Dealer / Company Name" value={form.dealerName} onChange={v=>f("dealerName",v)} required/><G2><Sel label="Region" value={form.region} onChange={v=>f("region",v)} options={REGIONS} placeholder="Select..." required/><Sel label="City" value={form.city} onChange={v=>f("city",v)} options={CITIES} placeholder="Select..." required/></G2><G2><Fld label="Mobile" value={form.mobile} onChange={v=>f("mobile",v)} required/><Fld label="Email" value={form.email} onChange={v=>f("email",v)}/></G2><Fld label="Full Address" value={form.address} onChange={v=>f("address",v)} required/><div style={{display:"flex",justifyContent:"flex-end",marginTop:4}}><Btn disabled={!form.dealerName||!form.region||!form.city||!form.mobile||!form.address} onClick={()=>setStep(1)}>Next →</Btn></div></Card>}
     {step===1&&<Card><ST>Bank & Tax</ST><G2><Fld label="PAN" value={form.pan} onChange={v=>f("pan",v.toUpperCase())} required maxLength={10}/><Fld label="GST" value={form.gst} onChange={v=>f("gst",v.toUpperCase())}/></G2><Sel label="Bank" value={form.bank} onChange={v=>f("bank",v)} options={BANK_LIST} placeholder="Select bank..." required/><G2><Fld label="Account No." value={form.account} onChange={v=>f("account",v)} required/><Fld label="IFSC" value={form.ifsc} onChange={v=>f("ifsc",v.toUpperCase())} required/></G2><ST>Mandatory Documents</ST><FileInput label="GST Certificate" value={docs.gst} onChange={v=>setDocs(p=>({...p,gst:v}))} required/><FileInput label="PAN Card" value={docs.pan} onChange={v=>setDocs(p=>({...p,pan:v}))} required/><FileInput label="Bank Statement" value={docs.bank} onChange={v=>setDocs(p=>({...p,bank:v}))} required/><FileInput label="Cancelled Cheque" value={docs.cancelledCheque} onChange={v=>setDocs(p=>({...p,cancelledCheque:v}))} required/><ST>Other (Optional)</ST><FileInput label="Other" value={docs.other} onChange={v=>setDocs(p=>({...p,other:v}))}/><div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(0)}>← Back</Btn><Btn disabled={!form.pan||!form.bank||!form.account||!form.ifsc||!docs.gst||!docs.pan||!docs.bank||!docs.cancelledCheque} onClick={()=>setStep(2)}>Next →</Btn></div></Card>}
-    {step===2&&<Card><ST>OEM & Dealer Type</ST><G2><Sel label="Dealer Type" value={form.type} onChange={v=>f("type",v)} options={DEALER_TYPES} placeholder="Select..." required/><Sel label="OEM Brand" value={form.oem} onChange={v=>f("oem",v)} options={OEM_BRANDS} placeholder="Select..." required/></G2><Sel label="Categorisation" value={form.oemType} onChange={v=>f("oemType",v)} options={["Franchise Dealer","Authorised Service Centre","Multi-Brand Dealer","Independent Dealer"]} placeholder="Select..." required/><ST>OEM Documents</ST><FileInput label="Franchise Agreement" value={oemDocs.franchiseAgreement} onChange={v=>setOemDocs(p=>({...p,franchiseAgreement:v}))} required/><FileInput label="OEM Authorization Letter" value={oemDocs.oemLetter} onChange={v=>setOemDocs(p=>({...p,oemLetter:v}))} required/><ST>Other (Optional)</ST><FileInput label="Other OEM Doc" value={oemDocs.other} onChange={v=>setOemDocs(p=>({...p,other:v}))}/><div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(1)}>← Back</Btn><Btn disabled={!form.type||!form.oem||!form.oemType||!oemDocs.franchiseAgreement||!oemDocs.oemLetter} onClick={()=>setStep(3)}>Review →</Btn></div></Card>}
+    {step===2&&<Card><ST>OEM & Dealer Type</ST><G2><Sel label="Dealer Type" value={form.type} onChange={v=>f("type",v)} options={DEALER_TYPES} placeholder="Select..." required/><Sel label="OEM Brand" value={form.oem} onChange={v=>f("oem",v)} options={OEM_BRANDS} placeholder="Select..." required/></G2><Sel label="Company Code" value={form.companyCode} onChange={v=>f("companyCode",v)} options={COMPANY_CODES} placeholder="Select company code..." required/><ST>Dealer Location</ST><div style={{display:"flex",gap:8,marginBottom:8}}><Btn v={form.latMode==="auto"?"primary":"secondary"} sm onClick={()=>{f("latMode","auto");if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>{f("lat",pos.coords.latitude.toFixed(6));f("long",pos.coords.longitude.toFixed(6));},()=>alert("Location access denied"));}}}>📍 Auto-detect</Btn><Btn v={form.latMode==="manual"?"primary":"secondary"} sm onClick={()=>f("latMode","manual")}>✏️ Enter manually</Btn></div>{(form.latMode==="manual"||form.lat)&&<G2><Fld label="Latitude" value={form.lat} onChange={v=>f("lat",v)} placeholder="e.g. 28.6139" required={form.latMode==="manual"}/><Fld label="Longitude" value={form.long} onChange={v=>f("long",v)} placeholder="e.g. 77.2090" required={form.latMode==="manual"}/></G2>}{form.lat&&form.long&&<div style={{background:"#ECFDF5",border:"1px solid #BBF7D0",borderRadius:7,padding:"6px 10px",marginBottom:8,fontSize:11,color:"#065F46",fontWeight:700}}>📍 {form.lat}, {form.long}</div>}<ST>OEM Documents</ST><FileInput label="Franchise Agreement" value={oemDocs.franchiseAgreement} onChange={v=>setOemDocs(p=>({...p,franchiseAgreement:v}))} required/><FileInput label="OEM Authorization Letter" value={oemDocs.oemLetter} onChange={v=>setOemDocs(p=>({...p,oemLetter:v}))} required/><ST>Other (Optional)</ST><FileInput label="Other OEM Doc" value={oemDocs.other} onChange={v=>setOemDocs(p=>({...p,other:v}))}/><div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(1)}>← Back</Btn><Btn disabled={!form.type||!form.oem||!form.oemType||!oemDocs.franchiseAgreement||!oemDocs.oemLetter} onClick={()=>setStep(3)}>Review →</Btn></div></Card>}
     {step===3&&<Card><ST>Review & Submit</ST>{[["Dealer",form.dealerName],["Region",form.region],["City",form.city],["Type",form.type],["OEM",form.oem]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}<Alrt type="warning">Submitting adds to Ops Panel queue and sends auto-email to Admin Panel.</Alrt><div style={{display:"flex",justifyContent:"space-between",marginTop:10}}><Btn v="secondary" onClick={()=>setStep(2)}>← Edit</Btn><Btn v="success" icon="✓" onClick={submitTMForm}>Submit</Btn></div></Card>}
   </div>;
 
@@ -598,6 +609,158 @@ function ConfigModule({user,shared}){
 }
 
 // ═══════════════════════════════════════════════
+// STAGE MARKING MODULE (RA/RM + Ops/TM view)
+// ═══════════════════════════════════════════════
+function StageModule({user,shared}){
+  const{apps,setApps,leads,setLeads,dealers,counters}=shared;
+  const[selAppId,setSelAppId]=useState("");const[activeStage,setActiveStage]=useState(null);const[form,setForm]=useState({});const[showConfirm,setShowConfirm]=useState(false);
+  const isOps=["TM","Central Ops","Business Head"].includes(user.role);
+  let raIds=[user.id];if(user.role==="RM"&&user.raIds)raIds=[user.id,...user.raIds];
+  const myApps=isOps?apps:apps.filter(a=>raIds.includes(a.raId));
+  const selApp=apps.find(a=>a.id===selAppId);
+  const selDealer=selApp?dealers.find(d=>d.id===selApp.dealerId):null;
+  const selCounter=selApp?counters.find(c=>c.id===selApp.counterId):null;
+  const lead=selApp?leads.find(l=>l.appId===selApp.id):null;
+  const f=(k,v)=>setForm(p=>({...p,[k]:v}));
+
+  const stages=[
+    {id:"inspection",label:"Inspection Done",icon:"🔍",doneKey:"inspectionDone",atKey:"inspectionAt",color:"#5B21B6",bg:"#F5F3FF",
+     fields:[{k:"inspectionNotes",l:"Inspection Notes / Remarks",ph:"e.g. Clean car, AC works fine, minor tyre wear"}]},
+    {id:"token",label:"Token Done",icon:"🤝",doneKey:"tokenDone",atKey:"tokenAt",color:"#065F46",bg:"#ECFDF5",
+     fields:[{k:"tokenAmount",l:"Token Amount (₹)",type:"number",ph:"e.g. 5000"},{k:"tokenNotes",l:"Token Notes",ph:"e.g. Cheque received"}]},
+    {id:"si",label:"Stock-In (SI) Done",icon:"✅",doneKey:"siDone",atKey:"siAt",color:"#0F4C81",bg:"#EBF4FF",
+     fields:[{k:"siOtherCharges",l:"Other Charges (₹)",type:"number",ph:"e.g. 18000"},{k:"siGsType",l:"GS Type",type:"sel",opts:["GS","Non-GS"]},{k:"siServiceCharge",l:"Service Charge (₹)",type:"number",ph:"optional override"},{k:"siChallan",l:"Challan (₹)",type:"number",ph:"optional"},{k:"siEstRefurb",l:"Est. Refurb (₹)",type:"number",ph:"optional"},{k:"siNotes",l:"SI Notes",ph:"e.g. All docs verified"}]},
+  ];
+
+  function openStage(stageId){
+    if(!selAppId){alert("Select an App_ID first");return;}
+    const st=stages.find(s=>s.id===stageId);
+    if(selApp[st.doneKey]){if(!window.confirm("This stage is already marked. Re-mark / update?"))return;}
+    const prefill={};st.fields.forEach(f=>{if(selApp[f.k]!==undefined)prefill[f.k]=String(selApp[f.k]);});
+    setForm(prefill);setActiveStage(stageId);setShowConfirm(false);
+  }
+
+  function saveStage(){
+    const st=stages.find(s=>s.id===activeStage);const nowTs=new Date().toLocaleString("en-IN",{hour12:false}).slice(0,16);
+    const updates={[st.doneKey]:true,[st.atKey]:nowTs};
+    st.fields.forEach(f=>{updates[f.k]=f.type==="number"?Number(form[f.k]||0):(form[f.k]||"");});
+    // if SI marked, update stock-in, otherCharges, gsType on the app
+    if(activeStage==="si"){
+      updates.stockIn=true;
+      if(form.siOtherCharges)updates.otherCharges=Number(form.siOtherCharges);
+      if(form.siGsType)updates.gsType=form.siGsType;
+      if(form.siServiceCharge)updates.serviceCharge=Number(form.siServiceCharge);
+      if(form.siChallan)updates.challan=Number(form.siChallan);
+      if(form.siEstRefurb)updates.estRefurb=Number(form.siEstRefurb);
+    }
+    setApps(prev=>prev.map(a=>a.id===selAppId?{...a,...updates}:a));
+    // also update linked lead status
+    const leadStatus=activeStage==="inspection"?"Inspection Done":activeStage==="token"?"Token Done":"App_ID Created";
+    setLeads(prev=>prev.map(l=>l.appId===selAppId?{...l,status:activeStage==="si"?"App_ID Created":leadStatus}:l));
+    setActiveStage(null);setForm({});
+    alert("✓ Stage marked! Lead status and App_ID updated.");
+  }
+
+  const stageColor={inspection:{c:"#5B21B6",bg:"#F5F3FF"},token:{c:"#065F46",bg:"#ECFDF5"},si:{c:"#0F4C81",bg:"#EBF4FF"}};
+
+  return <div>
+    <Alrt type="info">Select any App_ID to mark/update stage milestones. SI marking updates stockIn flag, wallet, and GS type in real time.</Alrt>
+    <Card style={{marginBottom:14}}>
+      <ST>Select App_ID</ST>
+      <Sel value={selAppId} onChange={v=>{setSelAppId(v);setActiveStage(null);setForm({});}} options={myApps.map(a=>{const d=dealers.find(dd=>dd.id===a.dealerId);return{value:a.id,label:`${a.id} — ${a.vehicle} (${d?d.name:""})`};})} placeholder="Choose App_ID..."/>
+      {selApp&&<>
+        <div style={{background:T.accentL,borderRadius:9,padding:12,marginTop:10}}>
+          <div style={{fontSize:10,fontWeight:800,color:T.accent,marginBottom:6}}>APP_ID DETAILS</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+            {[["Vehicle",selApp.vehicle],["Reg. No.",selApp.regNo],["Dealer",selDealer&&selDealer.name],["Counter",selCounter&&selCounter.name],["UCM",selCounter&&selCounter.ucmName],["GS Type",selApp.gsType],["Quote",fmt(selApp.quote)],["Wallet",fmt(selApp.otherCharges-selApp.splitReleased)]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:T.accent,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800,wordBreak:"break-word"}}>{v||"—"}</div></div>)}
+          </div>
+        </div>
+        {lead&&<div style={{marginTop:8,fontSize:11,color:T.mid}}>Linked Lead: <strong>{lead.id}</strong> · Status: <Badge s={lead.status} sm/></div>}
+      </>}
+    </Card>
+
+    {selApp&&<>
+      <Lbl>Stage Timeline</Lbl>
+      <div style={{position:"relative",marginBottom:14}}>
+        <div style={{position:"absolute",left:18,top:0,bottom:0,width:2,background:T.border,zIndex:0}}/>
+        {stages.map((st,i)=>{const done=selApp[st.doneKey];const at=selApp[st.atKey];const sc=stageColor[st.id];return <div key={st.id} style={{display:"flex",gap:12,marginBottom:12,position:"relative",zIndex:1}}>
+          <div style={{width:36,height:36,borderRadius:"50%",background:done?sc.bg:"#F1F5F9",border:`2px solid ${done?sc.c:T.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>{done?st.icon:"○"}</div>
+          <div style={{flex:1}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3}}>
+              <div><span style={{fontSize:13,fontWeight:800,color:done?sc.c:T.mute}}>{st.label}</span>{done&&<span style={{marginLeft:6,fontSize:10,color:T.mute}}>· {at}</span>}</div>
+              <Btn sm v={done?"secondary":"primary"} onClick={()=>openStage(st.id)}>{done?"Update":"Mark Done"}</Btn>
+            </div>
+            {done&&st.id==="inspection"&&selApp.inspectionNotes&&<div style={{fontSize:11,color:T.mid,background:sc.bg,borderRadius:6,padding:"4px 8px"}}>{selApp.inspectionNotes}</div>}
+            {done&&st.id==="token"&&<div style={{fontSize:11,color:T.mid,background:sc.bg,borderRadius:6,padding:"4px 8px"}}>Token: {fmt(selApp.tokenAmount||0)}{selApp.tokenNotes?` · ${selApp.tokenNotes}`:""}</div>}
+            {done&&st.id==="si"&&<div style={{fontSize:11,color:T.mid,background:sc.bg,borderRadius:6,padding:"4px 8px"}}>Other Charges: {fmt(selApp.siOtherCharges||0)} · GS: {selApp.siGsType}{selApp.siNotes?` · ${selApp.siNotes}`:""}</div>}
+          </div>
+        </div>;})}
+      </div>
+
+      {activeStage&&<Card style={{border:`1.5px solid ${stageColor[activeStage].c}`,background:stageColor[activeStage].bg+"44"}}>
+        <ST>{stages.find(s=>s.id===activeStage).icon} {stages.find(s=>s.id===activeStage).label}</ST>
+        {activeStage==="si"&&<Alrt type="info">Marking SI Done will set stockIn=true on this App_ID, unlock the wallet, and update GS type. RA will see wallet as available immediately.</Alrt>}
+        {stages.find(s=>s.id===activeStage).fields.map(fld=>fld.type==="sel"?<Sel key={fld.k} label={fld.l} value={form[fld.k]||""} onChange={v=>f(fld.k,v)} options={fld.opts} placeholder="Select..."/>:<Fld key={fld.k} label={fld.l} value={form[fld.k]||""} onChange={v=>f(fld.k,v)} type={fld.type||"text"} placeholder={fld.ph}/>)}
+        <div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:8}}><Btn v="secondary" sm onClick={()=>{setActiveStage(null);setForm({});}}>Cancel</Btn><Btn v="success" icon="✓" onClick={saveStage}>Confirm & Save</Btn></div>
+      </Card>}
+    </>}
+  </div>;
+}
+
+// ═══════════════════════════════════════════════
+// COUNTER/UCM OVERRIDE MODULE (TM / Central Ops / BH)
+// ═══════════════════════════════════════════════
+function CounterUCMOverride({user,shared}){
+  const{apps,setApps,counters,dealers}=shared;
+  const[selAppId,setSelAppId]=useState("");const[newCounterId,setNewCounterId]=useState("");const[reason,setReason]=useState("");const[log,setLog]=useState([]);const[done,setDone]=useState(false);
+  const canAccess=["TM","Central Ops","Business Head"].includes(user.role);
+  if(!canAccess)return <div style={{textAlign:"center",padding:60,color:T.mute}}><div style={{fontSize:40,marginBottom:10}}>🔒</div><div style={{fontSize:14,fontWeight:700}}>TM, Central Ops & BH only.</div></div>;
+
+  const selApp=apps.find(a=>a.id===selAppId);const selDealer=selApp?dealers.find(d=>d.id===selApp.dealerId):null;
+  const currentCounter=selApp?counters.find(c=>c.id===selApp.counterId):null;
+  const newCounter=counters.find(c=>c.id===newCounterId);
+  // Show all active counters (can change to any counter, even cross-dealer, for testing)
+  const availableCounters=counters.filter(c=>c.status==="Active"&&c.id!==selApp?.counterId);
+
+  function applyOverride(){
+    if(!selAppId||!newCounterId||!reason){alert("Fill all fields");return;}
+    const entry={id:`OVR${Math.random().toString(36).slice(2,7).toUpperCase()}`,appId:selAppId,vehicle:selApp.vehicle,prevCounter:currentCounter?.name,prevUCM:currentCounter?.ucmName,newCounter:newCounter?.name,newUCM:newCounter?.ucmName,reason,by:user.role,at:new Date().toLocaleString("en-IN",{hour12:false}).slice(0,16)};
+    setApps(prev=>prev.map(a=>a.id===selAppId?{...a,counterId:newCounterId}:a));
+    setLog(p=>[entry,...p]);setDone(true);
+    setTimeout(()=>{setDone(false);setSelAppId("");setNewCounterId("");setReason("");},1200);
+  }
+
+  if(done)return <div style={{textAlign:"center",padding:60}}><div style={{fontSize:48,marginBottom:12}}>✅</div><div style={{fontSize:15,fontWeight:800}}>Counter & UCM Updated!</div><div style={{fontSize:12,color:T.mute,marginTop:4}}>All payout references now use the new counter/UCM</div></div>;
+
+  return <div>
+    <Alrt type="warning">This overrides the counter and UCM mapped to any App_ID. Use to simulate different counter/UCM scenarios since Admin Panel is not integrated.</Alrt>
+    <Card style={{marginBottom:14}}>
+      <ST>Override Counter & UCM for App_ID</ST>
+      <Sel label="Select App_ID" value={selAppId} onChange={v=>{setSelAppId(v);setNewCounterId("");}} options={apps.map(a=>{const d=dealers.find(dd=>dd.id===a.dealerId);return{value:a.id,label:`${a.id} — ${a.vehicle} (${d?d.name:""})`};})} placeholder="Choose App_ID..."/>
+      {selApp&&<>
+        <div style={{background:T.accentL,borderRadius:9,padding:12,marginBottom:10}}>
+          <div style={{fontSize:10,fontWeight:800,color:T.accent,marginBottom:6}}>CURRENT MAPPING</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+            {[["Dealer",selDealer?.name],["Counter",currentCounter?.name],["UCM Name",currentCounter?.ucmName],["UCM Mobile",currentCounter?.ucmMobile],["Counter City",currentCounter?.city]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:T.accent,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800}}>{v||"—"}</div></div>)}
+          </div>
+        </div>
+        <Sel label="New Counter (includes all active counters)" value={newCounterId} onChange={setNewCounterId} options={availableCounters.map(c=>{const d=dealers.find(dd=>dd.id===c.dealerId);return{value:c.id,label:`${c.name} — ${c.ucmName} (${d?d.name:""})`};})} placeholder="Select new counter..."/>
+        {newCounter&&<div style={{background:T.successL,border:"1px solid #BBF7D0",borderRadius:9,padding:12,marginBottom:10}}>
+          <div style={{fontSize:10,fontWeight:800,color:T.success,marginBottom:6}}>NEW MAPPING PREVIEW</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+            {[["Counter",newCounter.name],["UCM Name",newCounter.ucmName],["UCM Mobile",newCounter.ucmMobile],["City",newCounter.city]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:T.success,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800}}>{v||"—"}</div></div>)}
+          </div>
+          {newCounter.dealerId!==selApp.dealerId&&<Alrt type="warning">Note: This counter belongs to a different dealer. Marking for cross-dealer scenario testing.</Alrt>}
+        </div>}
+        <Fld label="Reason / Note *" value={reason} onChange={setReason} placeholder="e.g. Testing different UCM scenario / Admin mapped differently" required/>
+        <Btn full v="primary" icon="⚡" disabled={!newCounterId||!reason} onClick={applyOverride}>Apply Counter & UCM Override</Btn>
+      </>}
+    </Card>
+    {log.length>0&&<Card><Lbl>Override Log ({log.length})</Lbl>{log.map(e=><div key={e.id} style={{padding:"8px 0",borderBottom:`1px solid ${T.border}`}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}><span style={{fontSize:12,fontWeight:800,color:T.text}}>{e.appId} — {e.vehicle}</span><span style={{fontSize:10,color:T.mute}}>{e.at}</span></div><div style={{fontSize:11,color:T.mid}}>From: <strong>{e.prevCounter}</strong> / {e.prevUCM}</div><div style={{fontSize:11,color:T.success,fontWeight:700}}>→ To: {e.newCounter} / {e.newUCM}</div><div style={{fontSize:10,color:T.mute}}>Reason: {e.reason} · By: {e.by}</div></div>)}</Card>}
+  </div>;
+}
+
+// ═══════════════════════════════════════════════
 // ROLE META
 // ═══════════════════════════════════════════════
 const ROLE_COLOR={"RA":"#0F4C81","RM":"#5B21B6","TM":"#065F46","Central Ops":"#92400E","Business Head":"#C2410C","Finance":"#991B1B"};
@@ -642,13 +805,14 @@ function App(){
 
   const showToast=useCallback((msg,type="success")=>setToast({msg,type,k:Date.now()}),[]);
 
-  const TITLES={dashboard:"Dashboard",leads:"Leads",appids:"App_IDs",onboarding:isFieldRole(user.role)?"Dealer Onboarding":"Dealer Onboarding",counter:"Counter & UCM",sap:"SAP & Payees",payouts:"Payout Status",payout:"Raise Payout",approvals:"Approvals",transfer:"Data Transfer",config:"Config Keys"};
+  const TITLES={dashboard:"Dashboard",leads:"Leads",appids:"App_IDs",stages:"Stage Marking",override:"Counter & UCM Override",onboarding:"Dealer Onboarding",counter:"Counter & UCM",sap:"SAP & Payees",payouts:"Payout Status",payout:"Raise Payout",approvals:"Approvals",transfer:"Data Transfer",config:"Config Keys"};
 
   function renderPage(){
     if(isFieldRole(user.role)){
       if(page==="dashboard")return <RADashboard user={user} shared={shared}/>;
       if(page==="leads")     return <LeadsModule user={user} shared={shared}/>;
       if(page==="appids")    return <AppIDsModule user={user} shared={shared}/>;
+      if(page==="stages")    return <StageModule user={user} shared={shared}/>;
       if(page==="onboarding")return <OnboardingModuleRA user={user} shared={shared}/>;
       if(page==="counter")   return <CounterModuleRA user={user} shared={shared}/>;
       if(page==="sap")       return <SAPModuleRA user={user} shared={shared}/>;
@@ -656,6 +820,8 @@ function App(){
     } else {
       if(page==="dashboard") return <OpsDashboard user={user} shared={shared}/>;
       if(page==="payout")    return <RaisePayoutModule user={user} shared={shared}/>;
+      if(page==="stages")    return <StageModule user={user} shared={shared}/>;
+      if(page==="override")  return <CounterUCMOverride user={user} shared={shared}/>;
       if(page==="onboarding")return <OnboardingModuleOps user={user} shared={shared}/>;
       if(page==="counter")   return <CounterModuleOps user={user} shared={shared}/>;
       if(page==="sap")       return <SAPModuleOps user={user} shared={shared}/>;
