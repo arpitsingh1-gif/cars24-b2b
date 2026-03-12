@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Cars24 B2B — Ops Panel</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>*{margin:0;padding:0;box-sizing:border-box;}body{font-family:'Segoe UI',system-ui,sans-serif;background:#F0F4F8;}select option{color:#000;}::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:4px;}</style>
+</head>
+<body><div id="root"></div>
+<script type="text/babel">
+const{useState,useEffect,useCallback}=React;
+
+// ─── CONSTANTS ────────────────────────────────────────────────────────────────
+const REGIONS=["NDL","UPE","WGJ","NPB","NRJ","CHN","STS","AMD","SKL","STN","MUM","PUN","WMH","WMP","HYD","BLR","KOL","JAI","NHR","NCB"];
+const CITIES=["Delhi","Gurgaon","Faridabad","Noida","Ghaziabad","Greater Noida","Lucknow","Kanpur","Agra","Jaipur","Mumbai","Pune","Thane","Nashik","Ahmedabad","Surat","Vadodara","Chennai","Hyderabad","Bengaluru","Kolkata","Chandigarh","Amritsar","Ludhiana","Indore","Bhopal","Nagpur","Kochi","Coimbatore","Visakhapatnam","Rajkot","Meerut","Dehradun"];
+const OEM_BRANDS=["Mercedes-Benz","BMW","Audi","Volkswagen","Volvo","Toyota","Honda","Hyundai","Kia","Maruti Suzuki","Tata Motors","Mahindra","Renault","Nissan","Skoda","Jeep","MG Motors","Multi-Brand","Other"];
+const DEALER_TYPES=["NCD","UCD","DSA","Franchise","Independent"];
+const BANK_LIST=["HDFC Bank","ICICI Bank","SBI","Kotak Mahindra","Axis Bank","Bank of Maharashtra","Punjab National Bank","Canara Bank","Bank of Baroda","IndusInd Bank","Yes Bank","IDFC First Bank","Federal Bank","RBL Bank","Union Bank of India"];
+const CONFIGS_DEFAULT={SPLIT_SAME_APP_GATE:15000,SPLIT_CROSS_APP_GATE:15000,NONGS_RATE:2,NONGS_CAP:10000,NONGS_AUTO_GATE:10000,FINANCE_GATE:15000};
+
+// ─── SEED DATA ────────────────────────────────────────────────────────────────
+const USERS=[
+  {id:"RA001",name:"Ravinder Singh",role:"RA",rmId:"RM001",tmId:"TM001",region:"NDL"},
+  {id:"RA002",name:"Ashwani Kumar", role:"RA",rmId:"RM001",tmId:"TM001",region:"UPE"},
+  {id:"RA003",name:"Satish Patil",  role:"RA",rmId:"RM002",tmId:"TM001",region:"WGJ"},
+  {id:"RM001",name:"Deepak Verma",  role:"RM",rmId:null,tmId:"TM001",region:"NDL",raIds:["RA001","RA002"]},
+  {id:"RM002",name:"Sneha Kulkarni",role:"RM",rmId:null,tmId:"TM001",region:"WGJ",raIds:["RA003"]},
+  {id:"TM001",name:"Vikram Anand",  role:"TM",region:"ALL"},
+];
+const INIT_DEALERS=[
+  {id:"D001",name:"Landmark Cars Ltd",   code:"108229",type:"NCD",oem:"Mercedes-Benz",region:"NDL",city:"Delhi",   raId:"RA001",status:"Active",onboardedAt:"2026-01-10"},
+  {id:"D002",name:"Raj Power Solutions", code:"138256",type:"NCD",oem:"Multi-Brand",  region:"UPE",city:"Lucknow", raId:"RA002",status:"Active",onboardedAt:"2026-01-18"},
+  {id:"D003",name:"Autobahn Automotive", code:"102341",type:"UCD",oem:"Volkswagen",   region:"WGJ",city:"Ahmedabad",raId:"RA003",status:"Active",onboardedAt:"2026-02-02"},
+];
+const INIT_COUNTERS=[
+  {id:"C001",dealerId:"D001",name:"Landmark - Delhi Main",     city:"Delhi",    ucmName:"Rahul Sharma", ucmMobile:"9811001001",raId:"RA001",status:"Active"},
+  {id:"C002",dealerId:"D001",name:"Landmark - Gurgaon Branch", city:"Gurgaon",  ucmName:"Priya Nair",   ucmMobile:"9811002002",raId:"RA001",status:"Active"},
+  {id:"C003",dealerId:"D002",name:"Raj Power - Lucknow HQ",    city:"Lucknow",  ucmName:"Anil Tiwari",  ucmMobile:"9811003003",raId:"RA002",status:"Active"},
+  {id:"C004",dealerId:"D003",name:"Autobahn - Ahmedabad",      city:"Ahmedabad",ucmName:"Meena Patel",  ucmMobile:"9811004004",raId:"RA003",status:"Active"},
+];
+const INIT_APPS=[
+  {id:"APP001",dealerId:"D001",counterId:"C001",raId:"RA001",vehicle:"2022 Hyundai Creta SX 1.5D",  regNo:"DL3CAB1234",quote:925000,serviceCharge:11800,challan:2500, estRefurb:8000, gsType:"GS",    stockIn:true, otherCharges:20000,splitReleased:0,   incentiveReleased:0,status:"Active"},
+  {id:"APP002",dealerId:"D001",counterId:"C002",raId:"RA001",vehicle:"2020 Maruti Swift ZXI+",       regNo:"DL7CQ5678", quote:485000,serviceCharge:6800, challan:0,    estRefurb:12000,gsType:"Non-GS",stockIn:true, otherCharges:8500, splitReleased:8500,incentiveReleased:0,status:"Active"},
+  {id:"APP003",dealerId:"D002",counterId:"C003",raId:"RA002",vehicle:"2021 Tata Nexon XZ+ Dark",    regNo:"UP32AX9012",quote:720000,serviceCharge:9200, challan:1500, estRefurb:6000, gsType:"GS",    stockIn:true, otherCharges:18000,splitReleased:0,   incentiveReleased:0,status:"Active"},
+  {id:"APP004",dealerId:"D003",counterId:"C004",raId:"RA003",vehicle:"2019 Honda City ZX CVT",      regNo:"GJ1BN3456", quote:580000,serviceCharge:7500, challan:3200, estRefurb:15000,gsType:"Non-GS",stockIn:false,otherCharges:11000,splitReleased:0,   incentiveReleased:0,status:"Active"},
+  {id:"APP005",dealerId:"D002",counterId:"C003",raId:"RA002",vehicle:"2022 Kia Seltos HTX+ 1.5P",   regNo:"UP80CK7890",quote:840000,serviceCharge:10500,challan:1200, estRefurb:9000, gsType:"GS",    stockIn:true, otherCharges:15000,splitReleased:5000,incentiveReleased:0,status:"Active"},
+];
+const INIT_PAYEES=[
+  {id:"SAP001",dealerIds:["D001","D002"],raId:"RA001",payeeName:"Landmark Cars Ltd",pan:"AABCL1862B",bank:"Kotak Mahindra",account:"9211233436",ifsc:"KKBK0000810",mobile:"9876500001",sapCode:"SAP-KL-001",fluxStatus:"Validated",status:"Active",createdAt:"2026-01-14"},
+  {id:"SAP002",dealerIds:["D002"],raId:"RA002",payeeName:"Amol Yuvraj Patil",pan:"CCIPP5942C",bank:"Bank of Maharashtra",account:"60236471678",ifsc:"MAHB0001022",mobile:"9876500002",sapCode:"SAP-JZ-002",fluxStatus:"Validation_Failed",status:"Active",createdAt:"2026-01-22"},
+];
+const INIT_OB=[
+  {id:"OB001",raId:"RA001",dealerName:"Speedway Motors",type:"DSA",oem:"Toyota",oemType:"Franchise Dealer",region:"NDL",city:"Gurgaon",pan:"BGHPS4412C",gst:"29BGHPS4412C1ZT",mobile:"9876543210",email:"info@speedway.in",address:"Sector 18, Gurgaon",bank:"HDFC Bank",account:"50200012345678",ifsc:"HDFC0001234",docs:{gst:"GST-cert.pdf",pan:"PAN.pdf",bank:"stmt.pdf",cancelledCheque:"cheque.pdf",other:""},oemDocs:{franchiseAgreement:"agreement.pdf",oemLetter:"letter.pdf",other:""},status:"Admin Panel Pending",dealerCode:"",submittedAt:"2026-03-07 09:00"},
+];
+const INIT_PR=[
+  {id:"PR001",appId:"APP003",raId:"RA002",payeeId:"SAP001",type:"Split",amount:18000,status:"Submitted",createdAt:"2026-03-08 10:22",utr:null,reason:"GS split for stock-in deal",crossDealerFlag:false,bhEdited:false,originalAmount:18000,rejectionReason:null},
+  {id:"PR002",appId:"APP001",raId:"RA001",payeeId:"SAP001",type:"Split",amount:9000, status:"Auto-Approved",createdAt:"2026-03-09 14:10",utr:"UTR826341092",reason:"Below auto gate",crossDealerFlag:false,bhEdited:false,originalAmount:9000,rejectionReason:null},
+];
+const INIT_COUNTER_REQS=[
+  {id:"CR001",raId:"RA001",dealerId:"D001",counterName:"Landmark - Dwarka",city:"Delhi",ucmName:"Mohit Chauhan",ucmMobile:"9811005005",ucmEmail:"",status:"Ops Review",submittedAt:"2026-03-06 11:00",rejectionReason:null},
+];
+const INIT_SAP_REQS=[
+  {id:"SR001",raId:"RA003",dealerIds:["D003"],payeeName:"Autobahn Group India",pan:"AATCA1234Z",bank:"Axis Bank",account:"918020012345",ifsc:"UTIB0001234",mobile:"9900112233",docs:{pan:"pan.pdf",cancelledCheque:"cheque.pdf",other:""},status:"Ops Review",submittedAt:"2026-03-08 14:30",sapCode:""},
+];
+
+// ─── DESIGN ───────────────────────────────────────────────────────────────────
+const C={bg:"#F0F4F8",sidebar:"#0D1B2E",sidebarB:"#182B44",surface:"#FFFFFF",surfaceAlt:"#F7F9FC",border:"#E2E8F0",text:"#0D1B2A",mid:"#475569",mute:"#94A3B8",accent:"#0F4C81",accentL:"#EBF4FF",accentD:"#0A3560",success:"#065F46",successL:"#ECFDF5",warn:"#92400E",warnL:"#FFFBEB",danger:"#991B1B",dangerL:"#FEF2F2",purple:"#5B21B6",purpleL:"#F5F3FF",orange:"#C2410C",orangeL:"#FFF7ED"};
+const SM={"Active":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Pending":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"Admin Panel Pending":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"OEM Tagging Pending":{bg:"#FFF7ED",c:"#C2410C",dot:"#F97316"},"Ops Review":{bg:"#EBF4FF",c:"#0F4C81",dot:"#3B82F6"},"Rejected":{bg:"#FEF2F2",c:"#991B1B",dot:"#EF4444"},"Auto-Approved":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Ops Approved":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"BH Review":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"BH Approved":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Released":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Submitted":{bg:"#EBF4FF",c:"#0F4C81",dot:"#3B82F6"},"Validated":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Validation_Failed":{bg:"#FEF2F2",c:"#991B1B",dot:"#EF4444"}};
+
+const fmt=n=>"₹"+Number(n).toLocaleString("en-IN");
+const uid=()=>Math.random().toString(36).slice(2,7).toUpperCase();
+const now=()=>new Date().toLocaleString("en-IN",{hour12:false}).slice(0,16);
+const raWalBal=(raId,apps)=>apps.filter(a=>a.raId===raId&&a.stockIn).reduce((s,a)=>s+a.otherCharges-a.splitReleased,0);
+
+function autoApprove(req,app,cfg){
+  if(!app.stockIn)return{ok:false,route:"BLOCKED",reason:"Stock-In not complete"};
+  if(req.type==="Split"){
+    const avail=app.otherCharges-app.splitReleased;
+    if(req.amount>avail)return{ok:false,route:"BLOCKED",reason:`Insufficient bucket. Available: ${fmt(avail)}`};
+    if(req.amount<cfg.SPLIT_SAME_APP_GATE)return{ok:true,route:"AUTO-APPROVED",reason:`Below ${fmt(cfg.SPLIT_SAME_APP_GATE)} gate`};
+    return{ok:false,route:"Ops Review → Finance",reason:`≥ ${fmt(cfg.SPLIT_SAME_APP_GATE)} — manual required`};
+  }
+  if(req.type==="Incentive"){
+    if(app.splitReleased>0)return{ok:false,route:"Business Head",reason:"Prior split on this App_ID"};
+    if(app.gsType==="Non-GS"){
+      const base=app.quote-(app.serviceCharge+app.challan+app.estRefurb);
+      const calc=Math.min((cfg.NONGS_RATE/100)*base,cfg.NONGS_CAP);
+      if(req.amount>calc*1.01)return{ok:false,route:"Business Head",reason:`Exceeds calculated ${fmt(calc)}`};
+      if(req.amount<=cfg.NONGS_AUTO_GATE)return{ok:true,route:"AUTO-APPROVED",reason:"Within cap & gate"};
+      return{ok:false,route:"Business Head",reason:`Above auto-gate ${fmt(cfg.NONGS_AUTO_GATE)}`};
+    }
+    return{ok:false,route:"Business Head",reason:"GS incentive needs BH approval"};
+  }
+  return{ok:false,route:"Pending",reason:""};
+}
+
+// ─── BASE COMPONENTS ─────────────────────────────────────────────────────────
+function Badge({s,sm}){const m=SM[s]||{bg:"#F3F4F6",c:"#6B7280",dot:"#9CA3AF"};return <span style={{display:"inline-flex",alignItems:"center",gap:4,background:m.bg,color:m.c,padding:sm?"2px 7px":"3px 9px",borderRadius:20,fontSize:sm?9:11,fontWeight:800,whiteSpace:"nowrap"}}><span style={{width:5,height:5,borderRadius:"50%",background:m.dot,flexShrink:0}}/>{s}</span>;}
+function Card({children,style={},onClick}){return <div onClick={onClick} style={{background:C.surface,borderRadius:10,border:`1px solid ${C.border}`,padding:16,...style,cursor:onClick?"pointer":undefined}}>{children}</div>;}
+function Lbl({children,color}){return <div style={{fontSize:9,fontWeight:800,color:color||C.mute,letterSpacing:1.1,textTransform:"uppercase",marginBottom:10}}>{children}</div>;}
+function ST({children}){return <div style={{fontSize:12,fontWeight:800,color:C.accent,borderBottom:`2px solid ${C.accentL}`,paddingBottom:4,marginBottom:10,marginTop:8}}>{children}</div>;}
+function Row({label,value,accent,mono}){return <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 0",borderBottom:`1px solid ${C.border}`}}><span style={{fontSize:12,color:C.mid}}>{label}</span><span style={{fontSize:12,fontWeight:700,color:accent||C.text,fontFamily:mono?"monospace":"inherit"}}>{value}</span></div>;}
+function Alrt({type="info",children}){const m={info:{bg:C.accentL,b:"#BFDBFE",c:C.accentD,i:"ℹ"},success:{bg:C.successL,b:"#BBF7D0",c:C.success,i:"✓"},warning:{bg:C.warnL,b:"#FDE68A",c:C.warn,i:"⚠"},error:{bg:C.dangerL,b:"#FECACA",c:C.danger,i:"✕"}}[type];return <div style={{background:m.bg,border:`1px solid ${m.b}`,borderRadius:8,padding:"9px 12px",display:"flex",gap:9,marginBottom:10}}><span style={{color:m.c,fontWeight:900,fontSize:12,flexShrink:0}}>{m.i}</span><span style={{fontSize:12,color:m.c,lineHeight:1.5}}>{children}</span></div>;}
+function Btn({children,onClick,v="primary",disabled,sm,icon,full}){const V={primary:{bg:C.accent,c:"#fff",b:C.accent},secondary:{bg:"#fff",c:C.mid,b:C.border},success:{bg:C.success,c:"#fff",b:C.success},danger:{bg:C.danger,c:"#fff",b:C.danger},ghost:{bg:"transparent",c:C.mute,b:"transparent"},warning:{bg:C.warn,c:"#fff",b:C.warn}};const s=V[v]||V.primary;return <button onClick={onClick} disabled={disabled} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5,background:disabled?"#F1F5F9":s.bg,color:disabled?"#94A3B8":s.c,border:`1.5px solid ${disabled?C.border:s.b}`,borderRadius:8,padding:sm?"5px 12px":"8px 16px",fontSize:sm?11:12,fontWeight:700,cursor:disabled?"not-allowed":"pointer",fontFamily:"inherit",width:full?"100%":undefined}}>{icon&&<span>{icon}</span>}{children}</button>;}
+function Fld({label,value,onChange,type="text",disabled,hint,error,required,placeholder,maxLength}){return <div style={{marginBottom:10}}>{label&&<label style={{display:"block",fontSize:11,fontWeight:700,color:C.mid,marginBottom:3}}>{label}{required&&<span style={{color:C.danger}}> *</span>}</label>}<input value={value||""} onChange={e=>onChange&&onChange(e.target.value)} type={type} disabled={disabled} placeholder={placeholder} maxLength={maxLength} style={{width:"100%",padding:"8px 10px",border:`1.5px solid ${error?"#F87171":C.border}`,borderRadius:7,fontSize:12,background:disabled?"#F8FAFC":"#fff",color:disabled?C.mute:C.text,outline:"none",fontFamily:"inherit"}}/>{hint&&<p style={{fontSize:10,color:C.mute,marginTop:2}}>{hint}</p>}{error&&<p style={{fontSize:10,color:C.danger,marginTop:2}}>{error}</p>}</div>;}
+function Sel({label,value,onChange,options,disabled,placeholder,required}){return <div style={{marginBottom:10}}>{label&&<label style={{display:"block",fontSize:11,fontWeight:700,color:C.mid,marginBottom:3}}>{label}{required&&<span style={{color:C.danger}}> *</span>}</label>}<select value={value||""} onChange={e=>onChange&&onChange(e.target.value)} disabled={disabled} style={{width:"100%",padding:"8px 10px",border:`1.5px solid ${C.border}`,borderRadius:7,fontSize:12,background:disabled?"#F8FAFC":"#fff",color:value?C.text:C.mute,outline:"none",fontFamily:"inherit",cursor:disabled?"not-allowed":"pointer"}}>{placeholder&&<option value="">{placeholder}</option>}{options.map(o=><option key={o.value||o} value={o.value||o}>{o.label||o}</option>)}</select></div>;}
+function G2({children,gap=10}){return <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap}}>{children}</div>;}
+function StepBar({steps,cur}){return <div style={{display:"flex",alignItems:"center",marginBottom:16}}>{steps.map((s,i)=><div key={i} style={{display:"flex",alignItems:"center",flex:i<steps.length-1?1:undefined}}><div style={{display:"flex",alignItems:"center",gap:6,flexShrink:0}}><div style={{width:22,height:22,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:900,background:i<cur?C.success:i===cur?C.accent:"#E2E8F0",color:i<=cur?"#fff":C.mute}}>{i<cur?"✓":i+1}</div><span style={{fontSize:10,fontWeight:700,color:i===cur?C.accent:i<cur?C.success:C.mute,whiteSpace:"nowrap"}}>{s}</span></div>{i<steps.length-1&&<div style={{flex:1,height:1,background:i<cur?C.success:C.border,margin:"0 8px"}}/>}</div>)}</div>;}
+function FileInput({label,value,onChange,required,hint}){return <div style={{marginBottom:10}}>{label&&<label style={{display:"block",fontSize:11,fontWeight:700,color:C.mid,marginBottom:3}}>{label}{required&&<span style={{color:C.danger}}> *</span>}</label>}{hint&&<p style={{fontSize:10,color:C.mute,marginBottom:3}}>{hint}</p>}<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{flex:1,border:`1.5px dashed ${value?"#10B981":C.border}`,borderRadius:7,padding:"7px 10px",background:value?C.successL:"#FAFAFA",cursor:"pointer"}} onClick={()=>{const n=prompt(`Enter filename for "${label}" (simulated upload):`);if(n)onChange(n);}}>{value?<span style={{fontSize:11,color:C.success,fontWeight:700}}>📄 {value}</span>:<span style={{fontSize:11,color:C.mute}}>Click to upload (simulated)</span>}</div>{value&&<button onClick={()=>onChange("")} style={{background:"none",border:"none",color:C.danger,cursor:"pointer",fontSize:16,fontWeight:700}}>×</button>}</div></div>;}
+function MultiDealerSel({dealers,selected,onChange}){return <div style={{marginBottom:10}}><label style={{display:"block",fontSize:11,fontWeight:700,color:C.mid,marginBottom:4}}>Linked Dealers <span style={{color:C.danger}}>*</span></label><div style={{border:`1.5px solid ${C.border}`,borderRadius:7,padding:8,background:"#fff",minHeight:44}}><div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:selected.length>0?6:0}}>{selected.map(id=>{const d=dealers.find(dd=>dd.id===id);return <span key={id} style={{display:"inline-flex",alignItems:"center",gap:4,background:C.accentL,color:C.accent,borderRadius:12,padding:"2px 8px",fontSize:11,fontWeight:700}}>{d?d.name:"?"}<button onClick={()=>onChange(selected.filter(x=>x!==id))} style={{background:"none",border:"none",color:C.accent,cursor:"pointer",fontSize:12,fontWeight:900}}>×</button></span>;})}</div><select value="" onChange={e=>{if(e.target.value&&!selected.includes(e.target.value))onChange([...selected,e.target.value]);}} style={{width:"100%",border:"none",outline:"none",fontSize:11,color:C.mute,background:"transparent",cursor:"pointer",fontFamily:"inherit"}}><option value="">+ Add dealer...</option>{dealers.filter(d=>d.status==="Active"&&!selected.includes(d.id)).map(d=><option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}</select></div><p style={{fontSize:10,color:C.mute,marginTop:2}}>Payee available for payout across all selected dealers</p></div>;}
+function Toast({msg,type,onDone}){useEffect(()=>{const t=setTimeout(onDone,2800);return()=>clearTimeout(t);},[]);const bg=type==="error"?C.danger:type==="warning"?C.warn:C.success;return <div style={{position:"fixed",top:16,right:16,background:bg,color:"#fff",padding:"10px 18px",borderRadius:9,fontSize:13,fontWeight:700,zIndex:9999,boxShadow:"0 6px 24px rgba(0,0,0,0.2)",maxWidth:340}}>{msg}</div>;}
+
+// ─── STAT BOX ─────────────────────────────────────────────────────────────────
+function StatBox({icon,label,value,sub,color,bg}){return <div style={{background:bg||C.accentL,borderRadius:10,padding:12,border:`1px solid ${color}22`}}><div style={{fontSize:20,marginBottom:3}}>{icon}</div><div style={{fontSize:20,fontWeight:900,color:C.text}}>{value}</div><div style={{fontSize:9,fontWeight:800,color:color,letterSpacing:0.7,textTransform:"uppercase",marginTop:1}}>{label}</div>{sub&&<div style={{fontSize:10,color:C.mute,marginTop:1}}>{sub}</div>}</div>;}
+
+// ─── DASHBOARD (role-aware) ───────────────────────────────────────────────────
+function Dashboard({role,apps,dealers,counters,onboarding,requests,counterReqs,sapReqs,configs}){
+  const allRAs=USERS.filter(u=>u.role==="RA");
+  const totalWallet=allRAs.reduce((s,ra)=>s+raWalBal(ra.id,apps),0);
+  const pendingApprovals=requests.filter(r=>!["Released","Auto-Approved","Rejected"].includes(r.status)).length;
+  const obPending=onboarding.filter(o=>o.status!=="Active"&&o.status!=="Rejected").length;
+  const counterPending=counterReqs.filter(r=>r.status==="Ops Review").length;
+  const sapPending=sapReqs.filter(r=>r.status==="Ops Review").length;
+
+  if(role==="Business Head"){
+    // BH sees full team overview
+    const bhApprovalPending=requests.filter(r=>["BH Review","Ops Approved"].includes(r.status)).length;
+    const totalApps=apps.length;const stockInPending=apps.filter(a=>!a.stockIn).length;
+    const releasedMTD=requests.filter(r=>r.status==="Released"||r.status==="Auto-Approved").reduce((s,r)=>s+r.amount,0);
+    const pendingPayout=requests.filter(r=>!["Released","Auto-Approved","Rejected"].includes(r.status)).reduce((s,r)=>s+r.amount,0);
+    return <div>
+      <div style={{background:`linear-gradient(135deg,${C.accentD},${C.accent})`,borderRadius:12,padding:16,color:"#fff",marginBottom:16}}>
+        <div style={{fontSize:10,fontWeight:800,letterSpacing:1,opacity:0.7,marginBottom:4}}>TEAM WALLET — ALL RAs</div>
+        <div style={{fontSize:32,fontWeight:900}}>{fmt(totalWallet)}</div>
+        <div style={{fontSize:12,opacity:0.75,marginTop:2}}>Total available across all RA portfolios</div>
+      </div>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:10,marginBottom:16}}>
+        <StatBox icon="⏳" label="BH Approvals" value={bhApprovalPending} color={bhApprovalPending>0?C.warn:C.success} bg={bhApprovalPending>0?C.warnL:C.successL}/>
+        <StatBox icon="💸" label="Released MTD" value={fmt(releasedMTD)} color={C.success} bg={C.successL}/>
+        <StatBox icon="🔄" label="Payout Pipeline" value={fmt(pendingPayout)} color={C.warn} bg={C.warnL}/>
+        <StatBox icon="🚗" label="Total App_IDs" value={totalApps} sub={`${stockInPending} stock-in pending`} color={C.accent} bg={C.accentL}/>
+        <StatBox icon="🏢" label="Active Dealers" value={dealers.filter(d=>d.status==="Active").length} color={C.success} bg={C.successL}/>
+        <StatBox icon="📋" label="Onboarding" value={obPending} sub="in pipeline" color={C.purple} bg={C.purpleL}/>
+      </div>
+      <Card style={{marginBottom:14}}>
+        <Lbl>Team Wallet by RA</Lbl>
+        <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+          <thead><tr>{["RA","Region","App_IDs","Wallet","Released","Stock-In Pend"].map(h=><th key={h} style={{padding:"6px 8px",textAlign:"left",fontSize:9,fontWeight:800,color:C.mute,borderBottom:`1.5px solid ${C.border}`}}>{h}</th>)}</tr></thead>
+          <tbody>{allRAs.map((ra,i)=>{const rApps=apps.filter(a=>a.raId===ra.id);const bal=raWalBal(ra.id,apps);const released=rApps.reduce((s,a)=>s+a.splitReleased,0);return <tr key={ra.id} style={{background:i%2===0?"#fff":C.surfaceAlt}}><td style={{padding:"7px 8px",fontWeight:700}}>{ra.name}</td><td style={{padding:"7px 8px",color:C.mid}}>{ra.region}</td><td style={{padding:"7px 8px"}}>{rApps.length}</td><td style={{padding:"7px 8px",fontWeight:800,color:bal>0?C.accent:C.danger}}>{fmt(bal)}</td><td style={{padding:"7px 8px",color:C.mute}}>{fmt(released)}</td><td style={{padding:"7px 8px",color:rApps.filter(a=>!a.stockIn).length>0?C.orange:C.mute}}>{rApps.filter(a=>!a.stockIn).length}</td></tr>;})}
+          </tbody>
+        </table>
+      </Card>
+      <Card style={{marginBottom:14}}>
+        <Lbl>Payout Activity</Lbl>
+        {requests.slice(-5).reverse().map(r=>{const a=apps.find(aa=>aa.id===r.appId);return <div key={r.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 0",borderBottom:`1px solid ${C.border}`}}><div><div style={{fontSize:12,fontWeight:700}}>{r.id} — {fmt(r.amount)}</div><div style={{fontSize:10,color:C.mute}}>{a&&a.vehicle} · {r.type} · {r.createdAt}</div></div><Badge s={r.status} sm/></div>;})}
+      </Card>
+      <Card>
+        <Lbl>Config Gates (read-only here)</Lbl>
+        {[["Split Same App Gate",fmt(configs.SPLIT_SAME_APP_GATE)],["Finance Gate",fmt(configs.FINANCE_GATE)],["Non-GS Rate",configs.NONGS_RATE+"%"],["Non-GS Cap",fmt(configs.NONGS_CAP)]].map(([l,v])=><Row key={l} label={l} value={v}/>)}
+      </Card>
+    </div>;
+  }
+
+  // Ops / Finance dashboard
+  return <div>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+      <StatBox icon="💰" label="Team Wallet" value={fmt(totalWallet)} color={C.accent} bg={C.accentL}/>
+      <StatBox icon="⏳" label="Pending Approvals" value={pendingApprovals} color={pendingApprovals>0?C.warn:C.success} bg={pendingApprovals>0?C.warnL:C.successL}/>
+      <StatBox icon="🏢" label="Onboarding Pending" value={obPending} color={C.purple} bg={C.purpleL}/>
+      <StatBox icon="🔗" label="Counter Requests" value={counterPending} color={C.orange} bg={C.orangeL}/>
+      <StatBox icon="🏦" label="SAP Pending" value={sapPending} color={C.accent} bg={C.accentL}/>
+      <StatBox icon="🚗" label="Active App_IDs" value={apps.filter(a=>a.status==="Active").length} color={C.success} bg={C.successL}/>
+    </div>
+    <Card style={{marginBottom:14}}>
+      <Lbl>RA Performance Snapshot</Lbl>
+      <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+        <thead><tr>{["Name","Role","Region","App_IDs","Wallet","Pend PR"].map(h=><th key={h} style={{padding:"6px 8px",textAlign:"left",fontSize:9,fontWeight:800,color:C.mute,borderBottom:`1.5px solid ${C.border}`}}>{h}</th>)}</tr></thead>
+        <tbody>{USERS.filter(u=>["RA","RM"].includes(u.role)).map((u,i)=>{const uApps=apps.filter(a=>a.raId===u.id);const bal=raWalBal(u.id,apps);const uPR=requests.filter(r=>r.raId===u.id&&!["Released","Auto-Approved","Rejected"].includes(r.status));return <tr key={u.id} style={{background:i%2===0?"#fff":C.surfaceAlt}}><td style={{padding:"7px 8px",fontWeight:700}}>{u.name}</td><td style={{padding:"7px 8px"}}><span style={{background:u.role==="RM"?C.purpleL:C.accentL,color:u.role==="RM"?C.purple:C.accent,padding:"1px 6px",borderRadius:8,fontSize:9,fontWeight:800}}>{u.role}</span></td><td style={{padding:"7px 8px",color:C.mid}}>{u.region}</td><td style={{padding:"7px 8px"}}>{uApps.length}</td><td style={{padding:"7px 8px",fontWeight:700,color:bal>0?C.accent:C.danger}}>{fmt(bal)}</td><td style={{padding:"7px 8px",color:uPR.length>0?C.warn:C.mute}}>{uPR.length}</td></tr>;})}
+        </tbody>
+      </table>
+    </Card>
+    <Card>
+      <Lbl>Onboarding Pipeline</Lbl>
+      {onboarding.map(ob=>{const ra=USERS.find(u=>u.id===ob.raId);return <div key={ob.id} style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:`1px solid ${C.border}`}}><div><div style={{fontSize:12,fontWeight:700}}>{ob.dealerName}</div><div style={{fontSize:10,color:C.mute}}>RA: {ra&&ra.name} · {ob.type} · {ob.region}</div></div><Badge s={ob.status} sm/></div>;})}
+    </Card>
+  </div>;
+}
+
+// ─── RAISE PAYOUT (TM) ───────────────────────────────────────────────────────
+function RaisePayout({role,apps,setApps,dealers,counters,payees,requests,setRequests,configs,toast}){
+  const [step,setStep]=useState(0);const [appId,setAppId]=useState("");const [payeeId,setPayeeId]=useState("");const [type,setType]=useState("");const [amount,setAmount]=useState("");const [reason,setReason]=useState("");const [ackCross,setAckCross]=useState(false);const [result,setResult]=useState(null);const [done,setDone]=useState(false);
+
+  if(role!=="TM / City Head")return <div style={{textAlign:"center",padding:60,color:C.mute}}><div style={{fontSize:40,marginBottom:12}}>🔒</div><div style={{fontSize:14,fontWeight:700,color:C.text}}>Only TM / City Head can raise payments.</div></div>;
+
+  const selApp=apps.find(a=>a.id===appId);
+  const selDealer=selApp?dealers.find(d=>d.id===selApp.dealerId):null;
+  const selCounter=selApp?counters.find(ct=>ct.id===selApp.counterId):null;
+  const selRA=selApp?USERS.find(u=>u.id===selApp.raId):null;
+  const walBal=selApp?raWalBal(selApp.raId,apps):0;
+  const avail=selApp?selApp.otherCharges-selApp.splitReleased:0;
+
+  // Payees linked to the dealer of the selected app
+  const dealerPayees=selApp?payees.filter(p=>p.status==="Active"&&p.dealerIds&&p.dealerIds.includes(selApp.dealerId)):[];
+  const selPayee=payees.find(p=>p.id===payeeId);
+  const isCross=selPayee&&selApp&&!selPayee.dealerIds.includes(selApp.dealerId);
+
+  const base=selApp?selApp.quote-(selApp.serviceCharge+selApp.challan+selApp.estRefurb):0;
+  const calcInc=selApp?Math.min((configs.NONGS_RATE/100)*base,configs.NONGS_CAP):0;
+
+  useEffect(()=>{if(type==="Incentive"&&selApp&&selApp.gsType==="Non-GS")setAmount(String(Math.round(calcInc)));else if(type!=="Incentive")setAmount("");},[type,appId]);
+
+  const amtErr=type==="Split"&&Number(amount)>avail?`Exceeds bucket (${fmt(avail)} available)`:"";
+  const walErr=type==="Split"&&walBal<=0?"RA wallet is zero — split blocked":"";
+
+  function preview(){if(!appId||!type||!amount||!reason||!payeeId){alert("Fill all required fields");return;}if(!selApp.stockIn){alert("Stock-In not complete");return;}if(walBal<=0&&type==="Split"){alert("Wallet empty");return;}setResult(autoApprove({type,amount:Number(amount)},selApp,configs));setStep(1);}
+
+  function submit(){const amt=Number(amount);const newReq={id:`PR${uid()}`,appId,payeeId,raId:selApp.raId,type,amount:amt,status:result.ok?"Auto-Approved":result.route.includes("Finance")||result.route.includes("Ops")?"Submitted":"BH Review",createdBy:"TM",createdAt:now(),reason,rejectionReason:null,bhEdited:false,originalAmount:amt,utr:result.ok?`UTR${Math.floor(Math.random()*9e8+1e8)}`:null,crossDealerFlag:isCross||false};if(result.ok&&type==="Split")setApps(prev=>prev.map(a=>a.id===appId?{...a,splitReleased:a.splitReleased+amt}:a));setRequests(p=>[...p,newReq]);toast(result.ok?"✓ Auto-approved & released!":`Submitted for ${result.route}`,result.ok?"success":isCross?"warning":"info");setDone(true);setTimeout(()=>{setDone(false);setStep(0);setAppId("");setPayeeId("");setType("");setAmount("");setReason("");setAckCross(false);setResult(null);},1800);}
+
+  if(done)return <div style={{textAlign:"center",padding:60}}><div style={{fontSize:50,marginBottom:14}}>{result&&result.ok?"✅":"📋"}</div><div style={{fontSize:16,fontWeight:800}}>{result&&result.ok?"Auto-Released!":"Submitted for Approval"}</div></div>;
+
+  return <div style={{maxWidth:640}}>
+    <StepBar steps={["Configure","Review & Submit"]} cur={step}/>
+    {step===0&&<>
+      <Card style={{marginBottom:12}}>
+        <ST>Select App_ID</ST>
+        <Sel value={appId} onChange={v=>{setAppId(v);setPayeeId("");setType("");}} options={apps.map(a=>({value:a.id,label:`${a.id} — ${a.vehicle}`}))} placeholder="Choose App_ID..." required/>
+        {selApp&&<>
+          {/* Auto-filled dealer, counter, UCM, RA */}
+          <div style={{background:C.accentL,borderRadius:9,padding:12,marginBottom:10}}>
+            <div style={{fontSize:10,fontWeight:800,color:C.accent,marginBottom:8}}>AUTO-FILLED FROM CARS24 ADMIN PANEL</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+              {[["Dealer",selDealer&&selDealer.name],["Dealer Code",selDealer&&selDealer.code],["Counter",selCounter&&selCounter.name],["Counter City",selCounter&&selCounter.city],["UCM Name",selCounter&&selCounter.ucmName],["UCM Mobile",selCounter&&selCounter.ucmMobile],["RA",selRA&&selRA.name],["Region",selDealer&&selDealer.region]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:C.accent,fontWeight:700,marginBottom:1}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800,color:C.text}}>{v||"—"}</div></div>)}
+            </div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginTop:6}}>
+              {[["C24 Quote",fmt(selApp.quote)],["GS Type",selApp.gsType],["Stock-In",selApp.stockIn?"✓ Complete":"✗ Pending"]].map(([l,v])=><div key={l} style={{background:l==="Stock-In"?(selApp.stockIn?"rgba(5,150,105,0.12)":"rgba(220,38,38,0.12)"):("rgba(255,255,255,0.7)"),borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,fontWeight:700,color:C.mute,marginBottom:1}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800}}>{v}</div></div>)}
+            </div>
+          </div>
+          {!selApp.stockIn&&<Alrt type="error">Stock-In not complete — payouts blocked for this App_ID.</Alrt>}
+          <ST>Payout Type</ST>
+          <Sel value={type} onChange={setType} options={[{value:"Split",label:"Split Payment (from Other Charges bucket)"},{value:"Incentive",label:"Incentive"}]} placeholder="Select type..." required/>
+          {type==="Split"&&<>
+            <div style={{background:walBal>0?C.accentL:C.dangerL,border:`1px solid ${walBal>0?"#BFDBFE":"#FECACA"}`,borderRadius:8,padding:12,marginBottom:10}}>
+              <div style={{fontSize:10,fontWeight:800,color:walBal>0?C.accentD:C.danger,marginBottom:2}}>RA WALLET (VALID FOR SPLIT ONLY)</div>
+              <div style={{fontSize:24,fontWeight:900,color:walBal>0?C.accent:C.danger}}>{fmt(walBal)}</div>
+              <div style={{fontSize:11,color:C.mute,marginTop:2}}>This App_ID bucket available: {fmt(avail)}</div>
+            </div>
+          </>}
+          {type&&<>
+            <ST>Payee (linked to this dealer)</ST>
+            {dealerPayees.length===0?<Alrt type="warning">No active payees linked to this dealer. Ask RA/RM to submit a SAP request.</Alrt>:
+              <Sel value={payeeId} onChange={setPayeeId} options={dealerPayees.map(p=>({value:p.id,label:`${p.payeeName} — ${p.bank} · ${p.fluxStatus}`}))} placeholder="Select payee..." required/>}
+            {isCross&&<Alrt type="warning">Note: This payee is cross-dealer. Deducted from this App_ID's bucket, flagged for BH.<div style={{marginTop:6}}><label style={{display:"flex",alignItems:"center",gap:6,cursor:"pointer",fontSize:11}}><input type="checkbox" checked={ackCross} onChange={e=>setAckCross(e.target.checked)}/>I acknowledge cross-dealer payment</label></div></Alrt>}
+            {type==="Incentive"&&selApp.gsType==="Non-GS"&&<div style={{background:C.successL,border:`1px solid #BBF7D0`,borderRadius:8,padding:12,marginBottom:10}}><Lbl color={C.success}>Non-GS Auto-Calculation</Lbl>{[["Base Amount",fmt(base)],[`${configs.NONGS_RATE}% of Base`,fmt((configs.NONGS_RATE/100)*base)],["Cap",fmt(configs.NONGS_CAP)],["Pre-filled Amount",fmt(calcInc)]].map(([l,v])=><Row key={l} label={l} value={v}/>)}</div>}
+            <Fld label="Amount (₹)" value={amount} onChange={setAmount} type="number" required hint={type==="Split"?`Bucket: ${fmt(avail)} · Wallet: ${fmt(walBal)}`:""} error={amtErr||walErr}/>
+            <Fld label="Reason / Remarks" value={reason} onChange={setReason} required placeholder="Purpose of this payment"/>
+          </>}
+        </>}
+      </Card>
+      <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}><Btn v="secondary" onClick={()=>{setAppId("");setPayeeId("");setType("");setAmount("");setReason("");setAckCross(false);}}>Reset</Btn><Btn onClick={preview} disabled={!appId||!type||!amount||!reason||!payeeId||!!amtErr||!!walErr||(isCross&&!ackCross)}>Check Rules →</Btn></div>
+    </>}
+    {step===1&&result&&<>
+      <Card style={{marginBottom:12,border:`1.5px solid ${result.ok?"#BBF7D0":result.route==="BLOCKED"?"#FECACA":"#FDE68A"}`}}>
+        <div style={{display:"flex",alignItems:"center",gap:14,marginBottom:12}}><div style={{fontSize:40}}>{result.ok?"✅":result.route==="BLOCKED"?"🚫":"🔀"}</div><div><div style={{fontSize:15,fontWeight:900,color:result.ok?C.success:result.route==="BLOCKED"?C.danger:C.warn}}>{result.route}</div><div style={{fontSize:12,color:C.mid,marginTop:3}}>{result.reason}</div></div></div>
+        {result.ok&&<Alrt type="success">Auto-released instantly. App_ID bucket deducted, RA wallet updated.</Alrt>}
+        {result.route==="BLOCKED"&&<Alrt type="error">Cannot proceed. Go back and fix.</Alrt>}
+      </Card>
+      <Card style={{background:C.surfaceAlt,marginBottom:12}}><Lbl>Summary</Lbl>
+        {[["App_ID",appId],["Dealer",selDealer&&selDealer.name],["Counter",selCounter&&selCounter.name],["UCM",selCounter&&selCounter.ucmName],["RA",selRA&&selRA.name],["Type",type],["Amount",fmt(amount)],["Payee",selPayee&&selPayee.payeeName],["RA Wallet After",fmt(walBal-Number(amount))],["Reason",reason]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}
+      </Card>
+      <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}><Btn v="secondary" onClick={()=>setStep(0)}>← Edit</Btn><Btn v={result.route==="BLOCKED"?"secondary":result.ok?"success":"primary"} disabled={result.route==="BLOCKED"} onClick={submit}>{result.ok?"✓ Confirm & Release":"Submit for Approval"}</Btn></div>
+    </>}
+  </div>;
+}
+
+// ─── ONBOARDING (Central Ops / TM) ───────────────────────────────────────────
+function OnboardingModule({role,onboarding,setOnboarding,dealers,setDealers,counters,toast}){
+  const [sel,setSel]=useState(null);const [rejectReason,setRejectReason]=useState("");const [showRej,setShowRej]=useState(false);
+  // TM form
+  const [view,setView]=useState("list");const [step,setStep]=useState(0);const [form,setForm]=useState({});const [docs,setDocs]=useState({gst:"",pan:"",bank:"",cancelledCheque:"",other:""});const [oemDocs,setOemDocs]=useState({franchiseAgreement:"",oemLetter:"",other:""});
+  const f=(k,v)=>setForm(p=>({...p,[k]:v}));
+  const queue=onboarding.filter(o=>["Admin Panel Pending","OEM Tagging Pending","Ops Review"].includes(o.status));
+  const ob=sel?onboarding.find(o=>o.id===sel):null;const ra=ob?USERS.find(u=>u.id===ob.raId):null;
+
+  function simCode(id){const code=String(100000+Math.floor(Math.random()*99999));setOnboarding(p=>p.map(o=>o.id===id?{...o,dealerCode:code,status:"OEM Tagging Pending"}:o));toast(`Dealer code ${code} received`,"success");}
+  function completeOEM(id){setOnboarding(p=>p.map(o=>o.id===id?{...o,status:"Ops Review"}:o));toast("OEM tagging done","success");setSel(null);}
+  function activate(id){const o=onboarding.find(ob=>ob.id===id);setOnboarding(p=>p.map(ob=>ob.id===id?{...ob,status:"Active"}:ob));setDealers(p=>[...p,{id:`D${uid()}`,name:o.dealerName,code:o.dealerCode,type:o.type,oem:o.oem,region:o.region,city:o.city||"",raId:o.raId,status:"Active",onboardedAt:new Date().toISOString().slice(0,10)}]);toast(`${o.dealerName} activated!`,"success");setSel(null);}
+  function reject(id){if(!rejectReason){alert("Reason required");return;}setOnboarding(p=>p.map(o=>o.id===id?{...o,status:"Rejected",rejectionReason:rejectReason}:o));toast("Rejected","error");setSel(null);setRejectReason("");setShowRej(false);}
+
+  function submitTMForm(){const item={id:`OB${uid()}`,raId:"TM001",submittedBy:"TM",...form,docs,oemDocs,status:"Admin Panel Pending",dealerCode:"",submittedAt:now()};setOnboarding(p=>[...p,item]);setView("list");setStep(0);setForm({});setDocs({gst:"",pan:"",bank:"",cancelledCheque:"",other:""});setOemDocs({franchiseAgreement:"",oemLetter:"",other:""});toast("Submitted — auto-email sent","success");}
+
+  const allDealers=role==="TM / City Head"?dealers:dealers;
+
+  if(role==="TM / City Head"&&view==="form")return <div>
+    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}><Btn v="ghost" onClick={()=>{setView("list");setStep(0);setForm({});}} sm>← Back</Btn><span style={{fontSize:14,fontWeight:800}}>New Dealer Onboarding (TM)</span></div>
+    <StepBar steps={["Dealer Info","Bank & Docs","OEM Details","Review"]} cur={step}/>
+    {step===0&&<Card><ST>Dealer Information</ST>
+      <Fld label="Dealer / Company Name" value={form.dealerName} onChange={v=>f("dealerName",v)} required/><G2><Sel label="Region" value={form.region} onChange={v=>f("region",v)} options={REGIONS} placeholder="Select region..." required/><Sel label="City" value={form.city} onChange={v=>f("city",v)} options={CITIES} placeholder="Select city..." required/></G2><G2><Fld label="Mobile" value={form.mobile} onChange={v=>f("mobile",v)} required/><Fld label="Email" value={form.email} onChange={v=>f("email",v)}/></G2><Fld label="Full Address" value={form.address} onChange={v=>f("address",v)} required/>
+      <div style={{display:"flex",justifyContent:"flex-end",marginTop:4}}><Btn disabled={!form.dealerName||!form.region||!form.city||!form.mobile||!form.address} onClick={()=>setStep(1)}>Next →</Btn></div>
+    </Card>}
+    {step===1&&<Card><ST>Bank & Tax</ST>
+      <G2><Fld label="PAN" value={form.pan} onChange={v=>f("pan",v.toUpperCase())} required maxLength={10}/><Fld label="GST" value={form.gst} onChange={v=>f("gst",v.toUpperCase())}/></G2>
+      <Sel label="Bank" value={form.bank} onChange={v=>f("bank",v)} options={BANK_LIST} placeholder="Select bank..." required/><G2><Fld label="Account No." value={form.account} onChange={v=>f("account",v)} required/><Fld label="IFSC" value={form.ifsc} onChange={v=>f("ifsc",v.toUpperCase())} required/></G2>
+      <ST>Mandatory Documents</ST>
+      <FileInput label="GST Certificate" value={docs.gst} onChange={v=>setDocs(p=>({...p,gst:v}))} required hint="GST registration certificate"/>
+      <FileInput label="PAN Card" value={docs.pan} onChange={v=>setDocs(p=>({...p,pan:v}))} required hint="Company/proprietor PAN"/>
+      <FileInput label="Bank Statement (3 months)" value={docs.bank} onChange={v=>setDocs(p=>({...p,bank:v}))} required hint="Latest 3-month statement"/>
+      <FileInput label="Cancelled Cheque" value={docs.cancelledCheque} onChange={v=>setDocs(p=>({...p,cancelledCheque:v}))} required hint="Account name must match dealer"/>
+      <ST>Other (Optional)</ST><FileInput label="Other Document" value={docs.other} onChange={v=>setDocs(p=>({...p,other:v}))}/>
+      <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(0)}>← Back</Btn><Btn disabled={!form.pan||!form.bank||!form.account||!form.ifsc||!docs.gst||!docs.pan||!docs.bank||!docs.cancelledCheque} onClick={()=>setStep(2)}>Next →</Btn></div>
+    </Card>}
+    {step===2&&<Card><ST>OEM & Dealer Type</ST>
+      <G2><Sel label="Dealer Type" value={form.type} onChange={v=>f("type",v)} options={DEALER_TYPES} placeholder="Select..." required/><Sel label="OEM Brand" value={form.oem} onChange={v=>f("oem",v)} options={OEM_BRANDS} placeholder="Select OEM..." required/></G2>
+      <Sel label="Dealer Categorisation" value={form.oemType} onChange={v=>f("oemType",v)} options={["Franchise Dealer","Authorised Service Centre","Multi-Brand Dealer","Independent Dealer"]} placeholder="Select..." required/>
+      <ST>OEM Documents (Mandatory)</ST>
+      <FileInput label="Franchise Agreement / Appointment Letter" value={oemDocs.franchiseAgreement} onChange={v=>setOemDocs(p=>({...p,franchiseAgreement:v}))} required/>
+      <FileInput label="OEM Authorization Letter" value={oemDocs.oemLetter} onChange={v=>setOemDocs(p=>({...p,oemLetter:v}))} required/>
+      <ST>Other OEM (Optional)</ST><FileInput label="Other OEM Document" value={oemDocs.other} onChange={v=>setOemDocs(p=>({...p,other:v}))}/>
+      <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(1)}>← Back</Btn><Btn disabled={!form.type||!form.oem||!form.oemType||!oemDocs.franchiseAgreement||!oemDocs.oemLetter} onClick={()=>setStep(3)}>Review →</Btn></div>
+    </Card>}
+    {step===3&&<Card><ST>Review & Submit</ST>
+      {[["Dealer",form.dealerName],["Region",form.region],["City",form.city],["Type",form.type],["OEM",form.oem],["Categorisation",form.oemType],["PAN",form.pan],["Bank",form.bank],["GST Doc",docs.gst],["PAN Doc",docs.pan],["Franchise Agr.",oemDocs.franchiseAgreement],["OEM Letter",oemDocs.oemLetter]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}
+      <Alrt type="warning">Submitting auto-emails Admin Panel team.</Alrt>
+      <div style={{display:"flex",justifyContent:"space-between",marginTop:10}}><Btn v="secondary" onClick={()=>setStep(2)}>← Edit</Btn><Btn v="success" icon="✓" onClick={submitTMForm}>Submit</Btn></div>
+    </Card>}
+  </div>;
+
+  return <div style={{display:"grid",gridTemplateColumns:sel?"1fr 1.4fr":"1fr",gap:16,alignItems:"start"}}>
+    <div>
+      {role==="TM / City Head"&&<div style={{marginBottom:12}}><Btn icon="+" onClick={()=>setView("form")}>Request New Dealer Onboarding</Btn></div>}
+      <Lbl>Pending Queue ({queue.length})</Lbl>
+      {queue.length===0&&<div style={{textAlign:"center",padding:32,color:C.mute,fontSize:13}}><div style={{fontSize:28,marginBottom:8}}>✓</div>All clear</div>}
+      {queue.map(o=>{const rUser=USERS.find(u=>u.id===o.raId);return <Card key={o.id} onClick={()=>{setSel(sel===o.id?null:o.id);setShowRej(false);setRejectReason("");}} style={{marginBottom:8,border:`1.5px solid ${sel===o.id?C.accent:C.border}`,background:sel===o.id?C.accentL:"#fff"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:13,fontWeight:800}}>{o.dealerName}</span><Badge s={o.status} sm/></div><div style={{fontSize:11,color:C.mute}}>{o.type} · {o.oem} · {o.region} · By: {rUser&&rUser.name} ({o.submittedBy})</div>{o.dealerCode&&<div style={{fontSize:11,fontWeight:800,color:C.success,marginTop:2}}>Code: {o.dealerCode}</div>}</Card>;})}
+      <div style={{marginTop:14}}><Lbl>All Onboarding ({onboarding.length})</Lbl>{onboarding.map(o=>{const rUser=USERS.find(u=>u.id===o.raId);return <div key={o.id} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:`1px solid ${C.border}`}}><div><div style={{fontSize:12,fontWeight:700}}>{o.dealerName}</div><div style={{fontSize:10,color:C.mute}}>{o.submittedAt} · {rUser&&rUser.name}</div></div><Badge s={o.status} sm/></div>;})}</div>
+    </div>
+    {ob&&<Card>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:12}}><div><div style={{fontSize:14,fontWeight:800}}>{ob.dealerName}</div><div style={{fontSize:11,color:C.mute}}>By: {ra&&ra.name} ({ob.submittedBy}) · {ob.submittedAt}</div></div><Badge s={ob.status}/></div>
+      {[["Region",ob.region],["City",ob.city],["Type",ob.type],["OEM",ob.oem],["Categorisation",ob.oemType],["Mobile",ob.mobile],["Email",ob.email],["PAN",ob.pan],["GST",ob.gst],["Bank",ob.bank],["Account",ob.account],["IFSC",ob.ifsc]].map(([l,v])=>v?<Row key={l} label={l} value={v}/>:null)}
+      <div style={{marginTop:8}}><div style={{fontSize:10,fontWeight:800,color:C.mute,marginBottom:4}}>DOCUMENTS</div>
+        {ob.docs&&Object.entries(ob.docs).filter(([,v])=>v).map(([k,v])=><div key={k} style={{fontSize:11,color:C.mid,padding:"2px 0"}}>📄 {v}</div>)}
+        {ob.oemDocs&&Object.entries(ob.oemDocs).filter(([,v])=>v).map(([k,v])=><div key={k} style={{fontSize:11,color:C.mid,padding:"2px 0"}}>📄 {v}</div>)}
+      </div>
+      {role==="Central Ops"&&<div style={{marginTop:12}}>
+        {ob.status==="Admin Panel Pending"&&<><Alrt type="info">Auto-email sent. Waiting for dealer code from Admin Panel.</Alrt><Btn v="secondary" sm onClick={()=>simCode(ob.id)}>🔄 Simulate Code Received</Btn></>}
+        {ob.status==="OEM Tagging Pending"&&<><Alrt type="warning">Code: <strong>{ob.dealerCode}</strong>. Hard-gated — OEM tagging only after code confirmation.</Alrt><div style={{display:"flex",gap:8,marginTop:8}}>{!showRej&&<Btn v="danger" sm onClick={()=>setShowRej(true)}>Reject</Btn>}<Btn v="success" onClick={()=>completeOEM(ob.id)} icon="✓">Complete OEM Tagging</Btn></div></>}
+        {ob.status==="Ops Review"&&<><Alrt type="info">OEM tagging complete. Review and activate.</Alrt><div style={{display:"flex",gap:8,marginTop:8}}>{!showRej&&<Btn v="danger" sm onClick={()=>setShowRej(true)}>Reject</Btn>}<Btn v="success" onClick={()=>activate(ob.id)} icon="✓">Activate Dealer</Btn></div></>}
+        {showRej&&<div style={{marginTop:10,padding:12,background:C.dangerL,borderRadius:8,border:"1px solid #FECACA"}}><Fld label="Rejection Reason *" value={rejectReason} onChange={setRejectReason}/><div style={{display:"flex",gap:8}}><Btn v="danger" sm onClick={()=>reject(ob.id)}>Confirm</Btn><Btn v="ghost" sm onClick={()=>{setShowRej(false);setRejectReason("");}}>Cancel</Btn></div></div>}
+      </div>}
+    </Card>}
+  </div>;
+}
+
+// ─── COUNTER & UCM (Central Ops / TM) ────────────────────────────────────────
+function CounterModule({role,dealers,counters,setCounters,counterReqs,setCounterReqs,toast}){
+  const [sel,setSel]=useState(null);const [rejectReason,setRejectReason]=useState("");const [showRej,setShowRej]=useState(false);
+  const [showForm,setShowForm]=useState(false);const [form,setForm]=useState({});const f=(k,v)=>setForm(p=>({...p,[k]:v}));
+  const queue=counterReqs.filter(r=>r.status==="Ops Review");
+  const req=sel?counterReqs.find(r=>r.id===sel):null;const reqDealer=req?dealers.find(d=>d.id===req.dealerId):null;
+
+  function approve(id){const r=counterReqs.find(r=>r.id===id);setCounterReqs(p=>p.map(rr=>rr.id===id?{...rr,status:"Active"}:rr));setCounters(p=>[...p,{id:`C${uid()}`,dealerId:r.dealerId,name:r.counterName,city:r.city,ucmName:r.ucmName,ucmMobile:r.ucmMobile,raId:r.raId,status:"Active"}]);toast("Counter created!","success");setSel(null);}
+  function reject(id){if(!rejectReason){alert("Reason required");return;}setCounterReqs(p=>p.map(r=>r.id===id?{...r,status:"Rejected",rejectionReason:rejectReason}:r));toast("Rejected","error");setSel(null);setRejectReason("");setShowRej(false);}
+  function submitForm(){if(!form.dealerId||!form.counterName||!form.city||!form.ucmName||!form.ucmMobile){alert("Fill required fields");return;}setCounterReqs(p=>[...p,{id:`CR${uid()}`,raId:"TM001",dealerId:form.dealerId,counterName:form.counterName,city:form.city,ucmName:form.ucmName,ucmMobile:form.ucmMobile,ucmEmail:form.ucmEmail||"",status:"Ops Review",submittedAt:now(),rejectionReason:null}]);setShowForm(false);setForm({});toast("Counter request submitted","success");}
+
+  return <div style={{display:"grid",gridTemplateColumns:sel?"1fr 1.3fr":"1fr",gap:16,alignItems:"start"}}>
+    <div>
+      {role==="TM / City Head"&&<div style={{marginBottom:12}}><Btn icon="+" onClick={()=>setShowForm(!showForm)}>Request Counter & UCM Mapping</Btn></div>}
+      {showForm&&role==="TM / City Head"&&<Card style={{marginBottom:12,border:`1.5px solid ${C.accent}`}}><ST>Counter & UCM Form (TM)</ST>
+        <Sel label="Dealer" value={form.dealerId} onChange={v=>f("dealerId",v)} options={dealers.filter(d=>d.status==="Active").map(d=>({value:d.id,label:`${d.name} (${d.code})`}))} placeholder="Select dealer..." required/>
+        <Fld label="Counter Name" value={form.counterName} onChange={v=>f("counterName",v)} required placeholder="e.g. Landmark - Delhi Main"/>
+        <Sel label="City" value={form.city} onChange={v=>f("city",v)} options={CITIES} placeholder="Select city..." required/>
+        <G2><Fld label="UCM Name" value={form.ucmName} onChange={v=>f("ucmName",v)} required/><Fld label="UCM Mobile" value={form.ucmMobile} onChange={v=>f("ucmMobile",v)} required/></G2>
+        <Fld label="UCM Email" value={form.ucmEmail} onChange={v=>f("ucmEmail",v)}/>
+        <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}><Btn v="secondary" sm onClick={()=>{setShowForm(false);setForm({});}}>Cancel</Btn><Btn sm icon="✓" onClick={submitForm}>Submit</Btn></div>
+      </Card>}
+      <Lbl>Queue ({queue.length})</Lbl>
+      {queue.length===0&&<div style={{textAlign:"center",padding:32,color:C.mute,fontSize:13}}><div style={{fontSize:28,marginBottom:8}}>✓</div>All clear</div>}
+      {queue.map(r=>{const d=dealers.find(d=>d.id===r.dealerId);const rUser=USERS.find(u=>u.id===r.raId);return <Card key={r.id} onClick={()=>{setSel(sel===r.id?null:r.id);setShowRej(false);setRejectReason("");}} style={{marginBottom:8,border:`1.5px solid ${sel===r.id?C.accent:C.border}`,background:sel===r.id?C.accentL:"#fff"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,fontWeight:800}}>{r.counterName}</span><Badge s={r.status} sm/></div><div style={{fontSize:11,color:C.mute}}>{d&&d.name} · {r.city} · UCM: {r.ucmName}</div><div style={{fontSize:10,color:C.mute}}>By: {rUser&&rUser.name} · {r.submittedAt}</div></Card>;})}
+      <div style={{marginTop:14}}><Lbl>All Counters ({counters.length})</Lbl>
+        {counters.map(c=>{const d=dealers.find(d=>d.id===c.dealerId);return <div key={c.id} style={{padding:"7px 0",borderBottom:`1px solid ${C.border}`}}><div style={{display:"flex",justifyContent:"space-between"}}><div style={{fontSize:12,fontWeight:700}}>{c.name}</div><Badge s={c.status} sm/></div><div style={{fontSize:11,color:C.mute}}>{d&&d.name} · {c.city} · UCM: {c.ucmName} · {c.ucmMobile}</div></div>;})}
+      </div>
+    </div>
+    {req&&<Card>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:12}}><div style={{fontSize:14,fontWeight:800}}>{req.counterName}</div><Badge s={req.status}/></div>
+      {[["Dealer",reqDealer&&reqDealer.name],["City",req.city],["UCM Name",req.ucmName],["UCM Mobile",req.ucmMobile],["UCM Email",req.ucmEmail||"—"],["Submitted",req.submittedAt]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}
+      {role==="Central Ops"&&req.status==="Ops Review"&&<div style={{marginTop:12}}>
+        {!showRej&&<div style={{display:"flex",gap:8}}><Btn v="danger" sm onClick={()=>setShowRej(true)}>Reject</Btn><Btn v="success" onClick={()=>approve(req.id)} icon="✓">Approve & Create Counter</Btn></div>}
+        {showRej&&<div style={{padding:12,background:C.dangerL,borderRadius:8,border:"1px solid #FECACA",marginTop:8}}><Fld label="Rejection Reason *" value={rejectReason} onChange={setRejectReason}/><div style={{display:"flex",gap:8}}><Btn v="danger" sm onClick={()=>reject(req.id)}>Confirm</Btn><Btn v="ghost" sm onClick={()=>setShowRej(false)}>Cancel</Btn></div></div>}
+      </div>}
+    </Card>}
+  </div>;
+}
+
+// ─── SAP / PAYEES ─────────────────────────────────────────────────────────────
+function SAPModule({role,dealers,sapReqs,setSapReqs,payees,setPayees,toast}){
+  const [sel,setSel]=useState(null);const [rejectReason,setRejectReason]=useState("");const [showRej,setShowRej]=useState(false);
+  const [showForm,setShowForm]=useState(false);const [form,setForm]=useState({});const [selDealers,setSelDealers]=useState([]);const [docs,setDocs]=useState({pan:"",cancelledCheque:"",other:""});const f=(k,v)=>setForm(p=>({...p,[k]:v}));
+
+  function approve(id){const r=sapReqs.find(sr=>sr.id===id);const sapCode=`SAP-${uid()}`;setSapReqs(p=>p.map(sr=>sr.id===id?{...sr,status:"Active",sapCode}:sr));setPayees(p=>[...p,{id:`P${uid()}`,dealerIds:r.dealerIds,raId:r.raId,payeeName:r.payeeName,pan:r.pan,bank:r.bank,account:r.account,ifsc:r.ifsc,mobile:r.mobile||"",sapCode,fluxStatus:"Validated",status:"Active",createdAt:new Date().toISOString().slice(0,10)}]);toast(`SAP created: ${sapCode}`,"success");setSel(null);}
+  function reject(id){if(!rejectReason){alert("Reason required");return;}setSapReqs(p=>p.map(r=>r.id===id?{...r,status:"Rejected",rejectionReason:rejectReason}:r));toast("Rejected","error");setSel(null);setRejectReason("");setShowRej(false);}
+  function submitTMForm(){if(!form.payeeName||!form.pan||!form.bank||!form.account||!form.ifsc||selDealers.length===0){alert("Fill all required fields and select at least one dealer");return;}if(!docs.pan||!docs.cancelledCheque){alert("PAN card and Cancelled Cheque are mandatory");return;}setSapReqs(p=>[...p,{id:`SR${uid()}`,raId:"TM001",dealerIds:selDealers,payeeName:form.payeeName,pan:form.pan,bank:form.bank,account:form.account,ifsc:form.ifsc,mobile:form.mobile||"",docs,status:"Ops Review",submittedAt:now(),sapCode:""}]);setShowForm(false);setForm({});setSelDealers([]);setDocs({pan:"",cancelledCheque:"",other:""});toast("SAP request submitted","success");}
+
+  const req=sel?sapReqs.find(r=>r.id===sel):null;
+  const reqDealers=req?req.dealerIds.map(id=>dealers.find(d=>d.id===id)).filter(Boolean):[];
+  const reqRA=req?USERS.find(u=>u.id===req.raId):null;
+  const queue=sapReqs.filter(r=>r.status==="Ops Review");
+
+  return <div>
+    {role==="TM / City Head"&&<div style={{marginBottom:12}}><Btn icon="+" onClick={()=>setShowForm(!showForm)}>Request New Payee / SAP</Btn></div>}
+    {showForm&&role==="TM / City Head"&&<Card style={{marginBottom:12,border:`1.5px solid ${C.accent}`}}><ST>SAP Form (TM)</ST>
+      <Alrt type="info">Payee can be linked to multiple dealers. Ops will review and trigger SAP creation.</Alrt>
+      <MultiDealerSel dealers={dealers.filter(d=>d.status==="Active")} selected={selDealers} onChange={setSelDealers}/>
+      <Fld label="Payee Name (Account Holder)" value={form.payeeName} onChange={v=>f("payeeName",v)} required/>
+      <G2><Fld label="PAN" value={form.pan} onChange={v=>f("pan",v.toUpperCase())} required maxLength={10}/><Fld label="Mobile" value={form.mobile} onChange={v=>f("mobile",v)}/></G2>
+      <Sel label="Bank" value={form.bank} onChange={v=>f("bank",v)} options={BANK_LIST} placeholder="Select bank..." required/>
+      <G2><Fld label="Account No." value={form.account} onChange={v=>f("account",v)} required/><Fld label="IFSC" value={form.ifsc} onChange={v=>f("ifsc",v.toUpperCase())} required/></G2>
+      <ST>Mandatory Documents</ST>
+      <FileInput label="PAN Card" value={docs.pan} onChange={v=>setDocs(p=>({...p,pan:v}))} required hint="Payee PAN card copy"/>
+      <FileInput label="Cancelled Cheque" value={docs.cancelledCheque} onChange={v=>setDocs(p=>({...p,cancelledCheque:v}))} required hint="Account name must match payee"/>
+      <ST>Other (Optional)</ST><FileInput label="Other Document" value={docs.other} onChange={v=>setDocs(p=>({...p,other:v}))}/>
+      <div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:4}}><Btn v="secondary" sm onClick={()=>{setShowForm(false);setForm({});setSelDealers([]);}}>Cancel</Btn><Btn sm icon="✓" onClick={submitTMForm}>Submit</Btn></div>
+    </Card>}
+
+    <div style={{display:"grid",gridTemplateColumns:sel?"1fr 1.3fr":"1fr",gap:16,alignItems:"start"}}>
+      <div>
+        <Lbl>SAP Requests ({sapReqs.length})</Lbl>
+        {sapReqs.length===0&&<Alrt type="info">No SAP requests yet.</Alrt>}
+        {sapReqs.map(r=>{const ds=r.dealerIds.map(id=>dealers.find(d=>d.id===id)).filter(Boolean);const rUser=USERS.find(u=>u.id===r.raId);return <Card key={r.id} onClick={()=>{setSel(sel===r.id?null:r.id);setShowRej(false);setRejectReason("");}} style={{marginBottom:8,border:`1.5px solid ${sel===r.id?C.accent:C.border}`,background:sel===r.id?C.accentL:"#fff"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:13,fontWeight:800}}>{r.payeeName}</span><Badge s={r.status} sm/></div><div style={{fontSize:11,color:C.mute,marginBottom:2}}>{r.bank} · {r.pan}</div><div style={{fontSize:10,color:C.accent,fontWeight:700}}>Linked: {ds.map(d=>d.name).join(", ")}</div><div style={{fontSize:10,color:C.mute}}>By: {rUser&&rUser.name}</div>{r.sapCode&&<div style={{fontSize:11,fontWeight:800,color:C.success,fontFamily:"monospace",marginTop:2}}>{r.sapCode}</div>}</Card>;})}
+        <div style={{marginTop:14}}><Lbl>Active Payees ({payees.length})</Lbl>
+          {payees.map((p,i)=>{const ds=p.dealerIds.map(id=>dealers.find(d=>d.id===id)).filter(Boolean);return <div key={p.id} style={{background:i%2===0?"#fff":C.surfaceAlt,padding:"8px 10px",borderRadius:8,marginBottom:4,border:`1px solid ${C.border}`}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}><span style={{fontSize:12,fontWeight:800}}>{p.payeeName}</span><Badge s={p.fluxStatus} sm/></div><div style={{fontSize:11,color:C.mute}}>{p.bank} · {p.pan}</div><div style={{fontSize:10,color:C.accent,fontWeight:700}}>Dealers: {ds.map(d=>d.name).join(", ")}</div>{p.sapCode&&<div style={{fontSize:10,fontFamily:"monospace",color:C.success,fontWeight:700}}>{p.sapCode}</div>}</div>;})}</div>
+      </div>
+      {req&&<Card>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:12}}><div style={{fontSize:14,fontWeight:800}}>{req.payeeName}</div><Badge s={req.status}/></div>
+        <Lbl>Linked Dealers</Lbl>{reqDealers.map(d=><div key={d.id} style={{fontSize:12,color:C.mid,padding:"2px 0"}}>🏢 {d.name} ({d.code})</div>)}
+        <div style={{marginTop:8}}><Row label="By" value={reqRA&&reqRA.name}/><Row label="PAN" value={req.pan} mono/><Row label="Bank" value={req.bank}/><Row label="Account" value={req.account} mono/><Row label="IFSC" value={req.ifsc} mono/>{req.mobile&&<Row label="Mobile" value={req.mobile}/>}</div>
+        {req.docs&&<div style={{marginTop:8}}>{Object.entries(req.docs).filter(([,v])=>v).map(([k,v])=><div key={k} style={{fontSize:11,color:C.mid,padding:"2px 0"}}>📄 {v}</div>)}</div>}
+        {role==="Central Ops"&&req.status==="Ops Review"&&<div style={{marginTop:12}}>
+          <Alrt type="info">Approving triggers SAP integration and assigns a SAP code.</Alrt>
+          {!showRej&&<div style={{display:"flex",gap:8}}><Btn v="danger" sm onClick={()=>setShowRej(true)}>Reject</Btn><Btn v="success" onClick={()=>approve(req.id)} icon="✓">Approve & Create SAP</Btn></div>}
+          {showRej&&<div style={{padding:12,background:C.dangerL,borderRadius:8,border:"1px solid #FECACA",marginTop:8}}><Fld label="Rejection Reason *" value={rejectReason} onChange={setRejectReason}/><div style={{display:"flex",gap:8}}><Btn v="danger" sm onClick={()=>reject(req.id)}>Confirm</Btn><Btn v="ghost" sm onClick={()=>setShowRej(false)}>Cancel</Btn></div></div>}
+        </div>}
+      </Card>}
+    </div>
+  </div>;
+}
+
+// ─── APPROVALS ────────────────────────────────────────────────────────────────
+function Approvals({role,requests,setRequests,apps,setApps,dealers,payees,configs,toast}){
+  const [sel,setSel]=useState(null);const [bhAmt,setBhAmt]=useState("");const [rejectReason,setRejectReason]=useState("");const [showRej,setShowRej]=useState(false);
+  const queue=requests.filter(r=>{if(role==="Central Ops")return r.status==="Submitted";if(role==="Business Head")return["BH Review","Ops Approved"].includes(r.status)||(r.crossDealerFlag&&r.status==="Submitted");if(role==="Finance")return r.status==="BH Approved"&&r.amount>=configs.FINANCE_GATE;return false;});
+  const req=sel?requests.find(r=>r.id===sel):null;const app=req?apps.find(a=>a.id===req.appId):null;const dealer=app?dealers.find(d=>d.id===app.dealerId):null;const ra=app?USERS.find(u=>u.id===app.raId):null;const payee=req?payees.find(p=>p.id===req.payeeId):null;const finalAmt=bhAmt?Number(bhAmt):req&&req.amount;
+
+  if(role==="TM / City Head")return <div style={{textAlign:"center",padding:60,color:C.mute}}><div style={{fontSize:40,marginBottom:10}}>🔒</div><div style={{fontSize:14,fontWeight:700}}>TM does not have approval access.</div></div>;
+
+  function approve(){let newStatus;const amt=bhAmt?Number(bhAmt):req.amount;if(role==="Central Ops")newStatus="Ops Approved";else if(role==="Business Head"){newStatus=amt>=configs.FINANCE_GATE?"BH Approved":"Released";if(newStatus==="Released")setApps(prev=>prev.map(a=>a.id===req.appId?{...a,splitReleased:req.type==="Split"?a.splitReleased+amt:a.splitReleased,incentiveReleased:req.type==="Incentive"?a.incentiveReleased+amt:a.incentiveReleased}:a));}else if(role==="Finance"){newStatus="Released";setApps(prev=>prev.map(a=>a.id===req.appId?{...a,splitReleased:req.type==="Split"?a.splitReleased+req.amount:a.splitReleased}:a));}
+    const edited=role==="Business Head"&&bhAmt&&Number(bhAmt)!==req.amount;
+    setRequests(prev=>prev.map(r=>r.id===sel?{...r,status:newStatus,bhEdited:edited||r.bhEdited,amount:role==="Business Head"&&bhAmt?Number(bhAmt):r.amount,originalAmount:r.originalAmount||r.amount,utr:newStatus==="Released"?`UTR${Math.floor(Math.random()*9e8+1e8)}`:r.utr}:r));
+    toast(`${sel} → ${newStatus}`,"success");setSel(null);setBhAmt("");setShowRej(false);setRejectReason("");}
+
+  function reject(){if(!rejectReason){alert("Reason required");return;}setRequests(prev=>prev.map(r=>r.id===sel?{...r,status:"Rejected",rejectionReason:rejectReason}:r));toast("Rejected","error");setSel(null);setRejectReason("");setShowRej(false);}
+
+  return <div style={{display:"grid",gridTemplateColumns:sel?"260px 1fr":"1fr",gap:16,alignItems:"start"}}>
+    <div>
+      <Lbl>Queue ({queue.length})</Lbl>
+      {queue.length===0&&<div style={{textAlign:"center",padding:32,color:C.mute,fontSize:13}}><div style={{fontSize:28,marginBottom:8}}>✓</div>No pending items</div>}
+      {queue.map(r=>{const rApp=apps.find(a=>a.id===r.appId);return <Card key={r.id} onClick={()=>{setSel(sel===r.id?null:r.id);setBhAmt("");setShowRej(false);setRejectReason("");}} style={{marginBottom:8,border:`1.5px solid ${sel===r.id?C.accent:r.crossDealerFlag?"#FDE68A":C.border}`,background:sel===r.id?C.accentL:"#fff"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,fontWeight:800}}>{r.id}</span><Badge s={r.status} sm/></div>{r.crossDealerFlag&&<div style={{fontSize:9,fontWeight:800,color:C.warn,marginBottom:2}}>⚠ CROSS-DEALER</div>}<div style={{fontSize:11,color:C.mute}}>{r.appId} · {r.type}</div><div style={{fontSize:16,fontWeight:900,color:C.accent}}>{fmt(r.amount)}</div></Card>;})}
+      <div style={{marginTop:14}}><Lbl>All Requests</Lbl>{requests.map(r=>{const rApp=apps.find(a=>a.id===r.appId);return <div key={r.id} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:`1px solid ${C.border}`}}><div><div style={{fontSize:12,fontWeight:700}}>{r.id} — {fmt(r.amount)}</div><div style={{fontSize:10,color:C.mute}}>{r.type} · {rApp&&rApp.vehicle}</div></div><Badge s={r.status} sm/></div>;})}
+      </div>
+    </div>
+    {req&&app&&<div>
+      <Card style={{marginBottom:12}}>
+        <div style={{display:"flex",justifyContent:"space-between",marginBottom:12}}><div><div style={{fontSize:14,fontWeight:800}}>{req.id}</div><div style={{fontSize:11,color:C.mute}}>{req.createdAt}</div></div><Badge s={req.status}/></div>
+        {req.crossDealerFlag&&<Alrt type="warning">Cross-dealer payment — verify before approving.</Alrt>}
+        <Row label="App_ID" value={req.appId}/><Row label="Vehicle" value={app.vehicle}/><Row label="Dealer" value={dealer&&dealer.name}/><Row label="RA" value={ra&&ra.name}/><Row label="RA Wallet" value={fmt(raWalBal(app.raId,apps))}/><Row label="Payee" value={payee&&payee.payeeName||"—"}/><Row label="Type" value={req.type}/><Row label="Amount" value={<span style={{fontWeight:900,color:C.accent,fontSize:14}}>{fmt(req.amount)}</span>}/>{req.bhEdited&&<Row label="Original Amount" value={<span style={{textDecoration:"line-through",color:C.mute}}>{fmt(req.originalAmount)}</span>}/>}<Row label="Reason" value={req.reason}/>{req.utr&&<Row label="UTR" value={req.utr} mono/>}
+      </Card>
+      {role==="Business Head"&&!showRej&&<Card style={{marginBottom:12}}><ST>BH Override (Audit Logged)</ST><Fld label="Override Amount (leave blank = approve as-is)" value={bhAmt} onChange={setBhAmt} type="number" hint={`Original: ${fmt(req.amount)}`}/>{bhAmt&&Number(bhAmt)!==req.amount&&<Alrt type="warning">Changing {fmt(req.amount)} → {fmt(bhAmt)}. Permanently flagged.</Alrt>}{finalAmt>=configs.FINANCE_GATE&&<Alrt type="info">≥ {fmt(configs.FINANCE_GATE)} — will route to Finance.</Alrt>}</Card>}
+      {showRej&&<Card style={{marginBottom:12,border:"1.5px solid #FECACA"}}><Fld label="Rejection Reason *" value={rejectReason} onChange={setRejectReason}/><div style={{display:"flex",gap:8}}><Btn v="danger" onClick={reject}>Confirm Reject</Btn><Btn v="ghost" onClick={()=>setShowRej(false)}>Cancel</Btn></div></Card>}
+      {!showRej&&<div style={{display:"flex",gap:8,justifyContent:"flex-end"}}><Btn v="secondary" onClick={()=>setShowRej(true)}>Reject</Btn><Btn v="success" icon="✓" onClick={approve}>{role==="Finance"?"Final Approve & Release":"Approve →"}</Btn></div>}
+    </div>}
+  </div>;
+}
+
+// ─── DATA TRANSFER ────────────────────────────────────────────────────────────
+function DataTransfer({role,dealers,setDealers,counters,setCounters,apps,setApps,payees,setPayees,auditLog,setAuditLog,toast}){
+  const [fromId,setFromId]=useState("");const [toId,setToId]=useState("");const [reason,setReason]=useState("");const [scope,setScope]=useState("all");const [confirmed,setConfirmed]=useState(false);
+  // Single entity re-mapping
+  const [mapMode,setMapMode]=useState("bulk");const [entityType,setEntityType]=useState("");const [entityId,setEntityId]=useState("");const [newVal,setNewVal]=useState("");
+  const canAccess=["Central Ops","Business Head"].includes(role);
+  if(!canAccess)return <div style={{textAlign:"center",padding:60,color:C.mute}}><div style={{fontSize:40,marginBottom:10}}>🔒</div><div style={{fontSize:14,fontWeight:700}}>Data Transfer: Central Ops & Business Head only.</div></div>;
+
+  const ras=USERS.filter(u=>["RA","RM"].includes(u.role));
+  const fromUser=USERS.find(u=>u.id===fromId);const toUser=USERS.find(u=>u.id===toId);
+
+  function executeBulk(){
+    if(!fromId||!toId||!reason||!confirmed){alert("Fill all and confirm");return;}
+    if(fromId===toId){alert("Cannot transfer to same person");return;}
+    if(scope==="all"||scope==="dealers")setDealers(prev=>prev.map(d=>d.raId===fromId?{...d,raId:toId}:d));
+    if(scope==="all"||scope==="appids")setApps(prev=>prev.map(a=>a.raId===fromId?{...a,raId:toId}:a));
+    if(scope==="all"||scope==="payees")setPayees(prev=>prev.map(p=>p.raId===fromId?{...p,raId:toId}:p));
+    const entry={id:`TXF${uid()}`,mode:"bulk",fromName:fromUser&&fromUser.name,toName:toUser&&toUser.name,scope,reason,executedBy:role,at:now()};
+    setAuditLog(p=>[...p,entry]);
+    toast(`Bulk transfer done: ${fromUser&&fromUser.name} → ${toUser&&toUser.name}`,"success");
+    setFromId("");setToId("");setReason("");setConfirmed(false);
+  }
+
+  function executeEntity(){
+    if(!entityType||!entityId||!reason){alert("Fill all fields");return;}
+    let desc="";
+    if(entityType==="dealer_ra"){setDealers(prev=>prev.map(d=>d.id===entityId?{...d,raId:newVal}:d));desc=`Dealer ${entityId} RA → ${newVal}`;}
+    if(entityType==="counter_dealer"){setCounters(prev=>prev.map(c=>c.id===entityId?{...c,dealerId:newVal}:c));desc=`Counter ${entityId} Dealer → ${newVal}`;}
+    if(entityType==="app_ra"){setApps(prev=>prev.map(a=>a.id===entityId?{...a,raId:newVal}:a));desc=`App_ID ${entityId} RA → ${newVal}`;}
+    if(entityType==="payee_dealer"){setPayees(prev=>prev.map(p=>p.id===entityId?{...p,dealerIds:p.dealerIds.includes(newVal)?p.dealerIds:[...p.dealerIds,newVal]}:p));desc=`Payee ${entityId} added dealer ${newVal}`;}
+    const entry={id:`TXF${uid()}`,mode:"entity",desc,reason,executedBy:role,at:now()};
+    setAuditLog(p=>[...p,entry]);
+    toast(`Mapping updated: ${desc}`,"success");
+    setEntityType("");setEntityId("");setNewVal("");setReason("");
+  }
+
+  const ETYPES=[{value:"dealer_ra",label:"Change Dealer → RA mapping"},{value:"counter_dealer",label:"Change Counter → Dealer mapping"},{value:"app_ra",label:"Change App_ID → RA mapping"},{value:"payee_dealer",label:"Add Dealer to Payee"}];
+
+  return <div style={{maxWidth:680}}>
+    <Alrt type="warning">All changes are permanently audit-logged. Central Ops & BH have full access to change any mapping, SAP, or data association.</Alrt>
+    <div style={{display:"flex",gap:8,marginBottom:14}}>
+      <Btn v={mapMode==="bulk"?"primary":"secondary"} sm onClick={()=>setMapMode("bulk")}>Bulk Transfer</Btn>
+      <Btn v={mapMode==="entity"?"primary":"secondary"} sm onClick={()=>setMapMode("entity")}>Single Entity Re-map</Btn>
+    </div>
+
+    {mapMode==="bulk"&&<Card style={{marginBottom:14}}>
+      <ST>Bulk Data Transfer</ST>
+      <G2><Sel label="Transfer FROM" value={fromId} onChange={v=>{setFromId(v);setConfirmed(false);}} options={ras.map(u=>({value:u.id,label:`${u.name} (${u.role})`}))} placeholder="Select..." required/><Sel label="Transfer TO" value={toId} onChange={v=>{setToId(v);setConfirmed(false);}} options={ras.filter(u=>u.id!==fromId).map(u=>({value:u.id,label:`${u.name} (${u.role})`}))} placeholder="Select..." required/></G2>
+      <Sel label="Scope" value={scope} onChange={v=>{setScope(v);setConfirmed(false);}} options={[{value:"all",label:"All data (dealers + App_IDs + payees)"},{value:"dealers",label:"Dealers only"},{value:"appids",label:"App_IDs only"},{value:"payees",label:"Payees only"}]}/>
+      <Fld label="Reason *" value={reason} onChange={setReason} required placeholder="e.g. RA resigned"/>
+      {fromId&&toId&&<div style={{background:C.surfaceAlt,borderRadius:8,padding:10,marginBottom:10}}><Lbl>Preview</Lbl><Row label="From" value={fromUser&&fromUser.name}/><Row label="To" value={toUser&&toUser.name}/><Row label="Dealers" value={dealers.filter(d=>d.raId===fromId).length+" dealers"}/><Row label="App_IDs" value={apps.filter(a=>a.raId===fromId).length+" app_ids"}/></div>}
+      <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}><input type="checkbox" id="cf" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)}/><label htmlFor="cf" style={{fontSize:12,color:C.danger,fontWeight:700,cursor:"pointer"}}>I confirm this is authorised and permanent</label></div>
+      <Btn v="danger" icon="⚡" disabled={!fromId||!toId||!reason||!confirmed} onClick={executeBulk}>Execute Bulk Transfer</Btn>
+    </Card>}
+
+    {mapMode==="entity"&&<Card style={{marginBottom:14}}>
+      <ST>Single Entity Re-mapping</ST>
+      <Alrt type="info">Change a single dealer's RA, a single App_ID's RA, a counter's dealer link, or add a dealer to a payee.</Alrt>
+      <Sel label="Mapping Type" value={entityType} onChange={v=>{setEntityType(v);setEntityId("");setNewVal("");}} options={ETYPES} placeholder="Select type..."/>
+      {entityType==="dealer_ra"&&<><Sel label="Select Dealer" value={entityId} onChange={setEntityId} options={dealers.map(d=>({value:d.id,label:`${d.name} (current RA: ${USERS.find(u=>u.id===d.raId)&&USERS.find(u=>u.id===d.raId).name||d.raId})`}))} placeholder="Select dealer..."/><Sel label="New RA" value={newVal} onChange={setNewVal} options={USERS.filter(u=>u.role==="RA").map(u=>({value:u.id,label:u.name}))} placeholder="Select new RA..."/></>}
+      {entityType==="counter_dealer"&&<><Sel label="Select Counter" value={entityId} onChange={setEntityId} options={counters.map(c=>({value:c.id,label:`${c.name} (current dealer: ${dealers.find(d=>d.id===c.dealerId)&&dealers.find(d=>d.id===c.dealerId).name||c.dealerId})`}))} placeholder="Select counter..."/><Sel label="New Dealer" value={newVal} onChange={setNewVal} options={dealers.filter(d=>d.status==="Active").map(d=>({value:d.id,label:d.name}))} placeholder="Select new dealer..."/></>}
+      {entityType==="app_ra"&&<><Sel label="Select App_ID" value={entityId} onChange={setEntityId} options={apps.map(a=>({value:a.id,label:`${a.id} — ${a.vehicle} (current RA: ${USERS.find(u=>u.id===a.raId)&&USERS.find(u=>u.id===a.raId).name||a.raId})`}))} placeholder="Select App_ID..."/><Sel label="New RA" value={newVal} onChange={setNewVal} options={USERS.filter(u=>u.role==="RA").map(u=>({value:u.id,label:u.name}))} placeholder="Select new RA..."/></>}
+      {entityType==="payee_dealer"&&<><Sel label="Select Payee" value={entityId} onChange={setEntityId} options={payees.map(p=>({value:p.id,label:p.payeeName}))} placeholder="Select payee..."/><Sel label="Add Dealer" value={newVal} onChange={setNewVal} options={dealers.filter(d=>d.status==="Active"&&entityId&&!payees.find(p=>p.id===entityId)?.dealerIds.includes(d.id)).map(d=>({value:d.id,label:d.name}))} placeholder="Select dealer to add..."/></>}
+      {entityType&&<Fld label="Reason *" value={reason} onChange={setReason} required placeholder="Reason for re-mapping"/>}
+      <Btn v="warning" icon="⚡" disabled={!entityType||!entityId||!newVal||!reason} onClick={executeEntity}>Apply Re-mapping</Btn>
+    </Card>}
+
+    {auditLog.length>0&&<Card>
+      <Lbl>Transfer Audit Log ({auditLog.length})</Lbl>
+      {auditLog.slice().reverse().map(e=><div key={e.id} style={{padding:"8px 0",borderBottom:`1px solid ${C.border}`}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}><span style={{fontSize:12,fontWeight:800,color:C.text}}>{e.mode==="bulk"?`${e.fromName} → ${e.toName}`:e.desc}</span><span style={{fontSize:10,color:C.mute}}>{e.at}</span></div>{e.scope&&<div style={{fontSize:11,color:C.mid}}>Scope: {e.scope}</div>}<div style={{fontSize:11,color:C.mute}}>Reason: {e.reason} · By: {e.executedBy}</div></div>)}
+    </Card>}
+  </div>;
+}
+
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+function ConfigPanel({role,configs,setConfigs}){
+  const [local,setLocal]=useState({...configs});
+  if(role!=="Business Head")return <div style={{textAlign:"center",padding:60,color:C.mute}}><div style={{fontSize:40,marginBottom:10}}>🔒</div><div style={{fontSize:14,fontWeight:700}}>Config: Business Head only.</div></div>;
+  const LABELS={SPLIT_SAME_APP_GATE:["Split Same App_ID Gate (₹)","Auto-approve splits below this"],SPLIT_CROSS_APP_GATE:["Split Cross App_ID Gate (₹)","Cross-app gate"],NONGS_RATE:["Non-GS Incentive Rate (%)","Applied on base amount"],NONGS_CAP:["Non-GS Cap (₹)","Max incentive per vehicle"],NONGS_AUTO_GATE:["Non-GS Auto-Approve Gate (₹)","Incentive below this auto-approved"],FINANCE_GATE:["Finance Gate (₹)","Routes to Finance at/above this"]};
+  return <div style={{maxWidth:520}}>
+    <Alrt type="warning">Changes apply immediately to all new requests and are audit-logged.</Alrt>
+    <Card>{Object.entries(local).map(([k,v])=><div key={k} style={{marginBottom:14}}><div style={{fontSize:12,fontWeight:700,color:C.text,marginBottom:1}}>{LABELS[k]&&LABELS[k][0]||k}</div><div style={{fontSize:11,color:C.mute,marginBottom:5}}>{LABELS[k]&&LABELS[k][1]}</div><div style={{display:"flex",gap:8,alignItems:"center"}}><input value={v} type="number" onChange={e=>setLocal(p=>({...p,[k]:Number(e.target.value)}))} style={{flex:1,padding:"8px 10px",border:`1.5px solid ${C.border}`,borderRadius:7,fontSize:14,fontWeight:700,fontFamily:"inherit",color:C.text,outline:"none"}}/><span style={{fontSize:13,color:C.mute,width:20}}>{k.includes("RATE")?"%":"₹"}</span></div></div>)}
+      <div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:8}}><Btn v="secondary" sm onClick={()=>setLocal({...CONFIGS_DEFAULT})}>Reset</Btn><Btn sm icon="✓" onClick={()=>{setConfigs({...local});alert("✓ Config saved!");}}>Save Config</Btn></div>
+    </Card>
+  </div>;
+}
+
+// ─── SIDEBAR & MAIN APP ───────────────────────────────────────────────────────
+const ROLE_META={"TM / City Head":{color:"#0F4C81",short:"TM"},"Central Ops":{color:"#065F46",short:"OPS"},"Business Head":{color:"#92400E",short:"BH"},"Finance":{color:"#5B21B6",short:"FIN"}};
+const NAV=[
+  {id:"dashboard",label:"Dashboard",icon:"▦"},
+  {id:"payout",   label:"Raise Payout",icon:"💸",roles:["TM / City Head"]},
+  {id:"onboarding",label:"Onboarding",icon:"🏢",badge:"ob"},
+  {id:"counter",  label:"Counter & UCM",icon:"🔗",badge:"ctr"},
+  {id:"sap",      label:"SAP & Payees",icon:"🏦",badge:"sap"},
+  {id:"approvals",label:"Approvals",icon:"✓",badge:"apr",roles:["Central Ops","Business Head","Finance"]},
+  {id:"transfer", label:"Data Transfer",icon:"⚡",roles:["Central Ops","Business Head"]},
+  {id:"config",   label:"Config Keys",icon:"⚙",roles:["Business Head"]},
+];
+
+function App(){
+  const [role,setRole]=useState("TM / City Head");const [page,setPage]=useState("dashboard");
+  const [apps,setApps]=useState(INIT_APPS);const [dealers,setDealers]=useState(INIT_DEALERS);const [counters,setCounters]=useState(INIT_COUNTERS);const [payees,setPayees]=useState(INIT_PAYEES);const [requests,setRequests]=useState(INIT_PR);const [onboarding,setOnboarding]=useState(INIT_OB);const [counterReqs,setCounterReqs]=useState(INIT_COUNTER_REQS);const [sapReqs,setSapReqs]=useState(INIT_SAP_REQS);const [auditLog,setAuditLog]=useState([]);const [configs,setConfigs]=useState({...CONFIGS_DEFAULT});const [toastData,setToastData]=useState(null);
+  const toast=useCallback((msg,type="success")=>setToastData({msg,type,k:Date.now()}),[]);
+
+  const badges={apr:requests.filter(r=>{if(role==="Central Ops")return r.status==="Submitted";if(role==="Business Head")return["BH Review","Ops Approved"].includes(r.status);if(role==="Finance")return r.status==="BH Approved"&&r.amount>=configs.FINANCE_GATE;return false;}).length,ob:onboarding.filter(o=>["Admin Panel Pending","OEM Tagging Pending","Ops Review"].includes(o.status)).length,ctr:counterReqs.filter(r=>r.status==="Ops Review").length,sap:sapReqs.filter(r=>r.status==="Ops Review").length};
+
+  const visNav=NAV.filter(n=>!n.roles||n.roles.includes(role));
+  useEffect(()=>{if(!visNav.find(n=>n.id===page))setPage("dashboard");},[role]);
+
+  const rm=ROLE_META[role]||ROLE_META["Central Ops"];
+  const TITLES={dashboard:"Dashboard",payout:"Raise Payout",onboarding:"Dealer Onboarding",counter:"Counter & UCM Mapping",sap:"SAP & Payees",approvals:`Approvals${badges.apr>0?` (${badges.apr})`:""}`,transfer:"Data Transfer",config:"Config Keys"};
+
+  return <div style={{display:"flex",minHeight:"100vh",background:C.bg}}>
+    {toastData&&<Toast key={toastData.k} msg={toastData.msg} type={toastData.type} onDone={()=>setToastData(null)}/>}
+    {/* Sidebar */}
+    <div style={{width:210,background:C.sidebar,display:"flex",flexDirection:"column",flexShrink:0,position:"sticky",top:0,height:"100vh",overflowY:"auto"}}>
+      <div style={{padding:"14px 12px 10px",borderBottom:`1px solid ${C.sidebarB}`}}>
+        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}><div style={{background:C.accent,borderRadius:7,padding:"3px 9px"}}><span style={{color:"#fff",fontWeight:900,fontSize:13}}>C24</span></div><div><div style={{color:"#fff",fontWeight:800,fontSize:12}}>B2B Ops Panel</div><div style={{color:"#4A7BAA",fontSize:10}}>v2.0 Simulation</div></div></div>
+      </div>
+      <div style={{padding:"10px 10px",borderBottom:`1px solid ${C.sidebarB}`}}>
+        <div style={{fontSize:9,fontWeight:800,color:"#4A7BAA",letterSpacing:1,marginBottom:5}}>SWITCH ROLE</div>
+        <select value={role} onChange={e=>setRole(e.target.value)} style={{width:"100%",background:`${rm.color}22`,color:rm.color,border:`1.5px solid ${rm.color}55`,borderRadius:7,padding:"6px 8px",fontSize:11,fontWeight:800,cursor:"pointer",fontFamily:"inherit",outline:"none"}}>
+          {["TM / City Head","Central Ops","Business Head","Finance"].map(r=><option key={r} value={r} style={{color:"#000",background:"#fff"}}>{r}</option>)}
+        </select>
+      </div>
+      <nav style={{flex:1,padding:"8px"}}>
+        {visNav.map(n=>{const active=page===n.id;const cnt=n.badge?badges[n.badge]:0;return <button key={n.id} onClick={()=>setPage(n.id)} style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,padding:"9px 10px",borderRadius:7,border:"none",cursor:"pointer",background:active?"rgba(15,76,129,0.25)":"transparent",color:active?"#7AB3F5":"#6B8CAE",marginBottom:2,textAlign:"left",fontFamily:"inherit"}}><div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:15}}>{n.icon}</span><span style={{fontSize:11,fontWeight:active?800:500}}>{n.label}</span></div>{cnt>0&&<span style={{background:C.danger,color:"#fff",fontSize:9,fontWeight:900,padding:"1px 5px",borderRadius:10,minWidth:18,textAlign:"center"}}>{cnt}</span>}</button>;})}
+      </nav>
+      <div style={{padding:"8px 10px 14px",borderTop:`1px solid ${C.sidebarB}`}}>
+        <div style={{background:"rgba(255,75,43,0.12)",border:"1px solid rgba(255,75,43,0.3)",borderRadius:7,padding:"7px 10px"}}><div style={{fontSize:9,fontWeight:800,color:"#FF7A5C",letterSpacing:0.8}}>SIMULATION MODE</div><div style={{fontSize:9,color:"#A0694A",marginTop:2}}>No real payouts released</div></div>
+      </div>
+    </div>
+    {/* Main */}
+    <div style={{flex:1,display:"flex",flexDirection:"column",minWidth:0}}>
+      <div style={{background:C.surface,borderBottom:`1px solid ${C.border}`,padding:"0 22px",height:52,display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0}}>
+        <span style={{fontSize:15,fontWeight:800,color:C.text}}>{TITLES[page]}</span>
+        <div style={{display:"flex",alignItems:"center",gap:8}}><div style={{width:28,height:28,borderRadius:"50%",background:`${rm.color}22`,display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:10,fontWeight:900,color:rm.color}}>{rm.short}</span></div><span style={{fontSize:13,fontWeight:700,color:rm.color}}>{role}</span></div>
+      </div>
+      <div style={{flex:1,padding:22,overflowY:"auto"}}>
+        {page==="dashboard" &&<Dashboard role={role} apps={apps} dealers={dealers} counters={counters} onboarding={onboarding} requests={requests} counterReqs={counterReqs} sapReqs={sapReqs} configs={configs}/>}
+        {page==="payout"    &&<RaisePayout role={role} apps={apps} setApps={setApps} dealers={dealers} counters={counters} payees={payees} requests={requests} setRequests={setRequests} configs={configs} toast={toast}/>}
+        {page==="onboarding"&&<OnboardingModule role={role} onboarding={onboarding} setOnboarding={setOnboarding} dealers={dealers} setDealers={setDealers} counters={counters} toast={toast}/>}
+        {page==="counter"   &&<CounterModule role={role} dealers={dealers} counters={counters} setCounters={setCounters} counterReqs={counterReqs} setCounterReqs={setCounterReqs} toast={toast}/>}
+        {page==="sap"       &&<SAPModule role={role} dealers={dealers} sapReqs={sapReqs} setSapReqs={setSapReqs} payees={payees} setPayees={setPayees} toast={toast}/>}
+        {page==="approvals" &&<Approvals role={role} requests={requests} setRequests={setRequests} apps={apps} setApps={setApps} dealers={dealers} payees={payees} configs={configs} toast={toast}/>}
+        {page==="transfer"  &&<DataTransfer role={role} dealers={dealers} setDealers={setDealers} counters={counters} setCounters={setCounters} apps={apps} setApps={setApps} payees={payees} setPayees={setPayees} auditLog={auditLog} setAuditLog={setAuditLog} toast={toast}/>}
+        {page==="config"    &&<ConfigPanel role={role} configs={configs} setConfigs={setConfigs}/>}
+      </div>
+    </div>
+  </div>;
+}
+ReactDOM.render(<App/>,document.getElementById("root"));
+</script></body></html>
