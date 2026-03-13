@@ -100,7 +100,7 @@ const INIT_SAP_REQS=[
 // DESIGN TOKENS
 // ═══════════════════════════════════════════════
 const T={bg:"#F0F4F8",card:"#FFFFFF",border:"#E2E8F0",text:"#0D1B2A",mid:"#475569",mute:"#94A3B8",accent:"#0F4C81",accentL:"#EBF4FF",accentD:"#0A3560",success:"#065F46",successL:"#ECFDF5",warn:"#92400E",warnL:"#FFFBEB",danger:"#991B1B",dangerL:"#FEF2F2",purple:"#5B21B6",purpleL:"#F5F3FF",orange:"#C2410C",orangeL:"#FFF7ED",sidebar:"#0D1B2E",sidebarB:"#182B44"};
-const SM={"Active":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Pending":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"Admin Panel Pending":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"OEM Tagging Pending":{bg:"#FFF7ED",c:"#C2410C",dot:"#F97316"},"Ops Review":{bg:"#EBF4FF",c:"#0F4C81",dot:"#3B82F6"},"Rejected":{bg:"#FEF2F2",c:"#991B1B",dot:"#EF4444"},"Auto-Approved":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Ops Approved":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"BH Review":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"BH Approved":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Released":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Submitted":{bg:"#EBF4FF",c:"#0F4C81",dot:"#3B82F6"},"Inspection Done":{bg:"#F5F3FF",c:"#5B21B6",dot:"#7C3AED"},"App_ID Created":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Lead Created":{bg:"#EBF4FF",c:"#0F4C81",dot:"#3B82F6"},"Validated":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Validation_Failed":{bg:"#FEF2F2",c:"#991B1B",dot:"#EF4444"}};
+const SM={"Active":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Pending":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"Admin Panel Pending":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"OEM Tagging Pending":{bg:"#FFF7ED",c:"#C2410C",dot:"#F97316"},"Ops Review":{bg:"#EBF4FF",c:"#0F4C81",dot:"#3B82F6"},"Rejected":{bg:"#FEF2F2",c:"#991B1B",dot:"#EF4444"},"Auto-Approved":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Ops Approved":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"BH Review":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"BH Approved":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Released":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Submitted":{bg:"#EBF4FF",c:"#0F4C81",dot:"#3B82F6"},"Inspection Done":{bg:"#F5F3FF",c:"#5B21B6",dot:"#7C3AED"},"App_ID Created":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Lead Created":{bg:"#EBF4FF",c:"#0F4C81",dot:"#3B82F6"},"Validated":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Validation_Failed":{bg:"#FEF2F2",c:"#991B1B",dot:"#EF4444"},"Token Done":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"PR Done":{bg:"#EBF4FF",c:"#0F4C81",dot:"#3B82F6"},"Delivery Released":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"SI Done":{bg:"#0F4C81",c:"#fff",dot:"#3B82F6"}};
 
 const fmt=n=>"₹"+Number(n).toLocaleString("en-IN");
 const uid=()=>Math.random().toString(36).slice(2,7).toUpperCase();
@@ -133,7 +133,6 @@ const fieldNav=[
   {id:"dashboard",label:"Home",icon:"🏠"},
   {id:"leads",label:"Leads",icon:"📋"},
   {id:"appids",label:"App_IDs",icon:"🚗"},
-  {id:"stages",label:"Stages",icon:"🎯"},
   {id:"onboarding",label:"Dealers",icon:"🏢"},
   {id:"counter",label:"Counter",icon:"🔗"},
   {id:"sap",label:"SAP",icon:"🏦"},
@@ -141,8 +140,9 @@ const fieldNav=[
 ];
 const opsNav=[
   {id:"dashboard",label:"Dashboard",icon:"▦"},
+  {id:"leads",label:"Leads",icon:"📋"},
+  {id:"appids",label:"App_IDs",icon:"🚗"},
   {id:"payout",label:"Raise Payout",icon:"💸",roles:["TM"]},
-  {id:"stages",label:"Stages",icon:"🎯",roles:["TM","Central Ops","Business Head"]},
   {id:"override",label:"Ctr Override",icon:"🔄",roles:["TM","Central Ops","Business Head"]},
   {id:"onboarding",label:"Onboarding",icon:"🏢",badge:"ob"},
   {id:"counter",label:"Counter",icon:"🔗",badge:"ctr"},
@@ -174,72 +174,411 @@ function RADashboard({user,shared}){
   </div>;
 }
 
-function LeadsModule({user,shared}){
-  const{dealers,counters,leads,setLeads}=shared;
-  const[view,setView]=useState("list");const[step,setStep]=useState(0);const[sel,setSel]=useState(null);const[form,setForm]=useState({});const f=(k,v)=>setForm(p=>({...p,[k]:v}));
-  let raIds=[user.id];if(user.role==="RM"&&user.raIds)raIds=[user.id,...user.raIds];
-  const myLeads=leads.filter(l=>raIds.includes(l.raId));
-  const myDealers=dealers.filter(d=>raIds.includes(d.raId)&&d.status==="Active");
-  const dealerCtrs=counters.filter(c=>c.dealerId===form.dealerId&&c.status==="Active");
-  const selCtr=counters.find(c=>c.id===form.counterId);
-  const selDealer=dealers.find(d=>d.id===form.dealerId);
-  const calcPrice=()=>{let base=0;const yr=parseInt(form.year||"2020");const km=parseInt(form.km||"0");const mk=form.make||"";if(["Mercedes-Benz","BMW","Audi","Volvo"].includes(mk))base=1200000;else if(["Kia","Skoda","Volkswagen","Jeep","MG Motors"].includes(mk))base=800000;else if(["Hyundai","Honda","Toyota","Tata Motors","Mahindra"].includes(mk))base=600000;else base=450000;base=base*Math.pow(0.82,2026-yr);base=base*(1-(km/200000)*0.25);if(form.accident==="Major")base*=0.80;else if(form.accident==="Minor")base*=0.92;if(form.flood==="Yes")base*=0.75;if(form.tyres==="Poor")base*=0.96;if(form.ownership==="2nd")base*=0.95;else if(form.ownership==="3rd+")base*=0.88;return Math.round(base/1000)*1000;};
-  function submitLead(){const price=calcPrice();const lead={id:`L${uid()}`,raId:user.id,...form,price,status:"Lead Created",appId:"",createdAt:now()};setLeads(p=>[...p,lead]);alert(`✓ Lead created!\nIndicative Price: ${fmt(price)}`);setView("list");setStep(0);setForm({});}
+// ═══════════════════════════════════════════════
+// STAGE DIALOGUE — lifted out of LeadsModule to prevent remount on keystroke
+// ═══════════════════════════════════════════════
+const ALL_STAGES_ORDER={"Lead Created":0,"Inspection Done":1,"Token Done":2,"PR Done":3,"Delivery Released":4,"SI Done":5};
+const ALL_STAGES_LIST=["Lead Created","Inspection Done","Token Done","PR Done","Delivery Released","SI Done"];
 
-  if(sel){const lead=myLeads.find(l=>l.id===sel);if(!lead)return null;const ld=dealers.find(d=>d.id===lead.dealerId);const lc=counters.find(c=>c.id===lead.counterId);const ra=ALL_USERS.find(u=>u.id===lead.raId);return <div><div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}><Btn v="ghost" onClick={()=>setSel(null)} sm>← Back</Btn><span style={{fontSize:14,fontWeight:800}}>{lead.make} {lead.model} {lead.year}</span></div>
-    <Card style={{marginBottom:10}}><ST>Vehicle Identity</ST>{[["Reg. No.",lead.regNo],["Make",lead.make],["Model",lead.model],["Year",lead.year],["Variant",lead.variant||"—"],["Fuel",lead.fuel],["Transmission",lead.transmission],["Color",lead.color||"—"]].map(([l,v])=><Row key={l} label={l} value={v}/>)}</Card>
-    <Card style={{marginBottom:10}}><ST>Condition</ST>{[["KM Driven",Number(lead.km||0).toLocaleString("en-IN")+" km"],["Ownership",lead.ownership],["Accident",lead.accident+(lead.accidentDesc?` (${lead.accidentDesc})`:"")],["Flood",lead.flood],["Tyres",lead.tyres],["Engine",lead.engine],["Electrical",lead.electrical]].map(([l,v])=><Row key={l} label={l} value={v}/>)}</Card>
-    <Card style={{marginBottom:10}}><ST>Dealership & Counter</ST>{[["Dealer",ld&&ld.name],["Dealer Code",ld&&ld.code],["Counter",lc&&lc.name],["City",lc&&lc.city],["UCM Name",lc&&lc.ucmName],["UCM Mobile",lc&&lc.ucmMobile],["RA",ra&&ra.name]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}</Card>
-    <Card><ST>Valuation & Status</ST><div style={{background:`linear-gradient(135deg,${T.accentD},${T.accent})`,borderRadius:10,padding:14,textAlign:"center",marginBottom:10}}><div style={{fontSize:10,color:"rgba(255,255,255,0.7)",fontWeight:800,marginBottom:4}}>INDICATIVE C24 PRICE</div><div style={{fontSize:26,fontWeight:900,color:"#fff"}}>{fmt(lead.price)}</div></div>{[["Status",lead.status],["Lead ID",lead.id],["App_ID",lead.appId||"Not yet created"],["Created",lead.createdAt]].map(([l,v])=><Row key={l} label={l} value={v}/>)}</Card>
-  </div>;}
+function StageDialogue({lead,apps,setApps,setLeads,onClose}){
+  const app=apps.find(a=>a.id===lead.appId);
+  const[form,setForm]=useState(()=>({
+    targetStage:lead.status||"Lead Created",
+    c24Quote:lead.c24Quote>0?String(lead.c24Quote):app?String(app.quote):"",
+    inspectionNotes:lead.inspectionNotes||app?.inspectionNotes||"",
+    tokenAmount:lead.tokenAmount>0?String(lead.tokenAmount):app?.tokenAmount>0?String(app.tokenAmount):"1",
+    tokenNotes:lead.tokenNotes||app?.tokenNotes||"",
+    challan:lead.challan>0?String(lead.challan):app?String(app.challan||0):"0",
+    otherCharges:lead.otherCharges_lead>0?String(lead.otherCharges_lead):app?String(app.otherCharges||0):"0",
+    partyPeshi:lead.partyPeshi>0?String(lead.partyPeshi):"0",
+    deliveryReleased:lead.deliveryReleased>0?String(lead.deliveryReleased):"",
+    deliveryNotes:lead.deliveryNotes||"",
+    siGsType:lead.siGsType||app?.gsType||"GS",
+    siNotes:lead.siNotes||app?.siNotes||"",
+  }));
+  // sf: stable setter per field — won't recreate on render
+  const sf=useCallback((k)=>(e)=>setForm(p=>({...p,[k]:typeof e==="string"?e:e.target.value})),[]);
 
-  if(view==="form")return <div>
-    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}><Btn v="ghost" onClick={()=>{setView("list");setStep(0);setForm({});}} sm>← Back</Btn><span style={{fontSize:14,fontWeight:800}}>New Lead</span></div>
-    <StepBar steps={["Location","Vehicle","Condition","Price"]} cur={step}/>
-    {step===0&&<Card><ST>Step 1 — Dealership & Counter</ST>
-      <Sel label="Dealership" value={form.dealerId} onChange={v=>f("dealerId",v)} options={myDealers.map(d=>({value:d.id,label:`${d.name} (${d.code})`}))} placeholder="Select dealer..." required/>
-      {form.dealerId&&<>{dealerCtrs.length===0?<Alrt type="warning">No active counters for this dealer. Contact Central Ops.</Alrt>:<Sel label="Counter" value={form.counterId} onChange={v=>f("counterId",v)} options={dealerCtrs.map(c=>({value:c.id,label:`${c.name} — ${c.city}`}))} placeholder="Select counter..." required/>}{selCtr&&<div style={{background:T.accentL,borderRadius:8,padding:10,marginBottom:10}}><div style={{fontSize:10,fontWeight:800,color:T.accent,marginBottom:4}}>AUTO-FILLED FROM COUNTER</div><Row label="Counter" value={selCtr.name}/><Row label="City" value={selCtr.city}/><Row label="UCM Name" value={selCtr.ucmName}/><Row label="UCM Mobile" value={selCtr.ucmMobile}/></div>}</>}
-      <Fld label="Registration Number" value={form.regNo} onChange={v=>f("regNo",v.toUpperCase())} required placeholder="e.g. DL3CAB1234" maxLength={15}/>
-      <div style={{display:"flex",justifyContent:"flex-end",marginTop:4}}><Btn disabled={!form.dealerId||!form.counterId||!form.regNo} onClick={()=>setStep(1)}>Next →</Btn></div>
-    </Card>}
-    {step===1&&<Card><ST>Step 2 — Vehicle Details</ST>
-      <G2><Sel label="Make" value={form.make} onChange={v=>f("make",v)} options={CAR_MAKES} placeholder="Select make..." required/><Fld label="Model" value={form.model} onChange={v=>f("model",v)} required placeholder="e.g. Creta"/></G2>
-      <G2><Sel label="Year" value={form.year} onChange={v=>f("year",v)} options={Array.from({length:15},(_,i)=>String(2026-i))} placeholder="Year..." required/><Fld label="Variant" value={form.variant} onChange={v=>f("variant",v)} placeholder="e.g. SX 1.5D"/></G2>
-      <G2><Sel label="Fuel" value={form.fuel} onChange={v=>f("fuel",v)} options={["Petrol","Diesel","CNG","Electric","Hybrid"]} placeholder="Select..." required/><Sel label="Transmission" value={form.transmission} onChange={v=>f("transmission",v)} options={["Manual","Automatic","AMT","CVT","DCT"]} placeholder="Select..." required/></G2>
-      <G2><Fld label="Color" value={form.color} onChange={v=>f("color",v)} placeholder="Pearl White"/><Fld label="KM Driven" value={form.km} onChange={v=>f("km",v)} type="number" required placeholder="35000"/></G2>
-      <Sel label="Ownership" value={form.ownership} onChange={v=>f("ownership",v)} options={["1st","2nd","3rd+"]} placeholder="Select..." required/>
-      <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(0)}>← Back</Btn><Btn disabled={!form.make||!form.model||!form.year||!form.fuel||!form.transmission||!form.km||!form.ownership} onClick={()=>setStep(2)}>Next →</Btn></div>
-    </Card>}
-    {step===2&&<Card><ST>Step 3 — Condition</ST>
-      <Sel label="Accident History" value={form.accident} onChange={v=>f("accident",v)} options={["No","Minor","Major"]} placeholder="Select..." required/>
-      {form.accident&&form.accident!=="No"&&<Fld label="Accident Details" value={form.accidentDesc} onChange={v=>f("accidentDesc",v)} placeholder="e.g. Front bumper damage"/>}
-      <Sel label="Flood / Waterlogging" value={form.flood} onChange={v=>f("flood",v)} options={["No","Yes"]} placeholder="Select..." required/>
-      <Sel label="Tyre Condition" value={form.tyres} onChange={v=>f("tyres",v)} options={["Excellent","Good","Fair","Poor"]} placeholder="Select..." required/>
-      <Sel label="Engine Condition" value={form.engine} onChange={v=>f("engine",v)} options={["No issues","Minor issue","Major issue"]} placeholder="Select..." required/>
-      <Sel label="Electrical Condition" value={form.electrical} onChange={v=>f("electrical",v)} options={["No issues","Minor issue","Major issue"]} placeholder="Select..." required/>
-      <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(1)}>← Back</Btn><Btn disabled={!form.accident||!form.flood||!form.tyres||!form.engine||!form.electrical} onClick={()=>setStep(3)}>Get Price →</Btn></div>
-    </Card>}
-    {step===3&&<Card><ST>Step 4 — Indicative Price</ST>
-      <div style={{background:`linear-gradient(135deg,${T.accentD},${T.accent})`,borderRadius:12,padding:18,textAlign:"center",marginBottom:12}}><div style={{fontSize:11,color:"rgba(255,255,255,0.7)",fontWeight:800,letterSpacing:1,marginBottom:4}}>INDICATIVE C24 PRICE</div><div style={{fontSize:32,fontWeight:900,color:"#fff"}}>{fmt(calcPrice())}</div><div style={{fontSize:11,color:"rgba(255,255,255,0.6)",marginTop:4}}>Subject to full inspection</div></div>
-      <Alrt type="warning">Final quote determined after Cars24 evaluation team inspection.</Alrt>
-      <Lbl>Summary</Lbl>{[["Reg. No.",form.regNo],["Vehicle",`${form.make} ${form.model} ${form.year}`],["KM",Number(form.km||0).toLocaleString("en-IN")+" km"],["Dealer",selDealer&&selDealer.name],["Counter",selCtr&&selCtr.name],["UCM",selCtr&&selCtr.ucmName]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}
-      <div style={{display:"flex",justifyContent:"space-between",marginTop:10}}><Btn v="secondary" onClick={()=>setStep(2)}>← Edit</Btn><Btn v="success" icon="✓" onClick={submitLead}>Submit Lead</Btn></div>
-    </Card>}
-  </div>;
+  const tgt=form.targetStage||"Lead Created";
+  const tgtIdx=ALL_STAGES_ORDER[tgt]||0;
+  const curIdx=ALL_STAGES_ORDER[lead.status]||0;
+  const sc=form.c24Quote?Math.round(Number(form.c24Quote)*0.02):0;
+  const finalPayable=Number(form.c24Quote||0)-sc;
+  const deliveryPayment=Math.max(0,finalPayable-Number(form.challan||0)-Number(form.otherCharges||0)-Number(form.partyPeshi||0));
+  const delivRel=Number(form.deliveryReleased||0);
+  const delivPending=Math.max(0,deliveryPayment-delivRel);
+  const needsInsp=tgtIdx>=1;
+  const needsToken=tgtIdx>=2;
+  const needsPR=tgtIdx>=3;
+  const needsDeliv=tgtIdx>=4;
+  const needsSI=tgtIdx>=5;
 
-  return <div>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><Lbl>Leads ({myLeads.length})</Lbl><Btn sm icon="+" onClick={()=>setView("form")}>New Lead</Btn></div>
-    {myLeads.length===0&&<div style={{textAlign:"center",padding:36,color:T.mute}}><div style={{fontSize:28,marginBottom:8}}>📋</div><div>No leads yet</div><div style={{marginTop:10}}><Btn onClick={()=>setView("form")}>Create First Lead</Btn></div></div>}
-    {user.role==="RM"&&user.raIds&&user.raIds.map(raId=>{const ra=ALL_USERS.find(u=>u.id===raId);const raL=myLeads.filter(l=>l.raId===raId);return <div key={raId} style={{marginBottom:14}}><div style={{fontSize:11,fontWeight:800,color:T.accent,marginBottom:6,padding:"4px 0",borderBottom:`1px solid ${T.accentL}`}}>{ra&&ra.name} — {raL.length} leads</div>{raL.map(l=>{const d=dealers.find(dd=>dd.id===l.dealerId);return <Card key={l.id} onClick={()=>setSel(l.id)} style={{marginBottom:8}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,fontWeight:800}}>{l.make} {l.model} {l.year}</span><Badge s={l.status} sm/></div><div style={{fontSize:11,color:T.accent,fontWeight:700,marginBottom:2}}>{fmt(l.price)}</div><div style={{fontSize:11,color:T.mute}}>{l.regNo} · {l.km} km · {d&&d.name}</div></Card>;})}</div>;})}
-    {user.role==="RA"&&myLeads.map(l=>{const d=dealers.find(dd=>dd.id===l.dealerId);const c=counters.find(cc=>cc.id===l.counterId);return <Card key={l.id} onClick={()=>setSel(l.id)} style={{marginBottom:8}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,fontWeight:800}}>{l.make} {l.model} {l.year}</span><Badge s={l.status} sm/></div><div style={{fontSize:11,color:T.accent,fontWeight:700,marginBottom:2}}>{fmt(l.price)}</div><div style={{fontSize:11,color:T.mute}}>{l.regNo} · {l.km} km</div><div style={{fontSize:11,color:T.mute}}>{d&&d.name} · {c&&c.name}</div>{l.appId&&<div style={{fontSize:10,color:T.success,fontWeight:700,marginTop:2}}>App_ID: {l.appId}</div>}</Card>;})}
+  function save(){
+    const ts=new Date().toLocaleString("en-IN",{hour12:false}).slice(0,16);
+    const delivRelFinal=Math.min(delivRel,deliveryPayment);
+    // Update lead
+    setLeads(prev=>prev.map(l=>l.id===lead.id?{...l,
+      status:tgt,
+      c24Quote:Number(form.c24Quote||0),
+      serviceCharge:sc,
+      finalPayable,
+      challan:Number(form.challan||0),
+      otherCharges_lead:Number(form.otherCharges||0),
+      partyPeshi:Number(form.partyPeshi||0),
+      deliveryPayment,
+      deliveryReleased:delivRelFinal,
+      deliveryNotes:form.deliveryNotes||"",
+      deliveryPending:Math.max(0,deliveryPayment-delivRelFinal),
+      tokenAmount:Number(form.tokenAmount||0),
+      tokenNotes:form.tokenNotes||"",
+      inspectionNotes:form.inspectionNotes||"",
+      siGsType:form.siGsType||"GS",
+      siNotes:form.siNotes||"",
+      stageUpdatedAt:ts,
+    }:l));
+    // Sync App_ID — update all fields so every role sees latest state
+    if(app){
+      const u={};
+      if(tgtIdx>=1){
+        u.quote=Number(form.c24Quote||app.quote);
+        u.serviceCharge=sc;
+        u.inspectionDone=true;u.inspectionAt=ts;u.inspectionNotes=form.inspectionNotes||"";
+      }
+      if(tgtIdx>=2){u.tokenDone=true;u.tokenAt=ts;u.tokenAmount=Number(form.tokenAmount||0);u.tokenNotes=form.tokenNotes||"";}
+      if(tgtIdx>=3){u.challan=Number(form.challan||0);u.partyPeshi=Number(form.partyPeshi||0);}
+      if(tgtIdx>=4){u.deliveryReleasedAmt=delivRelFinal;}
+      if(tgtIdx>=5){
+        // SI Done: fully unlock — this is what TM payout, override, approvals all read
+        u.stockIn=true;
+        u.siDone=true;u.siAt=ts;u.siNotes=form.siNotes||"";
+        u.gsType=form.siGsType||"GS";
+        u.otherCharges=Number(form.otherCharges||0);
+        u.status="Active";
+      }
+      setApps(prev=>prev.map(a=>a.id===app.id?{...a,...u}:a));
+    } else if(tgtIdx>=5) {
+      // SI Done but no App_ID linked yet — auto-create one
+      const otherChargesVal=Number(form.otherCharges||0);
+      const newAppId="APP"+Math.random().toString(36).slice(2,6).toUpperCase();
+      const newApp={
+        id:newAppId,dealerId:lead.dealerId,counterId:lead.counterId,raId:lead.raId,
+        vehicle:`${lead.year||""} ${lead.make||""} ${lead.model||""}${lead.variant?" "+lead.variant:""}`.trim(),
+        regNo:lead.regNo||"",quote:Number(form.c24Quote||0),serviceCharge:sc,
+        challan:Number(form.challan||0),estRefurb:0,
+        gsType:form.siGsType||"GS",stockIn:true,
+        otherCharges:otherChargesVal,splitReleased:0,incentiveReleased:0,status:"Active",
+        inspectionDone:tgtIdx>=1,inspectionAt:tgtIdx>=1?ts:"",inspectionNotes:form.inspectionNotes||"",
+        tokenDone:tgtIdx>=2,tokenAt:tgtIdx>=2?ts:"",
+        tokenAmount:Number(form.tokenAmount||0),tokenNotes:form.tokenNotes||"",
+        siDone:true,siAt:ts,siNotes:form.siNotes||"",
+        partyPeshi:Number(form.partyPeshi||0),
+      };
+      setApps(prev=>[...prev,newApp]);
+      setLeads(prev=>prev.map(l=>l.id===lead.id?{...l,appId:newAppId}:l));
+    }
+    onClose();
+  }
+
+  return <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:9000,display:"flex",alignItems:"flex-start",justifyContent:"center",paddingTop:16,paddingBottom:24}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+    <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:480,maxHeight:"calc(100vh - 40px)",background:"#fff",borderRadius:16,overflow:"hidden",boxShadow:"0 24px 64px rgba(0,0,0,0.35)",display:"flex",flexDirection:"column"}}>
+      {/* Header */}
+      <div style={{background:`linear-gradient(135deg,${T.accentD},${T.accent})`,padding:"14px 16px",display:"flex",justifyContent:"space-between",alignItems:"center",flexShrink:0}}>
+        <div><div style={{color:"#fff",fontSize:14,fontWeight:900}}>Update Lead Stage</div><div style={{color:"rgba(255,255,255,0.65)",fontSize:11,marginTop:2}}>{lead.make} {lead.model} {lead.year} · {lead.regNo}</div></div>
+        <button onClick={onClose} style={{background:"rgba(255,255,255,0.15)",border:"none",color:"#fff",borderRadius:8,width:32,height:32,cursor:"pointer",fontSize:18,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>×</button>
+      </div>
+      <div style={{padding:16,overflowY:"auto",flex:1,WebkitOverflowScrolling:"touch"}}>
+        {/* Stage selector */}
+        <div style={{marginBottom:14}}>
+          <div style={{fontSize:10,fontWeight:800,color:T.mute,letterSpacing:1,textTransform:"uppercase",marginBottom:8}}>Select Target Stage</div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+            {ALL_STAGES_LIST.map(s=>{const isCur=s===lead.status;const isSel=s===tgt;const idx=ALL_STAGES_ORDER[s];const isPast=idx<curIdx;return <button key={s} onClick={()=>setForm(p=>({...p,targetStage:s}))} style={{padding:"8px 8px 7px",borderRadius:9,border:`2px solid ${isSel?T.accent:isPast?"#BBF7D0":T.border}`,background:isSel?T.accentL:isPast?"#ECFDF5":"#fff",cursor:"pointer",textAlign:"left",fontFamily:"inherit",transition:"all 0.1s"}}><div style={{fontSize:8,fontWeight:800,color:isSel?T.accent:isPast?T.success:T.mute,textTransform:"uppercase",letterSpacing:0.8,marginBottom:2}}>{isSel?"→ TARGET":isCur?"CURRENT":isPast?"✓ DONE":""}</div><div style={{fontSize:11,fontWeight:800,color:isSel?T.accentD:T.text}}>{s}</div></button>;})}
+          </div>
+          {tgtIdx>curIdx+1&&<div style={{background:T.warnL,border:`1px solid #FDE68A`,borderRadius:7,padding:"6px 10px",marginTop:8,fontSize:11,color:T.warn,fontWeight:700}}>⚠ Skipping stages — all inputs collected below</div>}
+        </div>
+
+        {/* INSPECTION */}
+        {needsInsp&&<div style={{background:"#F5F3FF",borderRadius:10,padding:12,marginBottom:10}}>
+          <div style={{fontSize:11,fontWeight:900,color:"#5B21B6",marginBottom:10}}>🔍 Inspection</div>
+          <div style={{marginBottom:8}}>
+            <label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>C24 Quote (₹) <span style={{color:T.danger}}>*</span></label>
+            <input value={form.c24Quote} onChange={sf("c24Quote")} inputMode="decimal" pattern="[0-9]*" placeholder="e.g. 850000"
+              style={{width:"100%",padding:"10px 12px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:14,fontFamily:"inherit",outline:"none",WebkitAppearance:"none",touchAction:"manipulation"}}/>
+          </div>
+          {form.c24Quote&&Number(form.c24Quote)>0&&<div style={{background:"#fff",borderRadius:8,padding:10,marginBottom:8,border:"1px solid #DDD6FE"}}>
+            <div style={{display:"flex",justifyContent:"space-between",padding:"3px 0"}}><span style={{fontSize:11,color:T.mid}}>C24 Quote</span><span style={{fontSize:12,fontWeight:700}}>{fmt(Number(form.c24Quote))}</span></div>
+            <div style={{display:"flex",justifyContent:"space-between",padding:"3px 0"}}><span style={{fontSize:11,color:T.mid}}>Service Charge (2%)</span><span style={{fontSize:12,fontWeight:700,color:T.danger}}>− {fmt(sc)}</span></div>
+            <div style={{display:"flex",justifyContent:"space-between",padding:"4px 0",borderTop:"1px solid #DDD6FE",marginTop:2}}><span style={{fontSize:11,fontWeight:800}}>Final Payable to CX</span><span style={{fontSize:14,fontWeight:900,color:T.success}}>{fmt(finalPayable)}</span></div>
+          </div>}
+          <div style={{marginBottom:0}}>
+            <label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>Inspection Notes</label>
+            <input value={form.inspectionNotes} onChange={sf("inspectionNotes")} placeholder="Condition, wear, defects..."
+              style={{width:"100%",padding:"9px 12px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:13,fontFamily:"inherit",outline:"none"}}/>
+          </div>
+        </div>}
+
+        {/* TOKEN */}
+        {needsToken&&<div style={{background:"#ECFDF5",borderRadius:10,padding:12,marginBottom:10}}>
+          <div style={{fontSize:11,fontWeight:900,color:T.success,marginBottom:10}}>🤝 Token</div>
+          <div style={{marginBottom:8}}>
+            <label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>Token Amount (₹)</label>
+            <input value={form.tokenAmount} onChange={sf("tokenAmount")} inputMode="decimal" pattern="[0-9]*" placeholder="Default: 1"
+              style={{width:"100%",padding:"10px 12px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:14,fontFamily:"inherit",outline:"none"}}/>
+          </div>
+          <div>
+            <label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>Token Notes</label>
+            <input value={form.tokenNotes} onChange={sf("tokenNotes")} placeholder="Mode, reference..."
+              style={{width:"100%",padding:"9px 12px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:13,fontFamily:"inherit",outline:"none"}}/>
+          </div>
+        </div>}
+
+        {/* PR DONE */}
+        {needsPR&&<div style={{background:"#EBF4FF",borderRadius:10,padding:12,marginBottom:10}}>
+          <div style={{fontSize:11,fontWeight:900,color:T.accent,marginBottom:4}}>📋 PR & Price Breakup</div>
+          {finalPayable>0&&<div style={{fontSize:11,color:T.mid,marginBottom:10,fontWeight:700}}>Final Payable to CX: {fmt(finalPayable)}</div>}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
+            <div><label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>Challan (₹)</label><input value={form.challan} onChange={sf("challan")} inputMode="decimal" pattern="[0-9]*" placeholder="0" style={{width:"100%",padding:"9px 10px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:13,fontFamily:"inherit",outline:"none"}}/></div>
+            <div><label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>Other Charges (₹)</label><input value={form.otherCharges} onChange={sf("otherCharges")} inputMode="decimal" pattern="[0-9]*" placeholder="0" style={{width:"100%",padding:"9px 10px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:13,fontFamily:"inherit",outline:"none"}}/></div>
+          </div>
+          <div style={{marginBottom:10}}>
+            <label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>Party Peshi (₹)</label>
+            <input value={form.partyPeshi} onChange={sf("partyPeshi")} inputMode="decimal" pattern="[0-9]*" placeholder="0" style={{width:"100%",padding:"9px 10px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:13,fontFamily:"inherit",outline:"none"}}/>
+          </div>
+          {finalPayable>0&&<div style={{background:"#fff",borderRadius:8,padding:10,border:"1px solid #BFDBFE"}}>
+            <div style={{fontSize:10,fontWeight:800,color:T.accent,marginBottom:6}}>DELIVERY PAYMENT CALCULATION</div>
+            {[["Final Payable to CX",fmt(finalPayable),false],[`− Challan`,fmt(Number(form.challan||0)),true],[`− Other Charges`,fmt(Number(form.otherCharges||0)),true],[`− Party Peshi`,fmt(Number(form.partyPeshi||0)),true]].map(([l,v,neg])=><div key={l} style={{display:"flex",justifyContent:"space-between",padding:"2px 0"}}><span style={{fontSize:11,color:T.mid}}>{l}</span><span style={{fontSize:11,fontWeight:700,color:neg?T.danger:T.text}}>{neg?"− ":""}{v}</span></div>)}
+            <div style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderTop:"1px solid #BFDBFE",marginTop:4}}><span style={{fontSize:12,fontWeight:900}}>Final Delivery Payment</span><span style={{fontSize:14,fontWeight:900,color:deliveryPayment>=0?T.success:T.danger}}>{fmt(deliveryPayment)}</span></div>
+          </div>}
+        </div>}
+
+        {/* DELIVERY RELEASED */}
+        {needsDeliv&&<div style={{background:T.successL,borderRadius:10,padding:12,marginBottom:10}}>
+          <div style={{fontSize:11,fontWeight:900,color:T.success,marginBottom:10}}>💸 Delivery Payment Released</div>
+          <div style={{marginBottom:8}}>
+            <label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>Amount Released (₹) <span style={{fontSize:10,color:T.mute}}>max: {fmt(deliveryPayment)}</span></label>
+            <input value={form.deliveryReleased} onChange={sf("deliveryReleased")} inputMode="decimal" pattern="[0-9]*" placeholder={String(deliveryPayment)}
+              style={{width:"100%",padding:"10px 12px",border:`1.5px solid ${delivRel>deliveryPayment?"#F87171":T.border}`,borderRadius:8,fontSize:14,fontFamily:"inherit",outline:"none"}}/>
+            {delivRel>deliveryPayment&&deliveryPayment>0&&<div style={{fontSize:10,color:T.danger,marginTop:2,fontWeight:700}}>⚠ Cannot exceed {fmt(deliveryPayment)} — will be capped on save</div>}
+          </div>
+          <div style={{marginBottom:8}}>
+            <label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>Release Reference / Notes</label>
+            <input value={form.deliveryNotes} onChange={sf("deliveryNotes")} placeholder="NEFT ref, cheque no., remarks..."
+              style={{width:"100%",padding:"9px 12px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:13,fontFamily:"inherit",outline:"none"}}/>
+          </div>
+          {form.deliveryReleased&&deliveryPayment>0&&<div style={{background:"#fff",borderRadius:8,padding:10,border:"1px solid #BBF7D0"}}>
+            <div style={{display:"flex",justifyContent:"space-between",padding:"3px 0"}}><span style={{fontSize:11,color:T.mid}}>Delivery Payment</span><span style={{fontSize:12,fontWeight:700}}>{fmt(deliveryPayment)}</span></div>
+            <div style={{display:"flex",justifyContent:"space-between",padding:"3px 0"}}><span style={{fontSize:11,color:T.success,fontWeight:700}}>Released</span><span style={{fontSize:12,fontWeight:700,color:T.success}}>{fmt(Math.min(delivRel,deliveryPayment))}</span></div>
+            {delivPending>0&&<div style={{display:"flex",justifyContent:"space-between",padding:"3px 0",borderTop:"1px solid #BBF7D0",marginTop:2}}><span style={{fontSize:11,color:T.warn,fontWeight:800}}>⏳ Pending</span><span style={{fontSize:12,fontWeight:800,color:T.warn}}>{fmt(delivPending)}</span></div>}
+            {delivPending===0&&<div style={{fontSize:11,color:T.success,fontWeight:800,marginTop:4,textAlign:"center"}}>✓ Fully Released</div>}
+          </div>}
+        </div>}
+
+        {/* SI */}
+        {needsSI&&<div style={{background:T.accentL,borderRadius:10,padding:12,marginBottom:10}}>
+          <div style={{fontSize:11,fontWeight:900,color:T.accentD,marginBottom:10}}>✅ Stock-In (SI)</div>
+          <div style={{background:T.warnL,border:`1px solid #FDE68A`,borderRadius:7,padding:"6px 10px",marginBottom:10,fontSize:11,color:T.warn,fontWeight:700}}>SI Done will mark stockIn=true and unlock payout wallet for TM.</div>
+          <div style={{marginBottom:8}}>
+            <label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>GS Type</label>
+            <select value={form.siGsType} onChange={sf("siGsType")} style={{width:"100%",padding:"9px 10px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:13,fontFamily:"inherit",outline:"none"}}>
+              <option value="GS">GS</option><option value="Non-GS">Non-GS</option>
+            </select>
+          </div>
+          <div>
+            <label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>SI Notes</label>
+            <input value={form.siNotes} onChange={sf("siNotes")} placeholder="Any SI remarks..."
+              style={{width:"100%",padding:"9px 12px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:13,fontFamily:"inherit",outline:"none"}}/>
+          </div>
+        </div>}
+
+
+      </div>
+      <div style={{padding:"12px 16px",borderTop:`1px solid ${T.border}`,flexShrink:0,background:"#fff",display:"flex",gap:8,justifyContent:"flex-end"}}>
+        <Btn v="secondary" sm onClick={onClose}>Cancel</Btn>
+        <Btn v="success" icon="✓" onClick={save} disabled={!form.targetStage||(needsInsp&&!form.c24Quote)}>Save Stage</Btn>
+      </div>
+    </div>
   </div>;
 }
 
+function LeadsModule({user,shared}){
+  const{dealers,counters,leads,setLeads,apps,setApps}=shared;
+  const[view,setView]=useState("list");
+  const[step,setStep]=useState(0);
+  const[sel,setSel]=useState(null);
+  const[stageLeadId,setStageLeadId]=useState(null);
+  const[newLeadForm,setNewLeadForm]=useState({});
+  const nf=(k,v)=>setNewLeadForm(p=>({...p,[k]:v}));
+
+  let raIds=[user.id];
+  if(user.role==="RM"&&user.raIds) raIds=[user.id,...user.raIds];
+  const isOps=["TM","Central Ops","Business Head"].includes(user.role);
+  const myLeads=isOps?leads:leads.filter(l=>raIds.includes(l.raId));
+  const myDealers=isOps?dealers.filter(d=>d.status==="Active"):dealers.filter(d=>raIds.includes(d.raId)&&d.status==="Active");
+  const dealerCtrs=counters.filter(c=>c.dealerId===newLeadForm.dealerId&&c.status==="Active");
+  const selCtr=counters.find(c=>c.id===newLeadForm.counterId);
+  const selDealer=dealers.find(d=>d.id===newLeadForm.dealerId);
+
+  const calcPrice=(fd)=>{
+    let base=0;const yr=parseInt(fd.year||"2020");const km=parseInt(fd.km||"0");const mk=fd.make||"";
+    if(["Mercedes-Benz","BMW","Audi","Volvo"].includes(mk))base=1200000;
+    else if(["Kia","Skoda","Volkswagen","Jeep","MG Motors"].includes(mk))base=800000;
+    else if(["Hyundai","Honda","Toyota","Tata Motors","Mahindra"].includes(mk))base=600000;
+    else base=450000;
+    base=base*Math.pow(0.82,2026-yr);base=base*(1-(km/200000)*0.25);
+    if(fd.accident==="Major")base*=0.80;else if(fd.accident==="Minor")base*=0.92;
+    if(fd.flood==="Yes")base*=0.75;if(fd.tyres==="Poor")base*=0.96;
+    if(fd.ownership==="2nd")base*=0.95;else if(fd.ownership==="3rd+")base*=0.88;
+    return Math.round(base/1000)*1000;
+  };
+
+  function submitLead(){
+    const price=calcPrice(newLeadForm);
+    const newId=`L${uid()}`;
+    const lead={id:newId,raId:user.role==="RA"?user.id:user.id,...newLeadForm,price,status:"Lead Created",appId:"",createdAt:now(),c24Quote:0,serviceCharge:0,finalPayable:0,challan:0,otherCharges_lead:0,partyPeshi:0,deliveryPayment:0,deliveryReleased:0,deliveryPending:0,stageUpdatedAt:""};
+    setLeads(p=>[...p,lead]);
+    setNewLeadForm({});setView("list");setStep(0);
+    setStageLeadId(newId);
+  }
+
+  // ── LEAD DETAIL VIEW ──
+  if(sel&&!stageLeadId){
+    const lead=leads.find(l=>l.id===sel);
+    if(!lead)return null;
+    const ld=dealers.find(d=>d.id===lead.dealerId);const lc=counters.find(c=>c.id===lead.counterId);
+    const ra=ALL_USERS.find(u=>u.id===lead.raId);const app=apps.find(a=>a.id===lead.appId);
+    return <div>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
+        <div style={{display:"flex",alignItems:"center",gap:8}}><Btn v="ghost" onClick={()=>setSel(null)} sm>← Back</Btn><span style={{fontSize:14,fontWeight:800}}>{lead.make} {lead.model} {lead.year}</span></div>
+        <Btn sm v="primary" icon="🎯" onClick={()=>setStageLeadId(lead.id)}>Update Stage</Btn>
+      </div>
+      <div style={{background:`linear-gradient(135deg,${T.accentD},${T.accent})`,borderRadius:12,padding:14,marginBottom:10,color:"#fff"}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
+          <div><div style={{fontSize:9,opacity:0.7,fontWeight:800,marginBottom:3}}>CURRENT STAGE</div><Badge s={lead.status} sm/></div>
+          {lead.c24Quote>0&&<div style={{textAlign:"right"}}><div style={{fontSize:9,opacity:0.7,marginBottom:2}}>C24 QUOTE</div><div style={{fontSize:20,fontWeight:900}}>{fmt(lead.c24Quote)}</div></div>}
+        </div>
+        {lead.finalPayable>0&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginTop:6,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.15)"}}>
+          {[["Svc Charge",fmt(lead.serviceCharge)],["Final Payable",fmt(lead.finalPayable)],["Delivery Pmt",fmt(lead.deliveryPayment)]].map(([l,v])=><div key={l}><div style={{fontSize:9,opacity:0.6,marginBottom:1}}>{l}</div><div style={{fontSize:11,fontWeight:800}}>{v}</div></div>)}
+        </div>}
+        {lead.deliveryReleased>0&&<div style={{marginTop:8,display:"flex",gap:8}}>
+          <div style={{flex:1,background:"rgba(255,255,255,0.15)",borderRadius:7,padding:"5px 8px"}}><div style={{fontSize:9,opacity:0.7}}>Released</div><div style={{fontSize:12,fontWeight:800}}>{fmt(lead.deliveryReleased)}</div></div>
+          {lead.deliveryPending>0&&<div style={{flex:1,background:"rgba(255,180,0,0.2)",borderRadius:7,padding:"5px 8px"}}><div style={{fontSize:9,opacity:0.7}}>⏳ Pending</div><div style={{fontSize:12,fontWeight:800}}>{fmt(lead.deliveryPending)}</div></div>}
+          {lead.deliveryPending===0&&<div style={{flex:1,background:"rgba(16,185,129,0.2)",borderRadius:7,padding:"5px 8px"}}><div style={{fontSize:9,opacity:0.7}}>✓ Fully Released</div></div>}
+        </div>}
+      </div>
+      <Card style={{marginBottom:8}}><ST>Vehicle</ST>{[["Reg. No.",lead.regNo],["Make / Model",`${lead.make} ${lead.model}`],["Year / Variant",`${lead.year} ${lead.variant||""}`],["Fuel",lead.fuel],["Transmission",lead.transmission],["KM Driven",Number(lead.km||0).toLocaleString("en-IN")+" km"],["Ownership",lead.ownership],["Accident",lead.accident+(lead.accidentDesc?` (${lead.accidentDesc})`:"")],["Tyres",lead.tyres]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}</Card>
+      <Card style={{marginBottom:8}}><ST>Dealership</ST>{[["Dealer",ld&&ld.name],["Counter",lc&&lc.name],["UCM",lc&&lc.ucmName],["RA",ra&&ra.name]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}</Card>
+      {app&&<Card style={{marginBottom:8}}><ST>App_ID</ST>{[["App_ID",app.id],["GS Type",app.gsType],["Wallet",fmt(app.otherCharges-app.splitReleased)],["Stock-In",app.stockIn?"✓":"✗"]].map(([l,v])=><Row key={l} label={l} value={v}/>)}</Card>}
+    </div>;
+  }
+
+  // ── NEW LEAD FORM ──
+  if(view==="form") return <div>
+    {stageLeadId&&<StageDialogue lead={leads.find(l=>l.id===stageLeadId)||{id:"",make:"",model:"",year:"",regNo:"",status:"Lead Created",c24Quote:0,serviceCharge:0,finalPayable:0,challan:0,otherCharges_lead:0,partyPeshi:0,deliveryPayment:0,deliveryReleased:0,deliveryPending:0,inspectionNotes:"",tokenAmount:0,tokenNotes:"",siGsType:"GS",siNotes:""}} apps={apps} setApps={setApps} setLeads={setLeads} onClose={()=>setStageLeadId(null)}/>}
+    <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}><Btn v="ghost" onClick={()=>{setView("list");setStep(0);setNewLeadForm({});}} sm>← Back</Btn><span style={{fontSize:14,fontWeight:800}}>New Lead</span></div>
+    <StepBar steps={["Location","Vehicle","Condition","Price"]} cur={step}/>
+    {step===0&&<Card><ST>Step 1 — Dealership & Counter</ST>
+      <Sel label="Dealership" value={newLeadForm.dealerId} onChange={v=>nf("dealerId",v)} options={myDealers.map(d=>({value:d.id,label:`${d.name} (${d.code})`}))} placeholder="Select dealer..." required/>
+      {newLeadForm.dealerId&&<>{dealerCtrs.length===0?<Alrt type="warning">No active counters for this dealer.</Alrt>:<Sel label="Counter" value={newLeadForm.counterId} onChange={v=>nf("counterId",v)} options={dealerCtrs.map(c=>({value:c.id,label:`${c.name} — ${c.city}`}))} placeholder="Select counter..." required/>}{selCtr&&<div style={{background:T.accentL,borderRadius:8,padding:10,marginBottom:10}}><div style={{fontSize:10,fontWeight:800,color:T.accent,marginBottom:4}}>AUTO-FILLED</div><Row label="UCM" value={selCtr.ucmName}/><Row label="Mobile" value={selCtr.ucmMobile}/></div>}</>}
+      <Fld label="Registration Number" value={newLeadForm.regNo} onChange={v=>nf("regNo",v.toUpperCase())} required placeholder="e.g. DL3CAB1234" maxLength={15}/>
+      <div style={{display:"flex",justifyContent:"flex-end"}}><Btn disabled={!newLeadForm.dealerId||!newLeadForm.counterId||!newLeadForm.regNo} onClick={()=>setStep(1)}>Next →</Btn></div>
+    </Card>}
+    {step===1&&<Card><ST>Step 2 — Vehicle</ST>
+      <G2><Sel label="Make" value={newLeadForm.make} onChange={v=>nf("make",v)} options={CAR_MAKES} placeholder="Select make..." required/><Fld label="Model" value={newLeadForm.model} onChange={v=>nf("model",v)} required placeholder="e.g. Creta"/></G2>
+      <G2><Sel label="Year" value={newLeadForm.year} onChange={v=>nf("year",v)} options={Array.from({length:15},(_,i)=>String(2026-i))} placeholder="Year..." required/><Fld label="Variant" value={newLeadForm.variant} onChange={v=>nf("variant",v)} placeholder="e.g. SX 1.5D"/></G2>
+      <G2><Sel label="Fuel" value={newLeadForm.fuel} onChange={v=>nf("fuel",v)} options={["Petrol","Diesel","CNG","Electric","Hybrid"]} placeholder="Fuel..." required/><Sel label="Transmission" value={newLeadForm.transmission} onChange={v=>nf("transmission",v)} options={["Manual","Automatic","AMT","CVT","DCT"]} placeholder="Trans..." required/></G2>
+      <G2><Fld label="Color" value={newLeadForm.color} onChange={v=>nf("color",v)} placeholder="Pearl White"/><Fld label="KM Driven" value={newLeadForm.km} onChange={v=>nf("km",v)} type="number" required placeholder="35000"/></G2>
+      <Sel label="Ownership" value={newLeadForm.ownership} onChange={v=>nf("ownership",v)} options={["1st","2nd","3rd+"]} placeholder="Select..." required/>
+      <div style={{display:"flex",justifyContent:"space-between"}}><Btn v="secondary" onClick={()=>setStep(0)}>← Back</Btn><Btn disabled={!newLeadForm.make||!newLeadForm.model||!newLeadForm.year||!newLeadForm.fuel||!newLeadForm.transmission||!newLeadForm.km||!newLeadForm.ownership} onClick={()=>setStep(2)}>Next →</Btn></div>
+    </Card>}
+    {step===2&&<Card><ST>Step 3 — Condition</ST>
+      <Sel label="Accident History" value={newLeadForm.accident} onChange={v=>nf("accident",v)} options={["No","Minor","Major"]} placeholder="Select..." required/>
+      {newLeadForm.accident&&newLeadForm.accident!=="No"&&<Fld label="Accident Details" value={newLeadForm.accidentDesc} onChange={v=>nf("accidentDesc",v)} placeholder="e.g. Front bumper"/>}
+      <Sel label="Flood" value={newLeadForm.flood} onChange={v=>nf("flood",v)} options={["No","Yes"]} placeholder="Select..." required/>
+      <Sel label="Tyres" value={newLeadForm.tyres} onChange={v=>nf("tyres",v)} options={["Excellent","Good","Fair","Poor"]} placeholder="Select..." required/>
+      <Sel label="Engine" value={newLeadForm.engine} onChange={v=>nf("engine",v)} options={["No issues","Minor issue","Major issue"]} placeholder="Select..." required/>
+      <Sel label="Electrical" value={newLeadForm.electrical} onChange={v=>nf("electrical",v)} options={["No issues","Minor issue","Major issue"]} placeholder="Select..." required/>
+      <div style={{display:"flex",justifyContent:"space-between"}}><Btn v="secondary" onClick={()=>setStep(1)}>← Back</Btn><Btn disabled={!newLeadForm.accident||!newLeadForm.flood||!newLeadForm.tyres||!newLeadForm.engine||!newLeadForm.electrical} onClick={()=>setStep(3)}>Get Price →</Btn></div>
+    </Card>}
+    {step===3&&<Card><ST>Step 4 — Price</ST>
+      <div style={{background:`linear-gradient(135deg,${T.accentD},${T.accent})`,borderRadius:12,padding:16,textAlign:"center",marginBottom:12}}><div style={{fontSize:10,color:"rgba(255,255,255,0.7)",fontWeight:800,letterSpacing:1,marginBottom:4}}>INDICATIVE C24 PRICE</div><div style={{fontSize:30,fontWeight:900,color:"#fff"}}>{fmt(calcPrice(newLeadForm))}</div></div>
+      <Alrt type="info">After submitting, a stage update dialogue will open immediately.</Alrt>
+      {[["Reg. No.",newLeadForm.regNo],["Vehicle",`${newLeadForm.make} ${newLeadForm.model} ${newLeadForm.year}`],["Dealer",selDealer&&selDealer.name],["Counter",selCtr&&selCtr.name]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}
+      <div style={{display:"flex",justifyContent:"space-between",marginTop:10}}><Btn v="secondary" onClick={()=>setStep(2)}>← Edit</Btn><Btn v="success" icon="✓" onClick={submitLead}>Submit & Set Stage →</Btn></div>
+    </Card>}
+  </div>;
+
+  // ── LEAD LIST ──
+  const stageDialogueLead=stageLeadId?leads.find(l=>l.id===stageLeadId):null;
+  return <div>
+    {stageDialogueLead&&<StageDialogue lead={stageDialogueLead} apps={apps} setApps={setApps} setLeads={setLeads} onClose={()=>{setStageLeadId(null);}}/>}
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
+      <Lbl>Leads ({myLeads.length})</Lbl>
+      {(user.role==="RA"||user.role==="RM"||user.role==="TM")&&<Btn sm icon="+" onClick={()=>setView("form")}>New Lead</Btn>}
+    </div>
+    {myLeads.length===0&&<div style={{textAlign:"center",padding:36,color:T.mute}}><div style={{fontSize:28,marginBottom:8}}>📋</div><div>No leads yet</div></div>}
+    {user.role==="RM"&&user.raIds&&user.raIds.map(raId=>{const ra=ALL_USERS.find(u=>u.id===raId);const raL=myLeads.filter(l=>l.raId===raId);return <div key={raId} style={{marginBottom:14}}><div style={{fontSize:11,fontWeight:800,color:T.accent,marginBottom:6,padding:"4px 0",borderBottom:`1px solid ${T.accentL}`}}>{ra&&ra.name} — {raL.length} leads</div>{raL.map(l=>renderLeadCard(l))}</div>;})}
+    {(user.role==="RA"||isOps)&&myLeads.map(l=>renderLeadCard(l))}
+  </div>;
+
+  function renderLeadCard(l){
+    const d=dealers.find(dd=>dd.id===l.dealerId);
+    const c=counters.find(cc=>cc.id===l.counterId);
+    return <Card key={l.id} style={{marginBottom:8}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
+        <span style={{fontSize:12,fontWeight:800}}>{l.make} {l.model} {l.year}</span>
+        <Badge s={l.status} sm/>
+      </div>
+      {l.c24Quote>0
+        ?<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:5,marginBottom:6}}>
+          {[["Quote",fmt(l.c24Quote)],["Payable",fmt(l.finalPayable)],["Delivery",fmt(l.deliveryPayment)]].map(([lbl,v])=><div key={lbl} style={{background:"#F8FAFC",borderRadius:6,padding:"4px 6px"}}><div style={{fontSize:9,color:T.mute,fontWeight:700}}>{lbl}</div><div style={{fontSize:10,fontWeight:800}}>{v}</div></div>)}
+        </div>
+        :<div style={{fontSize:11,color:T.accent,fontWeight:700,marginBottom:4}}>Indicative: {fmt(l.price)}</div>}
+      <div style={{fontSize:11,color:T.mute,marginBottom:4}}>{l.regNo} · {d&&d.name} · {c&&c.name}</div>
+      {l.appId&&<div style={{fontSize:10,color:T.success,fontWeight:700,marginBottom:4}}>App_ID: {l.appId}</div>}
+      {l.deliveryReleased>0&&<div style={{display:"flex",gap:6,marginBottom:4}}>
+        <span style={{fontSize:10,fontWeight:800,color:T.success}}>💸 Released: {fmt(l.deliveryReleased)}</span>
+        {l.deliveryPending>0&&<span style={{fontSize:10,fontWeight:800,color:T.warn}}>⏳ Pending: {fmt(l.deliveryPending)}</span>}
+      </div>}
+      <div style={{display:"flex",gap:6}}>
+        <Btn sm v="secondary" onClick={()=>setSel(l.id)}>View</Btn>
+        <Btn sm v="primary" icon="🎯" onClick={()=>setStageLeadId(l.id)}>Update Stage</Btn>
+      </div>
+    </Card>;
+  }
+}
+
+
+
 function AppIDsModule({user,shared}){
-  const{apps,dealers,counters}=shared;const[sel,setSel]=useState(null);
+  const{apps,dealers,counters,leads}=shared;const[sel,setSel]=useState(null);
   let raIds=[user.id];if(user.role==="RM"&&user.raIds)raIds=[user.id,...user.raIds];
   const myApps=apps.filter(a=>raIds.includes(a.raId));
-  const renderApp=(a,extra)=>{const d=dealers.find(dd=>dd.id===a.dealerId);const c=counters.find(cc=>cc.id===a.counterId);const isOpen=sel===a.id;return <Card key={a.id} onClick={()=>setSel(isOpen?null:a.id)} style={{marginBottom:8,border:`1.5px solid ${isOpen?T.accent:T.border}`,background:isOpen?T.accentL:"#fff"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:12,fontWeight:800,color:T.accent}}>{a.id}</span><Badge s={a.stockIn?"Active":"Stock-In Pending"} sm/></div><div style={{fontSize:12,fontWeight:700,marginBottom:2}}>{a.vehicle}</div><div style={{fontSize:11,color:T.mute,marginBottom:6}}>{a.regNo} · {d&&d.name}</div><div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:5}}>{[["Available",fmt(a.otherCharges-a.splitReleased)],["Quote",fmt(a.quote)],["Type",a.gsType]].map(([l,v])=><div key={l} style={{background:"#F8FAFC",borderRadius:6,padding:"5px 7px"}}><div style={{fontSize:9,color:T.mute,fontWeight:700}}>{l}</div><div style={{fontSize:10,fontWeight:800,marginTop:1}}>{v}</div></div>)}</div>{isOpen&&<div style={{marginTop:10,borderTop:`1px solid ${T.border}`,paddingTop:10}}><ST>Full Details</ST>{[["Reg. No.",a.regNo],["Dealer",d&&d.name],["Dealer Code",d&&d.code],["Counter",c&&c.name],["City",c&&c.city],["UCM",c&&c.ucmName],["UCM Mobile",c&&c.ucmMobile],["C24 Quote",fmt(a.quote)],["Service Charge",fmt(a.serviceCharge)],["Challan",fmt(a.challan)],["Est. Refurb",fmt(a.estRefurb)],["Other Charges",fmt(a.otherCharges)],["Split Released",fmt(a.splitReleased)],["Split Available",fmt(a.otherCharges-a.splitReleased)],["GS Type",a.gsType],["Stock-In",a.stockIn?"✓ Complete":"✗ Pending"],...(extra||[])].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}</div>}</Card>;};
+  const renderApp=(a,extra)=>{
+    const d=dealers.find(dd=>dd.id===a.dealerId);const c=counters.find(cc=>cc.id===a.counterId);const isOpen=sel===a.id;
+    const linkedLead=leads.find(l=>l.appId===a.id);
+    // Stage pills
+    const stagePills=[{k:"inspectionDone",l:"Insp",c:"#5B21B6"},{k:"tokenDone",l:"Token",c:"#065F46"},{k:"siDone",l:"SI",c:"#0F4C81"}];
+    return <Card key={a.id} onClick={()=>setSel(isOpen?null:a.id)} style={{marginBottom:8,border:`1.5px solid ${isOpen?T.accent:T.border}`,background:isOpen?T.accentL:"#fff"}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+        <span style={{fontSize:12,fontWeight:800,color:T.accent}}>{a.id}</span>
+        <div style={{display:"flex",gap:4,alignItems:"center"}}>
+          {stagePills.map(p=><span key={p.k} style={{fontSize:9,fontWeight:800,padding:"2px 6px",borderRadius:8,background:a[p.k]?p.c+"22":"#F1F5F9",color:a[p.k]?p.c:"#94A3B8",border:`1px solid ${a[p.k]?p.c+"44":T.border}`}}>{p.l} {a[p.k]?"✓":"○"}</span>)}
+        </div>
+      </div>
+      <div style={{fontSize:12,fontWeight:700,marginBottom:2}}>{a.vehicle}</div>
+      <div style={{fontSize:11,color:T.mute,marginBottom:6}}>{a.regNo} · {d&&d.name}</div>
+      {linkedLead&&linkedLead.c24Quote>0&&<div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:5,marginBottom:6}}>
+        {[["C24 Quote",fmt(linkedLead.c24Quote)],["Svc Chg",fmt(linkedLead.serviceCharge)],["Payable",fmt(linkedLead.finalPayable)]].map(([l,v])=><div key={l} style={{background:"#EBF4FF",borderRadius:6,padding:"4px 6px"}}><div style={{fontSize:9,color:T.accent,fontWeight:700}}>{l}</div><div style={{fontSize:10,fontWeight:800,marginTop:1}}>{v}</div></div>)}
+      </div>}
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:5}}>
+        {[["Wallet",fmt(a.otherCharges-a.splitReleased)],["Released",fmt(a.splitReleased)],["GS Type",a.gsType]].map(([l,v])=><div key={l} style={{background:"#F8FAFC",borderRadius:6,padding:"5px 7px"}}><div style={{fontSize:9,color:T.mute,fontWeight:700}}>{l}</div><div style={{fontSize:10,fontWeight:800,marginTop:1}}>{v}</div></div>)}
+      </div>
+      {linkedLead&&linkedLead.deliveryReleased>0&&<div style={{fontSize:10,fontWeight:800,color:T.success,marginTop:5}}>💸 Delivery Released: {fmt(linkedLead.deliveryReleased)}</div>}
+      {isOpen&&<div style={{marginTop:10,borderTop:`1px solid ${T.border}`,paddingTop:10}}>
+        <ST>Full Details</ST>
+        {[["Reg. No.",a.regNo],["Dealer",d&&d.name],["Dealer Code",d&&d.code],["Counter",c&&c.name],["City",c&&c.city],["UCM",c&&c.ucmName],["UCM Mobile",c&&c.ucmMobile],["C24 Quote",fmt(a.quote)],["Service Charge",fmt(a.serviceCharge)],["Challan",fmt(a.challan)],["Est. Refurb",fmt(a.estRefurb)],["Other Charges (SI)",fmt(a.otherCharges)],["Split Released",fmt(a.splitReleased)],["Wallet Balance",fmt(a.otherCharges-a.splitReleased)],["GS Type",a.gsType],["Stock-In",a.stockIn?"✓ Complete":"✗ Pending"],["Inspection",a.inspectionDone?"✓ Done ("+a.inspectionAt+")":"○ Pending"],["Token",a.tokenDone?"✓ Done — "+fmt(a.tokenAmount||0):"○ Pending"],["SI",a.siDone?"✓ Done ("+a.siAt+")":"○ Pending"],...(linkedLead&&linkedLead.c24Quote>0?[["Final Payable to CX",fmt(linkedLead.finalPayable)],["Delivery Payment",fmt(linkedLead.deliveryPayment)],["Delivery Released",linkedLead.deliveryReleased>0?fmt(linkedLead.deliveryReleased):"Not yet"]]:[]),...(extra||[])].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}
+        {a.inspectionNotes&&<div style={{fontSize:11,color:T.mid,background:"#F5F3FF",borderRadius:6,padding:"6px 8px",marginTop:4}}>Inspection notes: {a.inspectionNotes}</div>}
+      </div>}
+    </Card>;};
   return <div><Lbl>App_IDs ({myApps.length})</Lbl>
     {user.role==="RM"&&user.raIds&&user.raIds.map(raId=>{const ra=ALL_USERS.find(u=>u.id===raId);const raApps=myApps.filter(a=>a.raId===raId);return <div key={raId} style={{marginBottom:14}}><div style={{fontSize:11,fontWeight:800,color:T.accent,marginBottom:6,padding:"4px 0",borderBottom:`1px solid ${T.accentL}`}}>{ra&&ra.name} — Wallet: {fmt(raWalBal(raId,apps))}</div>{raApps.map(a=>renderApp(a,[["RA",ra&&ra.name]]))}</div>;})}
     {user.role==="RA"&&myApps.map(a=>renderApp(a))}
@@ -611,154 +950,228 @@ function ConfigModule({user,shared}){
 // ═══════════════════════════════════════════════
 // STAGE MARKING MODULE (RA/RM + Ops/TM view)
 // ═══════════════════════════════════════════════
-function StageModule({user,shared}){
-  const{apps,setApps,leads,setLeads,dealers,counters}=shared;
-  const[selAppId,setSelAppId]=useState("");const[activeStage,setActiveStage]=useState(null);const[form,setForm]=useState({});const[showConfirm,setShowConfirm]=useState(false);
-  const isOps=["TM","Central Ops","Business Head"].includes(user.role);
-  let raIds=[user.id];if(user.role==="RM"&&user.raIds)raIds=[user.id,...user.raIds];
-  const myApps=isOps?apps:apps.filter(a=>raIds.includes(a.raId));
-  const selApp=apps.find(a=>a.id===selAppId);
-  const selDealer=selApp?dealers.find(d=>d.id===selApp.dealerId):null;
-  const selCounter=selApp?counters.find(c=>c.id===selApp.counterId):null;
-  const lead=selApp?leads.find(l=>l.appId===selApp.id):null;
-  const f=(k,v)=>setForm(p=>({...p,[k]:v}));
-
-  const stages=[
-    {id:"inspection",label:"Inspection Done",icon:"🔍",doneKey:"inspectionDone",atKey:"inspectionAt",color:"#5B21B6",bg:"#F5F3FF",
-     fields:[{k:"inspectionNotes",l:"Inspection Notes / Remarks",ph:"e.g. Clean car, AC works fine, minor tyre wear"}]},
-    {id:"token",label:"Token Done",icon:"🤝",doneKey:"tokenDone",atKey:"tokenAt",color:"#065F46",bg:"#ECFDF5",
-     fields:[{k:"tokenAmount",l:"Token Amount (₹)",type:"number",ph:"e.g. 5000"},{k:"tokenNotes",l:"Token Notes",ph:"e.g. Cheque received"}]},
-    {id:"si",label:"Stock-In (SI) Done",icon:"✅",doneKey:"siDone",atKey:"siAt",color:"#0F4C81",bg:"#EBF4FF",
-     fields:[{k:"siOtherCharges",l:"Other Charges (₹)",type:"number",ph:"e.g. 18000"},{k:"siGsType",l:"GS Type",type:"sel",opts:["GS","Non-GS"]},{k:"siServiceCharge",l:"Service Charge (₹)",type:"number",ph:"optional override"},{k:"siChallan",l:"Challan (₹)",type:"number",ph:"optional"},{k:"siEstRefurb",l:"Est. Refurb (₹)",type:"number",ph:"optional"},{k:"siNotes",l:"SI Notes",ph:"e.g. All docs verified"}]},
-  ];
-
-  function openStage(stageId){
-    if(!selAppId){alert("Select an App_ID first");return;}
-    const st=stages.find(s=>s.id===stageId);
-    if(selApp[st.doneKey]){if(!window.confirm("This stage is already marked. Re-mark / update?"))return;}
-    const prefill={};st.fields.forEach(f=>{if(selApp[f.k]!==undefined)prefill[f.k]=String(selApp[f.k]);});
-    setForm(prefill);setActiveStage(stageId);setShowConfirm(false);
-  }
-
-  function saveStage(){
-    const st=stages.find(s=>s.id===activeStage);const nowTs=new Date().toLocaleString("en-IN",{hour12:false}).slice(0,16);
-    const updates={[st.doneKey]:true,[st.atKey]:nowTs};
-    st.fields.forEach(f=>{updates[f.k]=f.type==="number"?Number(form[f.k]||0):(form[f.k]||"");});
-    // if SI marked, update stock-in, otherCharges, gsType on the app
-    if(activeStage==="si"){
-      updates.stockIn=true;
-      if(form.siOtherCharges)updates.otherCharges=Number(form.siOtherCharges);
-      if(form.siGsType)updates.gsType=form.siGsType;
-      if(form.siServiceCharge)updates.serviceCharge=Number(form.siServiceCharge);
-      if(form.siChallan)updates.challan=Number(form.siChallan);
-      if(form.siEstRefurb)updates.estRefurb=Number(form.siEstRefurb);
-    }
-    setApps(prev=>prev.map(a=>a.id===selAppId?{...a,...updates}:a));
-    // also update linked lead status
-    const leadStatus=activeStage==="inspection"?"Inspection Done":activeStage==="token"?"Token Done":"App_ID Created";
-    setLeads(prev=>prev.map(l=>l.appId===selAppId?{...l,status:activeStage==="si"?"App_ID Created":leadStatus}:l));
-    setActiveStage(null);setForm({});
-    alert("✓ Stage marked! Lead status and App_ID updated.");
-  }
-
-  const stageColor={inspection:{c:"#5B21B6",bg:"#F5F3FF"},token:{c:"#065F46",bg:"#ECFDF5"},si:{c:"#0F4C81",bg:"#EBF4FF"}};
-
-  return <div>
-    <Alrt type="info">Select any App_ID to mark/update stage milestones. SI marking updates stockIn flag, wallet, and GS type in real time.</Alrt>
-    <Card style={{marginBottom:14}}>
-      <ST>Select App_ID</ST>
-      <Sel value={selAppId} onChange={v=>{setSelAppId(v);setActiveStage(null);setForm({});}} options={myApps.map(a=>{const d=dealers.find(dd=>dd.id===a.dealerId);return{value:a.id,label:`${a.id} — ${a.vehicle} (${d?d.name:""})`};})} placeholder="Choose App_ID..."/>
-      {selApp&&<>
-        <div style={{background:T.accentL,borderRadius:9,padding:12,marginTop:10}}>
-          <div style={{fontSize:10,fontWeight:800,color:T.accent,marginBottom:6}}>APP_ID DETAILS</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
-            {[["Vehicle",selApp.vehicle],["Reg. No.",selApp.regNo],["Dealer",selDealer&&selDealer.name],["Counter",selCounter&&selCounter.name],["UCM",selCounter&&selCounter.ucmName],["GS Type",selApp.gsType],["Quote",fmt(selApp.quote)],["Wallet",fmt(selApp.otherCharges-selApp.splitReleased)]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:T.accent,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800,wordBreak:"break-word"}}>{v||"—"}</div></div>)}
-          </div>
-        </div>
-        {lead&&<div style={{marginTop:8,fontSize:11,color:T.mid}}>Linked Lead: <strong>{lead.id}</strong> · Status: <Badge s={lead.status} sm/></div>}
-      </>}
-    </Card>
-
-    {selApp&&<>
-      <Lbl>Stage Timeline</Lbl>
-      <div style={{position:"relative",marginBottom:14}}>
-        <div style={{position:"absolute",left:18,top:0,bottom:0,width:2,background:T.border,zIndex:0}}/>
-        {stages.map((st,i)=>{const done=selApp[st.doneKey];const at=selApp[st.atKey];const sc=stageColor[st.id];return <div key={st.id} style={{display:"flex",gap:12,marginBottom:12,position:"relative",zIndex:1}}>
-          <div style={{width:36,height:36,borderRadius:"50%",background:done?sc.bg:"#F1F5F9",border:`2px solid ${done?sc.c:T.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>{done?st.icon:"○"}</div>
-          <div style={{flex:1}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:3}}>
-              <div><span style={{fontSize:13,fontWeight:800,color:done?sc.c:T.mute}}>{st.label}</span>{done&&<span style={{marginLeft:6,fontSize:10,color:T.mute}}>· {at}</span>}</div>
-              <Btn sm v={done?"secondary":"primary"} onClick={()=>openStage(st.id)}>{done?"Update":"Mark Done"}</Btn>
-            </div>
-            {done&&st.id==="inspection"&&selApp.inspectionNotes&&<div style={{fontSize:11,color:T.mid,background:sc.bg,borderRadius:6,padding:"4px 8px"}}>{selApp.inspectionNotes}</div>}
-            {done&&st.id==="token"&&<div style={{fontSize:11,color:T.mid,background:sc.bg,borderRadius:6,padding:"4px 8px"}}>Token: {fmt(selApp.tokenAmount||0)}{selApp.tokenNotes?` · ${selApp.tokenNotes}`:""}</div>}
-            {done&&st.id==="si"&&<div style={{fontSize:11,color:T.mid,background:sc.bg,borderRadius:6,padding:"4px 8px"}}>Other Charges: {fmt(selApp.siOtherCharges||0)} · GS: {selApp.siGsType}{selApp.siNotes?` · ${selApp.siNotes}`:""}</div>}
-          </div>
-        </div>;})}
-      </div>
-
-      {activeStage&&<Card style={{border:`1.5px solid ${stageColor[activeStage].c}`,background:stageColor[activeStage].bg+"44"}}>
-        <ST>{stages.find(s=>s.id===activeStage).icon} {stages.find(s=>s.id===activeStage).label}</ST>
-        {activeStage==="si"&&<Alrt type="info">Marking SI Done will set stockIn=true on this App_ID, unlock the wallet, and update GS type. RA will see wallet as available immediately.</Alrt>}
-        {stages.find(s=>s.id===activeStage).fields.map(fld=>fld.type==="sel"?<Sel key={fld.k} label={fld.l} value={form[fld.k]||""} onChange={v=>f(fld.k,v)} options={fld.opts} placeholder="Select..."/>:<Fld key={fld.k} label={fld.l} value={form[fld.k]||""} onChange={v=>f(fld.k,v)} type={fld.type||"text"} placeholder={fld.ph}/>)}
-        <div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:8}}><Btn v="secondary" sm onClick={()=>{setActiveStage(null);setForm({});}}>Cancel</Btn><Btn v="success" icon="✓" onClick={saveStage}>Confirm & Save</Btn></div>
-      </Card>}
-    </>}
-  </div>;
-}
-
-// ═══════════════════════════════════════════════
-// COUNTER/UCM OVERRIDE MODULE (TM / Central Ops / BH)
-// ═══════════════════════════════════════════════
 function CounterUCMOverride({user,shared}){
   const{apps,setApps,counters,dealers}=shared;
-  const[selAppId,setSelAppId]=useState("");const[newCounterId,setNewCounterId]=useState("");const[reason,setReason]=useState("");const[log,setLog]=useState([]);const[done,setDone]=useState(false);
+  const[selAppId,setSelAppId]=useState("");
+  const[newDealerId,setNewDealerId]=useState("");
+  const[newCounterId,setNewCounterId]=useState("");
+  const[reason,setReason]=useState("");
+  const[log,setLog]=useState([]);
+  const[done,setDone]=useState(false);
+
   const canAccess=["TM","Central Ops","Business Head"].includes(user.role);
   if(!canAccess)return <div style={{textAlign:"center",padding:60,color:T.mute}}><div style={{fontSize:40,marginBottom:10}}>🔒</div><div style={{fontSize:14,fontWeight:700}}>TM, Central Ops & BH only.</div></div>;
 
-  const selApp=apps.find(a=>a.id===selAppId);const selDealer=selApp?dealers.find(d=>d.id===selApp.dealerId):null;
+  const selApp=apps.find(a=>a.id===selAppId);
+  const currentDealer=selApp?dealers.find(d=>d.id===selApp.dealerId):null;
   const currentCounter=selApp?counters.find(c=>c.id===selApp.counterId):null;
+  const newDealer=dealers.find(d=>d.id===newDealerId);
+  // Filter counters to only those of the selected new dealer
+  const dealerCounters=counters.filter(c=>c.dealerId===newDealerId&&c.status==="Active");
   const newCounter=counters.find(c=>c.id===newCounterId);
-  // Show all active counters (can change to any counter, even cross-dealer, for testing)
-  const availableCounters=counters.filter(c=>c.status==="Active"&&c.id!==selApp?.counterId);
 
   function applyOverride(){
-    if(!selAppId||!newCounterId||!reason){alert("Fill all fields");return;}
-    const entry={id:`OVR${Math.random().toString(36).slice(2,7).toUpperCase()}`,appId:selAppId,vehicle:selApp.vehicle,prevCounter:currentCounter?.name,prevUCM:currentCounter?.ucmName,newCounter:newCounter?.name,newUCM:newCounter?.ucmName,reason,by:user.role,at:new Date().toLocaleString("en-IN",{hour12:false}).slice(0,16)};
-    setApps(prev=>prev.map(a=>a.id===selAppId?{...a,counterId:newCounterId}:a));
-    setLog(p=>[entry,...p]);setDone(true);
-    setTimeout(()=>{setDone(false);setSelAppId("");setNewCounterId("");setReason("");},1200);
+    if(!selAppId||!newDealerId||!newCounterId||!reason){alert("Fill all fields");return;}
+    const entry={id:`OVR${Math.random().toString(36).slice(2,7).toUpperCase()}`,appId:selAppId,vehicle:selApp.vehicle,
+      prevDealer:currentDealer?.name,prevCounter:currentCounter?.name,prevUCM:currentCounter?.ucmName,
+      newDealer:newDealer?.name,newCounter:newCounter?.name,newUCM:newCounter?.ucmName,
+      reason,by:user.role,at:new Date().toLocaleString("en-IN",{hour12:false}).slice(0,16)};
+    setApps(prev=>prev.map(a=>a.id===selAppId?{...a,dealerId:newDealerId,counterId:newCounterId}:a));
+    setLog(p=>[entry,...p]);
+    setDone(true);
+    setTimeout(()=>{setDone(false);setSelAppId("");setNewDealerId("");setNewCounterId("");setReason("");},1400);
   }
 
-  if(done)return <div style={{textAlign:"center",padding:60}}><div style={{fontSize:48,marginBottom:12}}>✅</div><div style={{fontSize:15,fontWeight:800}}>Counter & UCM Updated!</div><div style={{fontSize:12,color:T.mute,marginTop:4}}>All payout references now use the new counter/UCM</div></div>;
+  if(done)return <div style={{textAlign:"center",padding:60}}><div style={{fontSize:48,marginBottom:12}}>✅</div><div style={{fontSize:15,fontWeight:800}}>Dealer, Counter & UCM Updated!</div><div style={{fontSize:12,color:T.mute,marginTop:4}}>All downstream references now reflect the new mapping</div></div>;
 
   return <div>
-    <Alrt type="warning">This overrides the counter and UCM mapped to any App_ID. Use to simulate different counter/UCM scenarios since Admin Panel is not integrated.</Alrt>
+    <Alrt type="warning">Override the Dealer, Counter and UCM on any App_ID. Used for scenario testing since Admin Panel is not integrated.</Alrt>
     <Card style={{marginBottom:14}}>
-      <ST>Override Counter & UCM for App_ID</ST>
-      <Sel label="Select App_ID" value={selAppId} onChange={v=>{setSelAppId(v);setNewCounterId("");}} options={apps.map(a=>{const d=dealers.find(dd=>dd.id===a.dealerId);return{value:a.id,label:`${a.id} — ${a.vehicle} (${d?d.name:""})`};})} placeholder="Choose App_ID..."/>
+      <ST>Select App_ID to Override</ST>
+      <Sel value={selAppId} onChange={v=>{setSelAppId(v);setNewDealerId("");setNewCounterId("");}}
+        options={apps.map(a=>{const d=dealers.find(dd=>dd.id===a.dealerId);return{value:a.id,label:`${a.id} — ${a.vehicle} (${d?d.name:""})`};})}
+        placeholder="Choose App_ID..."/>
+
       {selApp&&<>
-        <div style={{background:T.accentL,borderRadius:9,padding:12,marginBottom:10}}>
+        <div style={{background:T.accentL,borderRadius:9,padding:12,marginBottom:12}}>
           <div style={{fontSize:10,fontWeight:800,color:T.accent,marginBottom:6}}>CURRENT MAPPING</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
-            {[["Dealer",selDealer?.name],["Counter",currentCounter?.name],["UCM Name",currentCounter?.ucmName],["UCM Mobile",currentCounter?.ucmMobile],["Counter City",currentCounter?.city]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:T.accent,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800}}>{v||"—"}</div></div>)}
+            {[["Dealer",currentDealer?.name],["Dealer Code",currentDealer?.code],["Counter",currentCounter?.name],["UCM Name",currentCounter?.ucmName],["UCM Mobile",currentCounter?.ucmMobile],["Counter City",currentCounter?.city]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:T.accent,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800}}>{v||"—"}</div></div>)}
           </div>
         </div>
-        <Sel label="New Counter (includes all active counters)" value={newCounterId} onChange={setNewCounterId} options={availableCounters.map(c=>{const d=dealers.find(dd=>dd.id===c.dealerId);return{value:c.id,label:`${c.name} — ${c.ucmName} (${d?d.name:""})`};})} placeholder="Select new counter..."/>
-        {newCounter&&<div style={{background:T.successL,border:"1px solid #BBF7D0",borderRadius:9,padding:12,marginBottom:10}}>
-          <div style={{fontSize:10,fontWeight:800,color:T.success,marginBottom:6}}>NEW MAPPING PREVIEW</div>
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
-            {[["Counter",newCounter.name],["UCM Name",newCounter.ucmName],["UCM Mobile",newCounter.ucmMobile],["City",newCounter.city]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:T.success,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800}}>{v||"—"}</div></div>)}
-          </div>
-          {newCounter.dealerId!==selApp.dealerId&&<Alrt type="warning">Note: This counter belongs to a different dealer. Marking for cross-dealer scenario testing.</Alrt>}
-        </div>}
-        <Fld label="Reason / Note *" value={reason} onChange={setReason} placeholder="e.g. Testing different UCM scenario / Admin mapped differently" required/>
-        <Btn full v="primary" icon="⚡" disabled={!newCounterId||!reason} onClick={applyOverride}>Apply Counter & UCM Override</Btn>
+
+        <ST>New Dealer → Counter → UCM</ST>
+        <Sel label="Step 1 — Select New Dealer" value={newDealerId} onChange={v=>{setNewDealerId(v);setNewCounterId("");}}
+          options={dealers.filter(d=>d.status==="Active"&&d.id!==selApp.dealerId).map(d=>({value:d.id,label:`${d.name} (${d.code}) — ${d.city}`}))}
+          placeholder="Select new dealer..."/>
+
+        {newDealerId&&<>
+          {dealerCounters.length===0?<Alrt type="warning">No active counters for this dealer yet.</Alrt>:
+          <Sel label="Step 2 — Select Counter (filtered to new dealer)" value={newCounterId} onChange={setNewCounterId}
+            options={dealerCounters.map(c=>({value:c.id,label:`${c.name} — ${c.ucmName} (${c.city})`}))}
+            placeholder="Select counter..."/>}
+
+          {newCounter&&<div style={{background:T.successL,border:"1px solid #BBF7D0",borderRadius:9,padding:12,marginBottom:10}}>
+            <div style={{fontSize:10,fontWeight:800,color:T.success,marginBottom:6}}>NEW MAPPING PREVIEW</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
+              {[["Dealer",newDealer?.name],["Counter",newCounter.name],["UCM Name",newCounter.ucmName],["UCM Mobile",newCounter.ucmMobile],["City",newCounter.city]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:T.success,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800}}>{v||"—"}</div></div>)}
+            </div>
+          </div>}
+        </>}
+
+        <Fld label="Reason / Note *" value={reason} onChange={setReason} placeholder="e.g. Admin mapped to different dealer / scenario testing" required/>
+        <Btn full v="primary" icon="⚡" disabled={!newDealerId||!newCounterId||!reason} onClick={applyOverride}>Apply Override</Btn>
       </>}
     </Card>
-    {log.length>0&&<Card><Lbl>Override Log ({log.length})</Lbl>{log.map(e=><div key={e.id} style={{padding:"8px 0",borderBottom:`1px solid ${T.border}`}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}><span style={{fontSize:12,fontWeight:800,color:T.text}}>{e.appId} — {e.vehicle}</span><span style={{fontSize:10,color:T.mute}}>{e.at}</span></div><div style={{fontSize:11,color:T.mid}}>From: <strong>{e.prevCounter}</strong> / {e.prevUCM}</div><div style={{fontSize:11,color:T.success,fontWeight:700}}>→ To: {e.newCounter} / {e.newUCM}</div><div style={{fontSize:10,color:T.mute}}>Reason: {e.reason} · By: {e.by}</div></div>)}</Card>}
+    {log.length>0&&<Card><Lbl>Override Log ({log.length})</Lbl>{log.map(e=><div key={e.id} style={{padding:"8px 0",borderBottom:`1px solid ${T.border}`}}>
+      <div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}><span style={{fontSize:12,fontWeight:800}}>{e.appId} — {e.vehicle}</span><span style={{fontSize:10,color:T.mute}}>{e.at}</span></div>
+      <div style={{fontSize:11,color:T.mid}}>From: <strong>{e.prevDealer}</strong> / {e.prevCounter} / {e.prevUCM}</div>
+      <div style={{fontSize:11,color:T.success,fontWeight:700}}>→ To: {e.newDealer} / {e.newCounter} / {e.newUCM}</div>
+      <div style={{fontSize:10,color:T.mute}}>Reason: {e.reason} · By: {e.by}</div>
+    </div>)}</Card>}
   </div>;
 }
+
+
+
+// ═══════════════════════════════════════════════
+// ROLE GUIDE MODAL
+// ═══════════════════════════════════════════════
+const ROLE_GUIDES={
+  "RA":{color:"#0F4C81",bg:"#EBF4FF",icon:"🏃",title:"Relationship Associate",desc:"You are the field agent. You create leads, track vehicle journeys from inspection to SI, and monitor your wallet & payout status.",steps:[
+    {icon:"📋",title:"Create a Lead","body":"Go to Leads → New Lead. Fill dealer, counter, vehicle details in 4 steps. After submit, a stage dialogue opens immediately — set the current stage."},
+    {icon:"🎯",title:"Update Lead Stage","body":"On any lead card tap 'Update Stage'. Pick target stage (Inspection/Token/PR/Delivery/SI). Fill required inputs — amounts auto-calculate. You can skip to any stage and all inputs are collected."},
+    {icon:"💰",title:"Inspection","body":"Enter C24 Quote → Service Charge (2%) auto-calculates → Final Payable to CX shown instantly."},
+    {icon:"🤝",title:"Token","body":"Enter token amount (default ₹1) and notes. Used to mark token received from dealer/CX."},
+    {icon:"📋",title:"PR & Price Breakup","body":"Enter Challan, Other Charges, Party Peshi. Final Delivery Payment = Final Payable − all deductions."},
+    {icon:"💸",title:"Delivery Released","body":"Enter released amount (cannot exceed delivery payment). If partial, pending amount shows separately."},
+    {icon:"✅",title:"SI Done","body":"Marks Stock-In complete. This UNLOCKS your wallet — TM can now raise payouts for this App_ID. GS Type set here flows to payout logic."},
+    {icon:"🚗",title:"App_IDs","body":"View all your App_IDs with stage pills (Insp ✓ / Token ✓ / SI ✓), wallet balance, and full pricing details."},
+    {icon:"🏢",title:"Dealers & Counters","body":"Submit new dealer onboarding requests, counter/UCM mapping requests, and SAP payee creation requests."},
+    {icon:"💸",title:"Payouts","body":"Track payout requests raised by TM on your behalf. You cannot raise payouts — only TM can."},
+  ]},
+  "RM":{color:"#5B21B6",bg:"#F5F3FF",icon:"👤",title:"Regional Manager",desc:"You supervise your RAs. You see all their leads, App_IDs, wallet balances, and can raise onboarding/counter/SAP requests just like RAs.",steps:[
+    {icon:"🏠",title:"Dashboard","body":"See team wallet (all RAs combined), breakdown per RA, and recent activity. Spot who has pending SI or high wallet balance."},
+    {icon:"📋",title:"Team Leads","body":"Leads tab shows all your RAs' leads grouped by RA. You can open any lead and update its stage."},
+    {icon:"🚗",title:"Team App_IDs","body":"See all App_IDs across your team with wallet balance per RA."},
+    {icon:"🏢",title:"Dealer Requests","body":"Submit dealer onboarding, counter, SAP requests on behalf of your team."},
+    {icon:"💸",title:"Payout Tracker","body":"Monitor all payout requests raised by TM for your team's App_IDs."},
+  ]},
+  "TM":{color:"#065F46",bg:"#ECFDF5",icon:"🎯",title:"Territory Manager / City Head",desc:"You are the payout authority. You raise all payment requests for your team, can override counter/UCM mappings, and manage all dealer operations.",steps:[
+    {icon:"💸",title:"Raise Payout (most important)","body":"Go to Raise Payout. Select App_ID → dealer/counter/UCM/RA auto-fill. Select payout type (Split or Incentive). Choose payee. Enter amount + reason. System auto-checks rules → shows route (Auto-Approved / Ops Review / BH Review / BLOCKED)."},
+    {icon:"🚫",title:"Payout blocked?","body":"If stockIn=false the payout is blocked. Ask RA to update lead stage to SI Done first. Once done, wallet unlocks and payout flows through."},
+    {icon:"📋",title:"Update Lead Stages","body":"Go to Leads. You can see all leads across all RAs. Tap 'Update Stage' on any lead to mark Inspection/Token/PR/Delivery/SI."},
+    {icon:"🔄",title:"Counter & UCM Override","body":"Go to Ctr Override. Select App_ID → pick new dealer → counter dropdown shows only that dealer's counters → UCM auto-fills. Apply override. All downstream (Raise Payout, Approvals) reflects instantly."},
+    {icon:"🏢",title:"Dealer / Counter / SAP","body":"TM can raise dealer onboarding, counter, and SAP requests directly — no need to route through RA."},
+    {icon:"💡",title:"Scenario Testing Tip","body":"Switch roles using the top-right dropdown. Create a lead as RA, update stages to SI Done, then switch to TM and raise a payout. Watch it flow through Approvals."},
+  ]},
+  "Central Ops":{color:"#92400E",bg:"#FFFBEB",icon:"⚙️",title:"Central Ops",desc:"You process all requests from the field — dealer onboarding, counter creation, SAP creation — and approve payouts at first level.",steps:[
+    {icon:"🏢",title:"Onboarding Queue","body":"Dealer onboarding requests from RA/TM appear here. Flow: Admin Panel Pending → simulate code received → OEM Tagging → Ops Review → Activate. Once activated, dealer appears for all roles."},
+    {icon:"🔗",title:"Counter Queue","body":"Counter/UCM mapping requests. Review and Approve → counter becomes available for lead creation and payout overrides."},
+    {icon:"🏦",title:"SAP Queue","body":"Payee creation requests. Approve → SAP code assigned → payee available for TM to select in Raise Payout."},
+    {icon:"✓",title:"Payout Approvals","body":"Payouts with status 'Submitted' land here. Review app details, RA wallet, payee info → Approve (moves to BH/Finance) or Reject."},
+    {icon:"🔄",title:"Counter Override","body":"Override dealer/counter/UCM on any App_ID for scenario testing."},
+    {icon:"⚡",title:"Data Transfer","body":"Bulk transfer all data from one RA to another (e.g. RA resigned). Or single entity re-map for specific dealer/app."},
+  ]},
+  "Business Head":{color:"#C2410C",bg:"#FFF7ED",icon:"👑",title:"Business Head",desc:"You have the highest authority. You approve high-value payouts, edit amounts, configure system rules, and see full team performance.",steps:[
+    {icon:"▦",title:"BH Dashboard","body":"See team wallet across all RAs, released MTD, pipeline amount, and recent payout activity at a glance."},
+    {icon:"✓",title:"Approvals","body":"Payouts routed to BH (incentive payouts, or after Ops Approval) appear here. You can override the amount before approving — any edit is permanently audit-logged."},
+    {icon:"⚙",title:"Config Keys","body":"Adjust key thresholds: Split Gate (auto-approve below ₹15K), Non-GS Rate (2%), Non-GS Cap (₹10K), Finance Gate (₹15K). Changes apply immediately to all new requests."},
+    {icon:"⚡",title:"Data Transfer","body":"Full authority to bulk-transfer or re-map any entity. All logged."},
+    {icon:"🔄",title:"Counter Override","body":"Override dealer/counter/UCM on any App_ID."},
+  ]},
+  "Finance":{color:"#991B1B",bg:"#FEF2F2",icon:"💼",title:"Finance",desc:"You give final approval for high-value payouts (≥₹15,000). Payout releases above the Finance Gate come to you after BH approves.",steps:[
+    {icon:"✓",title:"Approvals Queue","body":"Only payouts with status 'BH Approved' AND amount ≥ Finance Gate (₹15K) appear here. Click any request to review full details — App_ID, dealer, payee, RA wallet."},
+    {icon:"💸",title:"Final Approve & Release","body":"Approving marks payout as Released, generates UTR, and deducts from RA wallet immediately."},
+    {icon:"📊",title:"Full History","body":"Scroll down in Approvals to see all historical payout requests with statuses."},
+    {icon:"💡",title:"Tip","body":"To test a Finance-routed payout: switch to TM, raise a Split payout ≥ ₹15K on a stockIn=true App_ID. It flows: Submitted → Ops Approved → BH Approved → Finance queue."},
+  ]},
+};
+
+function RoleGuide({user,onClose}){
+  const[tab,setTab]=useState(0);
+  const guide=ROLE_GUIDES[user.role]||ROLE_GUIDES["RA"];
+  const step=guide.steps[tab];
+  return <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.65)",zIndex:9500,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"20px 12px",overflowY:"auto"}}>
+    <div style={{width:"100%",maxWidth:480,background:"#fff",borderRadius:16,overflow:"hidden",boxShadow:"0 24px 64px rgba(0,0,0,0.4)"}}>
+      {/* Header */}
+      <div style={{background:`linear-gradient(135deg,${guide.color}dd,${guide.color})`,padding:"16px 18px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div><div style={{fontSize:11,color:"rgba(255,255,255,0.65)",fontWeight:800,marginBottom:2,letterSpacing:1}}>ROLE GUIDE</div><div style={{color:"#fff",fontSize:16,fontWeight:900}}>{guide.icon} {guide.title}</div></div>
+        <button onClick={onClose} style={{background:"rgba(255,255,255,0.15)",border:"none",color:"#fff",width:32,height:32,borderRadius:8,cursor:"pointer",fontSize:18,display:"flex",alignItems:"center",justifyContent:"center",fontWeight:700}}>×</button>
+      </div>
+      {/* Desc */}
+      <div style={{padding:"12px 18px",background:guide.bg,borderBottom:`1px solid ${guide.color}22`,fontSize:12,color:guide.color,fontWeight:600,lineHeight:1.5}}>{guide.desc}</div>
+      {/* Steps nav */}
+      <div style={{display:"flex",overflowX:"auto",padding:"10px 12px 0",gap:6,borderBottom:`1px solid ${T.border}`,WebkitOverflowScrolling:"touch"}}>
+        {guide.steps.map((s,i)=><button key={i} onClick={()=>setTab(i)} style={{flexShrink:0,padding:"5px 10px",borderRadius:20,border:`1.5px solid ${tab===i?guide.color:T.border}`,background:tab===i?guide.bg:"#fff",color:tab===i?guide.color:T.mute,cursor:"pointer",fontSize:10,fontWeight:700,fontFamily:"inherit",whiteSpace:"nowrap",marginBottom:8}}>{s.icon} {s.title}</button>)}
+      </div>
+      {/* Step content */}
+      <div style={{padding:"20px 18px"}}>
+        <div style={{fontSize:22,marginBottom:8}}>{step.icon}</div>
+        <div style={{fontSize:15,fontWeight:900,color:T.text,marginBottom:8}}>{step.title}</div>
+        <div style={{fontSize:13,color:T.mid,lineHeight:1.65}}>{step.body}</div>
+      </div>
+      {/* Nav */}
+      <div style={{padding:"0 18px 18px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div style={{fontSize:11,color:T.mute}}>{tab+1} / {guide.steps.length}</div>
+        <div style={{display:"flex",gap:8}}>
+          {tab>0&&<Btn v="secondary" sm onClick={()=>setTab(t=>t-1)}>← Prev</Btn>}
+          {tab<guide.steps.length-1?<Btn v="primary" sm onClick={()=>setTab(t=>t+1)}>Next →</Btn>:<Btn v="success" sm icon="✓" onClick={onClose}>Got it!</Btn>}
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
+
+// ═══════════════════════════════════════════════
+// ROLE GUIDE MODAL
+// ═══════════════════════════════════════════════
+const ROLE_GUIDES={
+  "RA":{icon:"📱",color:"#0F4C81",bg:"#EBF4FF",title:"RA — Relationship Associate",subtitle:"Field agent who creates leads and manages dealer relationships",steps:[
+    {step:"1",icon:"🏢",title:"Create a New Lead","desc":"Go to Leads → tap + New Lead. Fill dealer, counter, vehicle details across 4 steps. After submit, a stage dialogue opens automatically."},
+    {step:"2",icon:"🎯",title:"Update Lead Stage","desc":"From any lead card tap 'Update Stage'. Select a target stage — Inspection, Token, PR, Delivery Released, or SI Done. All required inputs appear below."},
+    {step:"3",icon:"🔍",title:"Inspection Done","desc":"Enter C24 Quote → Service Charge (2%) auto-calculates → Final Payable to CX is shown."},
+    {step:"4",icon:"🤝",title:"Token Done","desc":"Enter token amount (minimum ₹1) and any reference notes."},
+    {step:"5",icon:"📋",title:"PR Done","desc":"Enter Challan, Other Charges, Party Peshi → Final Delivery Payment auto-calculates."},
+    {step:"6",icon:"💸",title:"Delivery Released","desc":"Enter amount released (cannot exceed delivery payment). Pending amount shown if partially released."},
+    {step:"7",icon:"✅",title:"SI Done","desc":"Select GS/Non-GS type, add notes → saves to App_ID. TM can now raise payouts for this vehicle."},
+    {step:"8",icon:"🏦",title:"Submit SAP / Counter requests","desc":"Use Counter and SAP tabs to raise mapping requests to Central Ops."},
+  ]},
+  "RM":{icon:"👥",color:"#5B21B6",bg:"#F5F3FF",title:"RM — Regional Manager",subtitle:"Supervises RA team, monitors pipeline and wallets",steps:[
+    {step:"1",icon:"🏠",title:"Dashboard","desc":"See team wallet breakdown per RA, leads count, stock-in pending, and active deals at a glance."},
+    {step:"2",icon:"📋",title:"Leads — Team View","desc":"Leads tab shows all leads grouped by RA. Each card has stage badges. Tap 'Update Stage' to mark any lead on behalf of your RA."},
+    {step:"3",icon:"🚗",title:"App_IDs","desc":"See stage pills (Insp / Token / SI) and wallet balance per vehicle. Expand for full pricing breakdown."},
+    {step:"4",icon:"💸",title:"Payout Status","desc":"Track all payment requests raised by TM for your team. See UTR numbers for released payments."},
+  ]},
+  "TM":{icon:"🏙",color:"#065F46",bg:"#ECFDF5",title:"TM / City Head",subtitle:"Final payout authority — raises all payment requests",steps:[
+    {step:"1",icon:"📋",title:"Leads — Full View","desc":"See all leads across your city. Leads tab works the same as RA — you can update stages for any lead."},
+    {step:"2",icon:"💸",title:"Raise Payout","desc":"Select App_ID (only SI Done apps show wallet) → type auto-fills dealer/counter/UCM/RA → choose Split or Incentive → select payee → enter amount → check auto-approval rules."},
+    {step:"3",icon:"🔄",title:"Counter & UCM Override","desc":"Pick App_ID → select new Dealer → then counter filters to that dealer → apply override. Useful when Admin Panel mapping differs."},
+    {step:"4",icon:"🏢",title:"Request Onboarding / Counter / SAP","desc":"TM can raise all three request types just like RA — goes to Central Ops queue."},
+  ]},
+  "Central Ops":{icon:"⚙️",color:"#92400E",bg:"#FFFBEB",title:"Central Ops",subtitle:"Approves onboarding, counters, SAP, and payouts",steps:[
+    {step:"1",icon:"▦",title:"Dashboard","desc":"See all pending queues at a glance — onboarding, counter requests, SAP requests, payout approvals."},
+    {step:"2",icon:"🏢",title:"Onboarding Queue","desc":"Review dealer requests. Simulate dealer code receipt → complete OEM tagging → activate dealer. Activated dealers appear for all RA roles instantly."},
+    {step:"3",icon:"🔗",title:"Counter Queue","desc":"Review and approve counter+UCM mapping requests. Approved counters appear in RA lead form dropdown immediately."},
+    {step:"4",icon:"🏦",title:"SAP Queue","desc":"Review payee creation requests. Approve to assign SAP code — payee then appears in TM payout form."},
+    {step:"5",icon:"✓",title:"Payout Approvals","desc":"Approve 'Submitted' payout requests → routes to BH or Finance based on amount."},
+    {step:"6",icon:"⚡",title:"Data Transfer","desc":"Bulk transfer all RA data to another RA (e.g. if RA resigns), or remap individual entities."},
+    {step:"7",icon:"🔄",title:"Counter Override","desc":"Change dealer+counter+UCM on any App_ID — select new dealer first, then filtered counters appear."},
+  ]},
+  "Business Head":{icon:"👔",color:"#C2410C",bg:"#FFF7ED",title:"Business Head",subtitle:"Final approvals, config keys, and team oversight",steps:[
+    {step:"1",icon:"▦",title:"BH Dashboard","desc":"Full team wallet, released MTD, pipeline amount, all RA wallet breakdowns, and recent payout activity."},
+    {step:"2",icon:"✓",title:"Approvals","desc":"BH Review queue shows payout requests routed to you. You can override the amount (permanently flagged), approve, or reject."},
+    {step:"3",icon:"⚙",title:"Config Keys","desc":"Change auto-approval gates, Non-GS rate/cap, Finance gate. Changes apply to all new requests immediately."},
+    {step:"4",icon:"⚡",title:"Data Transfer","desc":"Both bulk and single-entity remapping available. Full audit log maintained."},
+  ]},
+  "Finance":{icon:"💰",color:"#991B1B",bg:"#FEF2F2",title:"Finance",subtitle:"Final release of high-value payouts",steps:[
+    {step:"1",icon:"✓",title:"Finance Queue","desc":"Only see payout requests with status 'BH Approved' AND amount ≥ Finance Gate (₹15,000 by default)."},
+    {step:"2",icon:"💸",title:"Approve & Release","desc":"Review full payout details — dealer, App_ID, vehicle, payee, amount. Click Approve to release and generate UTR."},
+    {step:"3",icon:"📊",title:"All Requests View","desc":"Bottom of approvals page shows all historical requests with status for reference."},
+  ]},
+};
+
 
 // ═══════════════════════════════════════════════
 // ROLE META
@@ -779,6 +1192,7 @@ function App(){
   const[userId,setUserId]=useState("RA001");
   const[page,setPage]=useState("dashboard");
   const[toast,setToast]=useState(null);
+  const[guideOpen,setGuideOpen]=useState(true); // show guide on load
 
   // SHARED STATE — single source of truth for ALL roles
   const[apps,setApps]=useState(INIT_APPS);
@@ -801,26 +1215,26 @@ function App(){
   // Badges for ops nav
   const badges={apr:payoutRequests.filter(r=>{if(user.role==="Central Ops")return r.status==="Submitted";if(user.role==="Business Head")return["BH Review","Ops Approved"].includes(r.status);if(user.role==="Finance")return r.status==="BH Approved"&&r.amount>=configs.FINANCE_GATE;return false;}).length,ob:onboarding.filter(o=>["Admin Panel Pending","OEM Tagging Pending","Ops Review"].includes(o.status)).length,ctr:counterReqs.filter(r=>r.status==="Ops Review").length,sap:sapReqs.filter(r=>r.status==="Ops Review").length};
 
-  useEffect(()=>{const firstPage=nav[0]&&nav[0].id;setPage(firstPage||"dashboard");},[userId]);
+  useEffect(()=>{const firstPage=nav[0]&&nav[0].id;setPage(firstPage||"dashboard");setGuideOpen(true);},[userId]);
 
   const showToast=useCallback((msg,type="success")=>setToast({msg,type,k:Date.now()}),[]);
 
-  const TITLES={dashboard:"Dashboard",leads:"Leads",appids:"App_IDs",stages:"Stage Marking",override:"Counter & UCM Override",onboarding:"Dealer Onboarding",counter:"Counter & UCM",sap:"SAP & Payees",payouts:"Payout Status",payout:"Raise Payout",approvals:"Approvals",transfer:"Data Transfer",config:"Config Keys"};
+  const TITLES={dashboard:"Dashboard",leads:"All Leads",appids:"All App_IDs",stages:"Stage Marking",override:"Counter & UCM Override",onboarding:"Dealer Onboarding",counter:"Counter & UCM",sap:"SAP & Payees",payouts:"Payout Status",payout:"Raise Payout",approvals:"Approvals",transfer:"Data Transfer",config:"Config Keys"};
 
   function renderPage(){
     if(isFieldRole(user.role)){
       if(page==="dashboard")return <RADashboard user={user} shared={shared}/>;
       if(page==="leads")     return <LeadsModule user={user} shared={shared}/>;
       if(page==="appids")    return <AppIDsModule user={user} shared={shared}/>;
-      if(page==="stages")    return <StageModule user={user} shared={shared}/>;
       if(page==="onboarding")return <OnboardingModuleRA user={user} shared={shared}/>;
       if(page==="counter")   return <CounterModuleRA user={user} shared={shared}/>;
       if(page==="sap")       return <SAPModuleRA user={user} shared={shared}/>;
       if(page==="payouts")   return <PayoutsModule user={user} shared={shared}/>;
     } else {
       if(page==="dashboard") return <OpsDashboard user={user} shared={shared}/>;
+      if(page==="leads")     return <LeadsModule user={user} shared={shared}/>;
+      if(page==="appids")    return <AppIDsModule user={user} shared={shared}/>;
       if(page==="payout")    return <RaisePayoutModule user={user} shared={shared}/>;
-      if(page==="stages")    return <StageModule user={user} shared={shared}/>;
       if(page==="override")  return <CounterUCMOverride user={user} shared={shared}/>;
       if(page==="onboarding")return <OnboardingModuleOps user={user} shared={shared}/>;
       if(page==="counter")   return <CounterModuleOps user={user} shared={shared}/>;
@@ -834,6 +1248,7 @@ function App(){
 
   return <div style={{background:T.bg,minHeight:"100vh",display:"flex",flexDirection:"column"}}>
     {toast&&<Toast key={toast.k} msg={toast.msg} type={toast.type} onDone={()=>setToast(null)}/>}
+    {guideOpen&&<RoleGuide user={user} onClose={()=>setGuideOpen(false)}/>}
 
     {/* TOP HEADER */}
     <div style={{background:T.accentD,padding:"0 14px",height:52,display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0,position:"sticky",top:0,zIndex:100}}>
@@ -847,8 +1262,9 @@ function App(){
       <div style={{display:"flex",alignItems:"center",gap:8}}>
         <div style={{textAlign:"right"}}>
           <div style={{color:"#fff",fontSize:11,fontWeight:800}}>{user.name}</div>
-          <div style={{fontSize:9,padding:"1px 6px",borderRadius:8,background:`${roleColor}33`,color:roleColor,fontWeight:800,marginTop:1,textAlign:"center"}}>{user.role}</div>
+          <div style={{display:"flex",alignItems:"center",gap:4,marginTop:1}}><div style={{fontSize:9,padding:"1px 6px",borderRadius:8,background:`${roleColor}33`,color:roleColor,fontWeight:800}}>{user.role}</div><button onClick={()=>setShowGuide(true)} style={{background:"rgba(255,255,255,0.15)",border:"none",color:"#fff",borderRadius:6,padding:"1px 6px",fontSize:9,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>? Guide</button></div>
         </div>
+        <button onClick={()=>setGuideOpen(true)} style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.25)",borderRadius:7,padding:"5px 9px",color:"#fff",cursor:"pointer",fontSize:12,fontWeight:800,flexShrink:0}}>?</button>
         <select value={userId} onChange={e=>setUserId(e.target.value)} style={{background:"rgba(255,255,255,0.12)",color:"#fff",border:"1px solid rgba(255,255,255,0.25)",borderRadius:7,padding:"5px 8px",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",outline:"none",maxWidth:130}}>
           <optgroup label="── Field Team ──" style={{color:"#000"}}>
             {ALL_USERS.filter(u=>isFieldRole(u.role)).map(u=><option key={u.id} value={u.id} style={{color:"#000"}}>{u.name} ({u.role})</option>)}
