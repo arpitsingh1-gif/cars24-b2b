@@ -117,7 +117,7 @@ const INIT_PAYEES=[
   {id:"SAP002",dealerIds:["D002"],raId:"RA002",payeeName:"Amol Yuvraj Patil",pan:"CCIPP5942C",bank:"Bank of Maharashtra",account:"60236471678",ifsc:"MAHB0001022",mobile:"9876500002",sapCode:"SAP-JZ-002",fluxStatus:"Validation_Failed",status:"Active",createdAt:"2026-01-22"},
 ];
 const INIT_OB=[
-  {id:"OB001",raId:"RA001",submittedBy:"RA",dealerName:"Speedway Motors",type:"DSA",oem:"Toyota",companyCode:"CSPL",region:"NDL",city:"Gurgaon",lat:"28.4595",long:"77.0266",pan:"BGHPS4412C",gst:"29BGHPS4412C1ZT",mobile:"9876543210",email:"info@speedway.in",address:"Sector 18, Gurgaon",bank:"HDFC Bank",account:"50200012345678",ifsc:"HDFC0001234",docs:{gst:"GST-cert.pdf",pan:"PAN.pdf",bank:"stmt.pdf",cancelledCheque:"cheque.pdf",other:""},oemDocs:{franchiseAgreement:"agreement.pdf",oemLetter:"letter.pdf",other:""},status:"Admin Panel Pending",dealerCode:"",submittedAt:"2026-03-07 09:00"},
+  {id:"OB001",raId:"RA001",submittedBy:"RA",dealerName:"Speedway Motors",type:"DSA",oem:"Toyota",companyCode:"CSPL",region:"NDL",city:"Gurgaon",lat:"28.4595",long:"77.0266",pan:"BGHPS4412C",gst:"29BGHPS4412C1ZT",mobile:"9876543210",email:"info@speedway.in",address:"Sector 18, Gurgaon",bank:"HDFC Bank",account:"50200012345678",ifsc:"HDFC0001234",docs:{gst:"GST-cert.pdf",pan:"PAN.pdf",cancelledCheque:"cheque.pdf",other:""},oemDocs:{franchiseAgreement:"agreement.pdf",oemLetter:"letter.pdf",other:""},status:"Admin Panel Pending",dealerCode:"",submittedAt:"2026-03-07 09:00"},
 ];
 const INIT_PR=[
   {id:"PR001",appId:"APP003",raId:"RA002",payeeId:"SAP001",type:"Split",amount:18000,status:"Submitted",createdAt:"2026-03-08 10:22",utr:null,reason:"GS split for stock-in deal",crossDealerFlag:false,bhEdited:false,originalAmount:18000,rejectionReason:null},
@@ -165,22 +165,20 @@ function Toast({msg,type,onDone}){useEffect(()=>{const t=setTimeout(onDone,3000)
 // ═══════════════════════════════════════════════
 const fieldNav=[
   {id:"dashboard",label:"Home",icon:"🏠"},
-  {id:"dealerperf",label:"Dealer Perf",icon:"📊"},
+  {id:"dealers",label:"Dealers",icon:"🏢"},
   {id:"leads",label:"Leads",icon:"📋"},
   {id:"appids",label:"App_IDs",icon:"🚗"},
-  {id:"onboarding",label:"Dealers",icon:"🏢"},
   {id:"counter",label:"Counter",icon:"🔗"},
   {id:"sap",label:"Payees",icon:"🏦"},
   {id:"payouts",label:"Payouts",icon:"💸"},
 ];
 const opsNav=[
   {id:"dashboard",label:"Dashboard",icon:"▦"},
-  {id:"dealerperf",label:"Dealer Perf",icon:"📊",roles:["TM","Central Ops","Business Head"]},
+  {id:"dealers",label:"Dealers",icon:"🏢",badge:"ob"},
   {id:"payout",label:"Raise Payout",icon:"💸",roles:["TM"]},
   {id:"leads",label:"Leads",icon:"📋",roles:["TM","Central Ops","Business Head"]},
   {id:"appids",label:"App_IDs",icon:"🚗",roles:["TM","Central Ops","Business Head"]},
   {id:"override",label:"Ctr Override",icon:"🔄",roles:["TM","Central Ops","Business Head"]},
-  {id:"onboarding",label:"Onboarding",icon:"🏢",badge:"ob"},
   {id:"counter",label:"Counter",icon:"🔗",badge:"ctr"},
   {id:"sap",label:"SAP",icon:"🏦",badge:"sap",roles:["TM","Central Ops","Business Head"]},
   {id:"approvals",label:"Approvals",icon:"✓",badge:"apr",roles:["Central Ops","Business Head","Finance"]},
@@ -257,7 +255,7 @@ function RADashboard({user,shared}){
     </div>
     {user.role==="RM"&&user.raIds&&<Card style={{marginBottom:10}}><Lbl>Team Breakdown</Lbl>{user.raIds.map(raId=>{const ra=ALL_USERS.find(u=>u.id===raId);const raL=leads.filter(l=>l.raId===raId);const raA=apps.filter(a=>a.raId===raId);return <div key={raId} style={{padding:"8px 0",borderBottom:`1px solid ${T.border}`}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><div style={{fontSize:12,fontWeight:800}}>{ra&&ra.name}</div><div style={{fontSize:13,fontWeight:800,color:T.accent}}>{fmt(raWalBal(raId,apps))}</div></div><div style={{display:"flex",gap:10}}><span style={{fontSize:10,color:T.mute}}>{raL.length} leads</span><span style={{fontSize:10,color:T.mute}}>{raA.length} apps</span></div></div>;})}</Card>}
     <Card style={{marginBottom:10}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><Lbl>Top Dealers</Lbl><button onClick={()=>{if(setPage)setPage("dealerperf");}} style={{background:T.accentL,border:"1px solid "+T.accent+"30",borderRadius:8,padding:"4px 10px",fontSize:10,fontWeight:700,cursor:"pointer",color:T.accent,fontFamily:"inherit"}}>View All →</button></div>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><Lbl>Top Dealers</Lbl><button onClick={()=>{if(setPage)setPage("dealers");}} style={{background:T.accentL,border:"1px solid "+T.accent+"30",borderRadius:8,padding:"4px 10px",fontSize:10,fontWeight:700,cursor:"pointer",color:T.accent,fontFamily:"inherit"}}>View All →</button></div>
       {myDealers.filter(d=>d.status==="Active").slice(0,3).map(d=>{
         const st=getDealerStats(d.id);
         return <div key={d.id} onClick={()=>openDealerDrawer(d)} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid "+T.border,cursor:"pointer"}}>
@@ -274,7 +272,7 @@ function RADashboard({user,shared}){
         </div>;
       })}
       {myDealers.filter(d=>d.status==="Active").length===0&&<div style={{fontSize:11,color:T.mute,padding:"8px 0"}}>No active dealers</div>}
-      {myDealers.filter(d=>d.status==="Active").length>3&&<div style={{textAlign:"center",paddingTop:8}}><button onClick={()=>{if(setPage)setPage("dealerperf");}} style={{background:"none",border:"none",color:T.accent,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>+{myDealers.filter(d=>d.status==="Active").length-3} more dealers →</button></div>}
+      {myDealers.filter(d=>d.status==="Active").length>3&&<div style={{textAlign:"center",paddingTop:8}}><button onClick={()=>{if(setPage)setPage("dealers");}} style={{background:"none",border:"none",color:T.accent,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>+{myDealers.filter(d=>d.status==="Active").length-3} more dealers →</button></div>}
     </Card>
     <Card><Lbl>Recent Leads</Lbl>{myLeads.slice(-3).reverse().map(l=><div key={l.id} onClick={()=>{if(setDeepLink)setDeepLink({page:"leads",id:l.id});if(setPage)setPage("leads");}} style={{padding:"6px 0",borderBottom:`1px solid ${T.border}`,cursor:"pointer"}}><div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,fontWeight:700,color:T.accent}}>{l.make} {l.model} {l.year} ↗</span><Badge s={l.status} sm/></div><div style={{fontSize:10,color:T.mute}}>{l.regNo} · {l.createdAt}</div></div>)}{myLeads.length===0&&<div style={{fontSize:11,color:T.mute,padding:"8px 0"}}>No leads yet</div>}</Card>
   </div>;
@@ -641,6 +639,12 @@ function OnboardingModuleRA({user,shared}){
   const[view,setView]=useState("list");const[step,setStep]=useState(0);const[form,setForm]=useState({});const[docs,setDocs]=useState({gst:"",pan:"",cancelledCheque:"",other:""});const[oemDocs,setOemDocs]=useState({franchiseAgreement:"",oemLetter:"",other:""});
   let raIds=[user.id];if(user.role==="RM"&&user.raIds)raIds=[user.id,...user.raIds];
   const myOB=onboarding.filter(o=>raIds.includes(o.raId));const f=(k,v)=>setForm(p=>({...p,[k]:v}));
+  const[mobileCheck,setMobileCheck]=useState(null);
+  const[emailCheck,setEmailCheck]=useState(null);
+  const[panCheck,setPanCheck]=useState(null);
+  function checkMobile(v){f("mobile",v);if(v.length>=10){const found=dealers.find(d=>d.mobile===v);setMobileCheck(found?{found:true,dealer:found}:{found:false});}else{setMobileCheck(null);}}
+  function checkEmail(v){f("email",v);if(v.length>=5&&v.includes("@")){const found=dealers.find(d=>d.email===v);setEmailCheck(found?{found:true,dealer:found}:{found:false});}else{setEmailCheck(null);}}
+  function checkPAN(v){v=v.toUpperCase();f("pan",v);if(v.length>=10){const found=dealers.find(d=>d.pan===v);setPanCheck(found?{found:true,dealer:found}:{found:false});}else{setPanCheck(null);}}
   function submit(){setOnboarding(p=>[...p,{id:`OB${uid()}`,raId:user.id,submittedBy:user.role,...form,docs,oemDocs,status:"Admin Panel Pending",dealerCode:"",submittedAt:now()}]);setView("list");setStep(0);setForm({});setDocs({gst:"",pan:"",cancelledCheque:"",other:""});setOemDocs({franchiseAgreement:"",oemLetter:"",other:""});alert("✓ Submitted! Auto-email sent to Admin Panel team. This now appears in Ops Panel queue.");}
   function simCode(id){const code=String(100000+Math.floor(Math.random()*99999));setOnboarding(p=>p.map(o=>o.id===id?{...o,dealerCode:code,status:"OEM Tagging Pending"}:o));alert(`Dealer code ${code} received from Admin Panel team.`);}
 
@@ -1063,8 +1067,9 @@ function TMDealerDetailPanel({dealer,stats,onClose,onNavigate,counters,apps,lead
   );
 }
 
-function TMDealerDashSection({dealers,leads,apps,payoutRequests,counters,onNavigate}){
+function TMDealerDashSection({dealers,leads,apps,payoutRequests,counters,onNavigate,user}){
   var[viewMode,setViewMode]=useState("flat");
+  var showToggle=user&&["RM","TM","Central Ops","Business Head"].indexOf(user.role)!==-1;
   var[selDealer,setSelDealer]=useState(null);
   var[searchTerm,setSearchTerm]=useState("");
   var activeDealers=dealers.filter(function(d){return d.status==="Active";});
@@ -1146,10 +1151,10 @@ function TMDealerDashSection({dealers,leads,apps,payoutRequests,counters,onNavig
         React.createElement("div",{style:{fontSize:14,fontWeight:900,color:T.text}},"Dealer Performance"),
         React.createElement("div",{style:{fontSize:10,color:T.mute,marginTop:1}},activeDealers.length+" active dealers · Tap any card for full analytics")
       ),
-      React.createElement("div",{style:{display:"flex",gap:4}},
+      showToggle?React.createElement("div",{style:{display:"flex",gap:4}},
         React.createElement("button",{onClick:function(){setViewMode("flat");},style:{background:viewMode==="flat"?T.accent:"#F1F5F9",color:viewMode==="flat"?"#fff":T.mid,border:"none",borderRadius:8,padding:"6px 12px",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s"}},"All"),
         React.createElement("button",{onClick:function(){setViewMode("grouped");},style:{background:viewMode==="grouped"?T.accent:"#F1F5F9",color:viewMode==="grouped"?"#fff":T.mid,border:"none",borderRadius:8,padding:"6px 12px",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s"}},"By RA")
-      )
+      ):null
     ),
     // Search
     React.createElement("div",{style:{marginBottom:12}},
@@ -1192,11 +1197,11 @@ function TMDealerDashSection({dealers,leads,apps,payoutRequests,counters,onNavig
 // ═══════════════════════════════════════════════
 function DealerPerfModule({user,shared}){
   var apps=shared.apps,dealers=shared.dealers,leads=shared.leads,payoutRequests=shared.payoutRequests,counters=shared.counters,setPage=shared.setPage,setDeepLink=shared.setDeepLink;
+  var[tab,setTab]=useState("perf");
   function handleNavigate(nav){
     if(setDeepLink&&nav.id)setDeepLink({page:nav.page,id:nav.id});
     if(setPage)setPage(nav.page);
   }
-  // Role-based filtering
   var isField=["RA","RM"].indexOf(user.role)!==-1;
   var raIds=[user.id];
   if(user.role==="RM"&&user.raIds)raIds=[user.id].concat(user.raIds);
@@ -1205,7 +1210,6 @@ function DealerPerfModule({user,shared}){
   var myApps=isField?apps.filter(function(a){return raIds.indexOf(a.raId)!==-1;}):apps;
   var myPR=isField?payoutRequests.filter(function(p){return raIds.indexOf(p.raId)!==-1;}):payoutRequests;
 
-  // Summary stats
   var activeDealers=myDealers.filter(function(d){return d.status==="Active";});
   var totalLeads=myLeads.length;
   var totalSI=myLeads.filter(function(l){return l.status==="SI Done";}).length;
@@ -1216,43 +1220,59 @@ function DealerPerfModule({user,shared}){
   var totalIncentives=myPR.filter(function(r){return r.type==="Incentive"&&["Released","Auto-Approved"].indexOf(r.status)!==-1;}).reduce(function(s,r){return s+r.amount;},0);
   var convRate=totalLeads>0?Math.round((totalSI/totalLeads)*100):0;
 
+  var obCount=shared.onboarding.filter(function(o){
+    if(isField)return raIds.indexOf(o.raId)!==-1;
+    return ["Admin Panel Pending","OEM Tagging Pending","Ops Review"].indexOf(o.status)!==-1;
+  }).length;
+
+  function TabBtn(props){
+    var active=tab===props.id;
+    return React.createElement("button",{onClick:function(){setTab(props.id);},style:{background:active?T.accent:"transparent",color:active?"#fff":T.mid,border:active?"none":"1px solid "+T.border,borderRadius:10,padding:"8px 18px",fontSize:12,fontWeight:active?800:600,cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s",position:"relative"}},
+      props.label,
+      props.count>0?React.createElement("span",{style:{background:active?"rgba(255,255,255,0.25)":"#DC3545",color:active?"#fff":"#fff",fontSize:9,fontWeight:900,padding:"1px 6px",borderRadius:8,marginLeft:6}},props.count):null
+    );
+  }
+
   return React.createElement("div",null,
-    // Page header
-    React.createElement("div",{style:{marginBottom:16}},
-      React.createElement("div",{style:{fontSize:18,fontWeight:900,color:T.text}},"Dealer Performance"),
-      React.createElement("div",{style:{fontSize:11,color:T.mute,marginTop:2}},isField?(user.role==="RM"?"Team dealer analytics across your RAs":"Your dealer portfolio analytics"):"All dealer analytics across the organisation")
-    ),
-    // Aggregate overview cards
-    React.createElement("div",{style:{background:"linear-gradient(135deg,#4535F1,#3428C9)",borderRadius:16,padding:18,color:"#fff",marginBottom:16,boxShadow:"0 4px 20px rgba(69,53,241,0.2)"}},
-      React.createElement("div",{style:{fontSize:9,fontWeight:800,letterSpacing:1.2,opacity:0.6,marginBottom:10}},isField?(user.role==="RM"?"TEAM OVERVIEW":"MY OVERVIEW"):"ORGANISATION OVERVIEW"),
-      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8}},
-        [{l:"Dealers",v:activeDealers.length},{l:"Total Leads",v:totalLeads},{l:"Inspections",v:totalInsp},{l:"SI Done",v:totalSI}].map(function(k){
-          return React.createElement("div",{key:k.l,style:{background:"rgba(255,255,255,0.1)",borderRadius:10,padding:"8px",textAlign:"center"}},
-            React.createElement("div",{style:{fontSize:18,fontWeight:900}},k.v),
-            React.createElement("div",{style:{fontSize:8,fontWeight:700,opacity:0.7,letterSpacing:0.5,textTransform:"uppercase",marginTop:2}},k.l)
-          );
-        })
-      ),
-      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8,marginTop:8}},
-        [{l:"GS Cars",v:gsCount},{l:"Non-GS",v:nonGsCount},{l:"Splits",v:fmt(totalSplits)},{l:"Incentives",v:fmt(totalIncentives)}].map(function(k){
-          return React.createElement("div",{key:k.l,style:{background:"rgba(255,255,255,0.1)",borderRadius:10,padding:"8px",textAlign:"center"}},
-            React.createElement("div",{style:{fontSize:14,fontWeight:900}},k.v),
-            React.createElement("div",{style:{fontSize:8,fontWeight:700,opacity:0.7,letterSpacing:0.5,textTransform:"uppercase",marginTop:2}},k.l)
-          );
-        })
-      ),
-      React.createElement("div",{style:{marginTop:12}},
-        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
-          React.createElement("span",{style:{fontSize:9,fontWeight:700,opacity:0.7}},"OVERALL CONVERSION (Lead → SI)"),
-          React.createElement("span",{style:{fontSize:11,fontWeight:900}},convRate+"%")
-        ),
-        React.createElement("div",{style:{height:5,background:"rgba(255,255,255,0.15)",borderRadius:4}},
-          React.createElement("div",{style:{height:5,background:"#fff",borderRadius:4,width:Math.min(convRate,100)+"%",transition:"width 0.4s"}})
-        )
+    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}},
+      React.createElement("div",{style:{fontSize:18,fontWeight:900,color:T.text}},"Dealers"),
+      React.createElement("div",{style:{display:"flex",gap:6}},
+        React.createElement(TabBtn,{id:"perf",label:"Performance",count:0}),
+        React.createElement(TabBtn,{id:"onboarding",label:"Onboarding",count:obCount})
       )
     ),
-    // Full dealer cards section
-    React.createElement(TMDealerDashSection,{dealers:myDealers,leads:leads,apps:apps,payoutRequests:payoutRequests,counters:counters,onNavigate:handleNavigate})
+    tab==="perf"?React.createElement("div",null,
+      React.createElement("div",{style:{background:"linear-gradient(135deg,#4535F1,#3428C9)",borderRadius:16,padding:18,color:"#fff",marginBottom:16,boxShadow:"0 4px 20px rgba(69,53,241,0.2)"}},
+        React.createElement("div",{style:{fontSize:9,fontWeight:800,letterSpacing:1.2,opacity:0.6,marginBottom:10}},isField?(user.role==="RM"?"TEAM OVERVIEW":"MY OVERVIEW"):"ORGANISATION OVERVIEW"),
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8}},
+          [{l:"Dealers",v:activeDealers.length},{l:"Total Leads",v:totalLeads},{l:"Inspections",v:totalInsp},{l:"SI Done",v:totalSI}].map(function(k){
+            return React.createElement("div",{key:k.l,style:{background:"rgba(255,255,255,0.1)",borderRadius:10,padding:"8px",textAlign:"center"}},
+              React.createElement("div",{style:{fontSize:18,fontWeight:900}},k.v),
+              React.createElement("div",{style:{fontSize:8,fontWeight:700,opacity:0.7,letterSpacing:0.5,textTransform:"uppercase",marginTop:2}},k.l)
+            );
+          })
+        ),
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8,marginTop:8}},
+          [{l:"GS Cars",v:gsCount},{l:"Non-GS",v:nonGsCount},{l:"Splits",v:fmt(totalSplits)},{l:"Incentives",v:fmt(totalIncentives)}].map(function(k){
+            return React.createElement("div",{key:k.l,style:{background:"rgba(255,255,255,0.1)",borderRadius:10,padding:"8px",textAlign:"center"}},
+              React.createElement("div",{style:{fontSize:14,fontWeight:900}},k.v),
+              React.createElement("div",{style:{fontSize:8,fontWeight:700,opacity:0.7,letterSpacing:0.5,textTransform:"uppercase",marginTop:2}},k.l)
+            );
+          })
+        ),
+        React.createElement("div",{style:{marginTop:12}},
+          React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
+            React.createElement("span",{style:{fontSize:9,fontWeight:700,opacity:0.7}},"OVERALL CONVERSION (Lead → SI)"),
+            React.createElement("span",{style:{fontSize:11,fontWeight:900}},convRate+"%")
+          ),
+          React.createElement("div",{style:{height:5,background:"rgba(255,255,255,0.15)",borderRadius:4}},
+            React.createElement("div",{style:{height:5,background:"#fff",borderRadius:4,width:Math.min(convRate,100)+"%",transition:"width 0.4s"}})
+          )
+        )
+      ),
+      React.createElement(TMDealerDashSection,{dealers:myDealers,leads:leads,apps:apps,payoutRequests:payoutRequests,counters:counters,onNavigate:handleNavigate,user:user})
+    ):
+    isField?React.createElement(OnboardingModuleRA,{user:user,shared:shared}):React.createElement(OnboardingModuleOps,{user:user,shared:shared})
   );
 }
 
@@ -1323,7 +1343,7 @@ function OpsDashboard({user,shared}){
         {allRAs.map(ra=>{const rApps=apps.filter(a=>a.raId===ra.id);const bal=raWalBal(ra.id,apps);const released=rApps.reduce((s,a)=>s+a.splitReleased,0);return <div key={ra.id} style={{padding:"8px 0",borderBottom:`1px solid ${T.border}`}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><div style={{fontSize:12,fontWeight:800}}>{ra.name} <span style={{fontSize:10,color:T.mute,fontWeight:400}}>({ra.region})</span></div><div style={{fontSize:14,fontWeight:900,color:bal>0?T.accent:T.danger}}>{fmt(bal)}</div></div><div style={{display:"flex",gap:10}}><span style={{fontSize:10,color:T.mute}}>{rApps.length} apps</span><span style={{fontSize:10,color:T.mute}}>Released: {fmt(released)}</span></div></div>;})}
       </Card>
       <Card><Lbl>Recent Payout Activity</Lbl>{payoutRequests.slice(-4).reverse().map(r=>{const a=apps.find(aa=>aa.id===r.appId);return <div key={r.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 0",borderBottom:`1px solid ${T.border}`}}><div><div style={{fontSize:12,fontWeight:700}}>{r.id} — {fmt(r.amount)}</div><div style={{fontSize:10,color:T.mute}}>{a&&a.vehicle} · {r.type}</div></div><Badge s={r.status} sm/></div>;})} </Card>
-      <Card style={{marginTop:14}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><Lbl>Active Dealers ({dealers.filter(d=>d.status==="Active").length})</Lbl><button onClick={()=>{if(setPage)setPage("dealerperf");}} style={{background:T.accentL,border:"1px solid "+T.accent+"30",borderRadius:8,padding:"4px 10px",fontSize:10,fontWeight:700,cursor:"pointer",color:T.accent,fontFamily:"inherit"}}>Dealer Perf →</button></div>{dealers.filter(d=>d.status==="Active").slice(0,3).map(d=>{const st=calcDealerMetrics(d.id,leads,apps,payoutRequests);const ra=ALL_USERS.find(u=>u.id===d.raId);return <div key={d.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 0",borderBottom:"1px solid "+T.border}}><div><div style={{fontSize:12,fontWeight:700}}>{d.name}</div><div style={{fontSize:9,color:T.mute}}>RA: {ra&&ra.name} · {st.leads}L · {st.si}SI · {st.gs}GS</div></div><div style={{fontSize:12,fontWeight:900,color:T.accent}}>{fmt(st.splits+st.incentives)}</div></div>;})}</Card>
+      <Card style={{marginTop:14}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><Lbl>Active Dealers ({dealers.filter(d=>d.status==="Active").length})</Lbl><button onClick={()=>{if(setPage)setPage("dealers");}} style={{background:T.accentL,border:"1px solid "+T.accent+"30",borderRadius:8,padding:"4px 10px",fontSize:10,fontWeight:700,cursor:"pointer",color:T.accent,fontFamily:"inherit"}}>Dealer Perf →</button></div>{dealers.filter(d=>d.status==="Active").slice(0,3).map(d=>{const st=calcDealerMetrics(d.id,leads,apps,payoutRequests);const ra=ALL_USERS.find(u=>u.id===d.raId);return <div key={d.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 0",borderBottom:"1px solid "+T.border}}><div><div style={{fontSize:12,fontWeight:700}}>{d.name}</div><div style={{fontSize:9,color:T.mute}}>RA: {ra&&ra.name} · {st.leads}L · {st.si}SI · {st.gs}GS</div></div><div style={{fontSize:12,fontWeight:900,color:T.accent}}>{fmt(st.splits+st.incentives)}</div></div>;})}</Card>
     </div>;
   }
   return <div>
@@ -1360,7 +1380,7 @@ function OpsDashboard({user,shared}){
     </div>
     <Card style={{marginBottom:14}}><Lbl>RA Snapshot</Lbl>{ALL_USERS.filter(u=>["RA","RM"].includes(u.role)).map(u=>{const uApps=apps.filter(a=>a.raId===u.id);const bal=raWalBal(u.id,apps);return <div key={u.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 0",borderBottom:`1px solid ${T.border}`}}><div><div style={{fontSize:12,fontWeight:700}}>{u.name} <span style={{background:u.role==="RM"?T.purpleL:T.accentL,color:u.role==="RM"?T.purple:T.accent,padding:"0 5px",borderRadius:6,fontSize:9,fontWeight:800}}>{u.role}</span></div><div style={{fontSize:10,color:T.mute}}>{u.region} · {uApps.length} apps</div></div><div style={{fontSize:13,fontWeight:800,color:bal>0?T.accent:T.danger}}>{fmt(bal)}</div></div>;})} </Card>
     <Card><Lbl>Onboarding Pipeline</Lbl>{onboarding.map(ob=>{const ra=ALL_USERS.find(u=>u.id===ob.raId);return <div key={ob.id} style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:`1px solid ${T.border}`}}><div><div style={{fontSize:12,fontWeight:700}}>{ob.dealerName}</div><div style={{fontSize:10,color:T.mute}}>By: {ra&&ra.name} ({ob.submittedBy}) · {ob.submittedAt}</div></div><Badge s={ob.status} sm/></div>;})} </Card>
-    {isTM&&<Card style={{marginTop:14}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><Lbl>Active Dealers ({dealers.filter(d=>d.status==="Active").length})</Lbl><button onClick={()=>{if(setPage)setPage("dealerperf");}} style={{background:T.accentL,border:"1px solid "+T.accent+"30",borderRadius:8,padding:"4px 10px",fontSize:10,fontWeight:700,cursor:"pointer",color:T.accent,fontFamily:"inherit"}}>Dealer Perf →</button></div>{dealers.filter(d=>d.status==="Active").slice(0,3).map(d=>{const st=calcDealerMetrics(d.id,leads,apps,payoutRequests);const ra=ALL_USERS.find(u=>u.id===d.raId);return <div key={d.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 0",borderBottom:"1px solid "+T.border}}><div><div style={{fontSize:12,fontWeight:700}}>{d.name}</div><div style={{fontSize:9,color:T.mute}}>RA: {ra&&ra.name} · {st.leads}L · {st.si}SI · {st.gs}GS</div></div><div style={{fontSize:12,fontWeight:900,color:T.accent}}>{fmt(st.splits+st.incentives)}</div></div>;})}</Card>}
+    {isTM&&<Card style={{marginTop:14}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><Lbl>Active Dealers ({dealers.filter(d=>d.status==="Active").length})</Lbl><button onClick={()=>{if(setPage)setPage("dealers");}} style={{background:T.accentL,border:"1px solid "+T.accent+"30",borderRadius:8,padding:"4px 10px",fontSize:10,fontWeight:700,cursor:"pointer",color:T.accent,fontFamily:"inherit"}}>Dealer Perf →</button></div>{dealers.filter(d=>d.status==="Active").slice(0,3).map(d=>{const st=calcDealerMetrics(d.id,leads,apps,payoutRequests);const ra=ALL_USERS.find(u=>u.id===d.raId);return <div key={d.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 0",borderBottom:"1px solid "+T.border}}><div><div style={{fontSize:12,fontWeight:700}}>{d.name}</div><div style={{fontSize:9,color:T.mute}}>RA: {ra&&ra.name} · {st.leads}L · {st.si}SI · {st.gs}GS</div></div><div style={{fontSize:12,fontWeight:900,color:T.accent}}>{fmt(st.splits+st.incentives)}</div></div>;})}</Card>}
   </div>;
 }
 
@@ -1413,7 +1433,7 @@ function RaisePayoutModule({user,shared}){
 function OnboardingModuleOps({user,shared}){
   const{dealers,setDealers,onboarding,setOnboarding,counterReqs,setCounterReqs}=shared;
   const[sel,setSel]=useState(null);const[rejectReason,setRejectReason]=useState("");const[showRej,setShowRej]=useState(false);
-  const[view,setView]=useState("list");const[step,setStep]=useState(0);const[form,setForm]=useState({});const[docs,setDocs]=useState({gst:"",pan:"",bank:"",cancelledCheque:"",other:""});const[oemDocs,setOemDocs]=useState({franchiseAgreement:"",oemLetter:"",other:""});
+  const[view,setView]=useState("list");const[step,setStep]=useState(0);const[form,setForm]=useState({});const[docs,setDocs]=useState({gst:"",pan:"",cancelledCheque:"",other:""});const[oemDocs,setOemDocs]=useState({franchiseAgreement:"",oemLetter:"",other:""});
   const f=(k,v)=>setForm(p=>({...p,[k]:v}));
   const queue=onboarding.filter(o=>["Admin Panel Pending","OEM Tagging Pending","Ops Review"].includes(o.status));
   const ob=sel?onboarding.find(o=>o.id===sel):null;const ra=ob?ALL_USERS.find(u=>u.id===ob.raId):null;
@@ -1421,13 +1441,13 @@ function OnboardingModuleOps({user,shared}){
   function completeOEM(id){setOnboarding(p=>p.map(o=>o.id===id?{...o,status:"Ops Review"}:o));setSel(null);}
   function activate(id){const o=onboarding.find(ob=>ob.id===id);setOnboarding(p=>p.map(ob=>ob.id===id?{...ob,status:"Active"}:ob));setDealers(p=>[...p,{id:`D${uid()}`,name:o.dealerName,code:o.dealerCode,type:o.type,oem:o.oem,region:o.region,city:o.city||"",raId:o.raId,status:"Active",onboardedAt:new Date().toISOString().slice(0,10)}]);alert(`✓ ${o.dealerName} activated! Now visible to all roles.`);setSel(null);}
   function reject(id){if(!rejectReason){alert("Reason required");return;}setOnboarding(p=>p.map(o=>o.id===id?{...o,status:"Rejected",rejectionReason:rejectReason}:o));setSel(null);setRejectReason("");setShowRej(false);}
-  function submitTMForm(){setOnboarding(p=>[...p,{id:`OB${uid()}`,raId:user.id,submittedBy:"TM",...form,docs,oemDocs,status:"Admin Panel Pending",dealerCode:"",submittedAt:now()}]);setView("list");setStep(0);setForm({});setDocs({gst:"",pan:"",bank:"",cancelledCheque:"",other:""});setOemDocs({franchiseAgreement:"",oemLetter:"",other:""});}
+  function submitTMForm(){setOnboarding(p=>[...p,{id:`OB${uid()}`,raId:user.id,submittedBy:"TM",...form,docs,oemDocs,status:"Admin Panel Pending",dealerCode:"",submittedAt:now()}]);setView("list");setStep(0);setForm({});setDocs({gst:"",pan:"",cancelledCheque:"",other:""});setOemDocs({franchiseAgreement:"",oemLetter:"",other:""});}
 
   if(user.role==="TM"&&view==="form")return <div>
     <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}><Btn v="ghost" onClick={()=>{setView("list");setStep(0);setForm({});}} sm>← Back</Btn><span style={{fontSize:14,fontWeight:800}}>New Dealer Onboarding (TM)</span></div>
     <StepBar steps={["Dealer Info","Bank & Docs","OEM Details","Review"]} cur={step}/>
     {step===0&&<Card><ST>Dealer Information</ST><Fld label="Dealer / Company Name" value={form.dealerName} onChange={v=>f("dealerName",v)} required/><G2><Sel label="Region" value={form.region} onChange={v=>f("region",v)} options={REGIONS} placeholder="Select..." required/><Sel label="City" value={form.city} onChange={v=>f("city",v)} options={CITIES} placeholder="Select..." required/></G2><G2><Fld label="Mobile" value={form.mobile} onChange={v=>f("mobile",v)} required/><Fld label="Email" value={form.email} onChange={v=>f("email",v)}/></G2><Fld label="Full Address" value={form.address} onChange={v=>f("address",v)} required/><div style={{display:"flex",justifyContent:"flex-end",marginTop:4}}><Btn disabled={!form.dealerName||!form.region||!form.city||!form.mobile||!form.address} onClick={()=>setStep(1)}>Next →</Btn></div></Card>}
-    {step===1&&<Card><ST>Bank & Tax</ST><G2><Fld label="PAN" value={form.pan} onChange={v=>f("pan",v.toUpperCase())} required maxLength={10}/><Fld label="GST" value={form.gst} onChange={v=>f("gst",v.toUpperCase())}/></G2><Sel label="Bank" value={form.bank} onChange={v=>f("bank",v)} options={BANK_LIST} placeholder="Select bank..." required/><G2><Fld label="Account No." value={form.account} onChange={v=>f("account",v)} required/><Fld label="IFSC" value={form.ifsc} onChange={v=>f("ifsc",v.toUpperCase())} required/></G2><ST>Mandatory Documents</ST><FileInput label="GST Certificate" value={docs.gst} onChange={v=>setDocs(p=>({...p,gst:v}))} required/><FileInput label="PAN Card" value={docs.pan} onChange={v=>setDocs(p=>({...p,pan:v}))} required/><FileInput label="Bank Statement" value={docs.bank} onChange={v=>setDocs(p=>({...p,bank:v}))} required/><FileInput label="Cancelled Cheque" value={docs.cancelledCheque} onChange={v=>setDocs(p=>({...p,cancelledCheque:v}))} required/><ST>Other (Optional)</ST><FileInput label="Other" value={docs.other} onChange={v=>setDocs(p=>({...p,other:v}))}/><div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(0)}>← Back</Btn><Btn disabled={!form.pan||!form.bank||!form.account||!form.ifsc||!docs.gst||!docs.pan||!docs.bank||!docs.cancelledCheque} onClick={()=>setStep(2)}>Next →</Btn></div></Card>}
+    {step===1&&<Card><ST>Bank & Tax</ST><G2><Fld label="PAN" value={form.pan} onChange={v=>f("pan",v.toUpperCase())} required maxLength={10}/><Fld label="GST" value={form.gst} onChange={v=>f("gst",v.toUpperCase())}/></G2><Sel label="Bank" value={form.bank} onChange={v=>f("bank",v)} options={BANK_LIST} placeholder="Select bank..." required/><G2><Fld label="Account No." value={form.account} onChange={v=>f("account",v)} required/><Fld label="IFSC" value={form.ifsc} onChange={v=>f("ifsc",v.toUpperCase())} required/></G2><ST>Mandatory Documents</ST><FileInput label="GST Certificate" value={docs.gst} onChange={v=>setDocs(p=>({...p,gst:v}))} required/><FileInput label="PAN Card" value={docs.pan} onChange={v=>setDocs(p=>({...p,pan:v}))} required/><FileInput label="Cancelled Cheque" value={docs.cancelledCheque} onChange={v=>setDocs(p=>({...p,cancelledCheque:v}))} required/><ST>Other (Optional)</ST><FileInput label="Other" value={docs.other} onChange={v=>setDocs(p=>({...p,other:v}))}/><div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(0)}>← Back</Btn><Btn disabled={!form.pan||!form.bank||!form.account||!form.ifsc||!docs.gst||!docs.pan||!docs.cancelledCheque} onClick={()=>setStep(2)}>Next →</Btn></div></Card>}
     {step===2&&<Card><ST>OEM & Dealer Type</ST><G2><Sel label="Dealer Type" value={form.type} onChange={v=>f("type",v)} options={DEALER_TYPES} placeholder="Select..." required/><Sel label="OEM Brand" value={form.oem} onChange={v=>f("oem",v)} options={OEM_BRANDS} placeholder="Select..." required/></G2><Sel label="Company Code" value={form.companyCode} onChange={v=>f("companyCode",v)} options={COMPANY_CODES} placeholder="Select company code..." required/><ST>Dealer Location</ST><div style={{display:"flex",gap:8,marginBottom:8}}><Btn v={form.latMode==="auto"?"primary":"secondary"} sm onClick={()=>{f("latMode","auto");if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>{f("lat",pos.coords.latitude.toFixed(6));f("long",pos.coords.longitude.toFixed(6));},()=>alert("Location access denied"));}}}>📍 Auto-detect</Btn><Btn v={form.latMode==="manual"?"primary":"secondary"} sm onClick={()=>f("latMode","manual")}>✏️ Enter manually</Btn></div>{(form.latMode==="manual"||form.lat)&&<G2><Fld label="Latitude" value={form.lat} onChange={v=>f("lat",v)} placeholder="e.g. 28.6139" required={form.latMode==="manual"}/><Fld label="Longitude" value={form.long} onChange={v=>f("long",v)} placeholder="e.g. 77.2090" required={form.latMode==="manual"}/></G2>}{form.lat&&form.long&&<div style={{background:"#ECFDF5",border:"1px solid #BBF7D0",borderRadius:7,padding:"6px 10px",marginBottom:8,fontSize:11,color:"#065F46",fontWeight:700}}>📍 {form.lat}, {form.long}</div>}<ST>OEM Documents</ST><FileInput label="Franchise Agreement" value={oemDocs.franchiseAgreement} onChange={v=>setOemDocs(p=>({...p,franchiseAgreement:v}))} required/><FileInput label="OEM Authorization Letter" value={oemDocs.oemLetter} onChange={v=>setOemDocs(p=>({...p,oemLetter:v}))} required/><ST>Other (Optional)</ST><FileInput label="Other OEM Doc" value={oemDocs.other} onChange={v=>setOemDocs(p=>({...p,other:v}))}/><div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(1)}>← Back</Btn><Btn disabled={!form.type||!form.oem||!form.companyCode||!oemDocs.franchiseAgreement||!oemDocs.oemLetter} onClick={()=>setStep(3)}>Review →</Btn></div></Card>}
     {step===3&&<Card><ST>Review & Submit</ST>{[["Dealer",form.dealerName],["Region",form.region],["City",form.city],["Type",form.type],["OEM",form.oem]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}<Alrt type="warning">Submitting adds to Ops Panel queue and sends auto-email to Admin Panel.</Alrt><div style={{display:"flex",justifyContent:"space-between",marginTop:10}}><Btn v="secondary" onClick={()=>setStep(2)}>← Edit</Btn><Btn v="success" icon="✓" onClick={submitTMForm}>Submit</Btn></div></Card>}
   </div>;
@@ -1914,28 +1934,26 @@ function App(){
 
   const showToast=useCallback((msg,type="success")=>setToast({msg,type,k:Date.now()}),[]);
 
-  const TITLES={dashboard:"Dashboard",dealerperf:"Dealer Performance",leads:"Leads",appids:"App_IDs",override:"Counter & UCM Override",onboarding:"Dealer Onboarding",counter:"Counter & UCM",sap:"SAP & Payees",payouts:"Payout Status",payout:"Raise Payout",approvals:"Approvals",transfer:"Data Transfer",config:"Config Keys",stages:"Stage Marking"};
+  const TITLES={dashboard:"Dashboard",dealers:"Dealers",leads:"Leads",appids:"App_IDs",override:"Counter & UCM Override",counter:"Counter & UCM",sap:"SAP & Payees",payouts:"Payout Status",payout:"Raise Payout",approvals:"Approvals",transfer:"Data Transfer",config:"Config Keys",stages:"Stage Marking"};
 
   function renderPage(){
     try{
     if(isFieldRole(user.role)){
       if(activePage==="dashboard")return <RADashboard user={user} shared={shared}/>;
-      if(activePage==="dealerperf")return <DealerPerfModule user={user} shared={shared}/>;
+      if(activePage==="dealers")  return <DealerPerfModule user={user} shared={shared}/>;
       if(activePage==="leads")     return <LeadsModule user={user} shared={shared}/>;
       if(activePage==="appids")    return <AppIDsModule user={user} shared={shared}/>;
       if(activePage==="stages")    return <StageModule user={user} shared={shared}/>;
-      if(activePage==="onboarding")return <OnboardingModuleRA user={user} shared={shared}/>;
       if(activePage==="counter")   return <CounterModuleRA user={user} shared={shared}/>;
       if(activePage==="sap")       return <SAPModuleRA user={user} shared={shared}/>;
       if(activePage==="payouts")   return <PayoutsModule user={user} shared={shared}/>;
     } else {
       if(activePage==="dashboard") return <OpsDashboard user={user} shared={shared}/>;
-      if(activePage==="dealerperf")return <DealerPerfModule user={user} shared={shared}/>;
+      if(activePage==="dealers")   return <DealerPerfModule user={user} shared={shared}/>;
       if(activePage==="payout")    return <RaisePayoutModule user={user} shared={shared}/>;
       if(activePage==="leads")     return <LeadsModule user={user} shared={shared}/>;
       if(activePage==="appids")    return <AppIDsModule user={user} shared={shared}/>;
       if(activePage==="override")  return <CounterUCMOverride user={user} shared={shared}/>;
-      if(activePage==="onboarding")return <OnboardingModuleOps user={user} shared={shared}/>;
       if(activePage==="counter")   return <CounterModuleOps user={user} shared={shared}/>;
       if(activePage==="sap")       return <SAPModuleOps user={user} shared={shared}/>;
       if(activePage==="approvals") return <ApprovalsModule user={user} shared={shared}/>;
