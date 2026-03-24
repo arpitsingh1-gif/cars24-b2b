@@ -3,19 +3,37 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
-<title>Cars24 B2B — Procurement Vertical</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<title>CARS24 B2B Partner Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#F0F4F8;-webkit-font-smoothing:antialiased;}
-select option{color:#000;}
+html,body,#root{height:100%;}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#F5F6FA;color:#111827;-webkit-font-smoothing:antialiased;}
+select option{color:#111827;}
 ::-webkit-scrollbar{width:4px;height:4px;}
-::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:4px;}
-@media(max-width:768px){.desktop-only{display:none!important;}.mobile-only{display:flex!important;}}
-@media(min-width:769px){.mobile-only{display:none!important;}.desktop-only{display:flex!important;}}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#4535F1;border-radius:4px;}
+.desktop-only{display:flex;}
 .mobile-only{display:none;}
+@media(max-width:768px){.desktop-only{display:none!important;}.mobile-only{display:flex!important;}}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:500;color:rgba(255,255,255,0.45);border:none;background:transparent;width:100%;text-align:left;font-family:'DM Sans',system-ui,sans-serif;transition:color 0.15s,background 0.15s;position:relative;margin-bottom:2px;}
+.nav-item:hover{color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.06);}
+.nav-item.active{color:#fff;background:rgba(69,53,241,0.15);font-weight:700;}
+.nav-item.active::before{content:'';position:absolute;left:0;top:18%;bottom:18%;width:3px;background:#4535F1;border-radius:0 3px 3px 0;}
+.c24-btn{font-family:'DM Sans',system-ui,sans-serif;border-radius:8px;cursor:pointer;font-weight:700;border:none;transition:filter 0.15s,transform 0.1s;}
+.c24-btn:hover:not(:disabled){filter:brightness(0.9);}
+.c24-btn:active:not(:disabled){transform:scale(0.97);}
+.c24-btn:disabled{opacity:0.45;cursor:not-allowed;}
+.c24-input{background:#fff;border:1.5px solid #E5E7EB;border-radius:8px;color:#111827;font-family:'DM Sans',system-ui,sans-serif;font-size:13px;outline:none;transition:border-color 0.15s,box-shadow 0.15s;}
+.c24-input:focus{border-color:#4535F1;box-shadow:0 0 0 3px rgba(69,53,241,0.1);}
+.c24-input::placeholder{color:#9CA3AF;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulseGlow{0%,100%{opacity:1;}50%{opacity:0.7;}}
 </style>
 </head>
 <body>
@@ -34,6 +52,7 @@ const BANK_LIST=["HDFC Bank","ICICI Bank","SBI","Kotak Mahindra","Axis Bank","Ba
 const CAR_MAKES=["Maruti Suzuki","Hyundai","Tata Motors","Honda","Toyota","Kia","Mahindra","Skoda","Volkswagen","Ford","Renault","Nissan","MG Motors","Jeep","BMW","Mercedes-Benz","Audi","Volvo","Other"];
 const CONFIGS_DEFAULT={SPLIT_SAME_APP_GATE:15000,SPLIT_CROSS_APP_GATE:15000,NONGS_RATE:2,NONGS_CAP:10000,NONGS_AUTO_GATE:10000,FINANCE_GATE:15000};
 const COMPANY_CODES=["CSPL","CAPL","CFSPL"];
+const C24_LOGO="data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/wAARCADEAdwDACIAAREBAhEB/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMAAAERAhEAPwD36iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigApRSUooAKKKKAEooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKUUlKKACiiigBKKKKACiiigAoooyPWgAooyPWjI9aACijI9aMj1oAKKM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0Eb7/wAc/wDia9Hoo/tjHf8APz8v8g5V2POP+FO6PnnUb7/xz/4mul8O+DdI8NMz2ULPOw2meVgz49OAAB9APftXRUVlVzPF1YuE5uzHypBRRRXCMKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigApRSUooAKKKKAEooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKUUlKKACiiigBKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAClFJSigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//Z";
 
 // ═══════════════════════════════════════════════
 // ALL USERS
@@ -54,9 +73,9 @@ const ALL_USERS=[
 // SEED DATA
 // ═══════════════════════════════════════════════
 const INIT_DEALERS=[
-  {id:"D001",name:"Landmark Cars Ltd",   code:"108229",type:"NCD",oem:"Mercedes-Benz",region:"NDL",city:"Delhi",   raId:"RA001",status:"Active",onboardedAt:"2026-01-10"},
-  {id:"D002",name:"Raj Power Solutions", code:"138256",type:"NCD",oem:"Multi-Brand",  region:"UPE",city:"Lucknow", raId:"RA002",status:"Active",onboardedAt:"2026-01-18"},
-  {id:"D003",name:"Autobahn Automotive", code:"102341",type:"UCD",oem:"Volkswagen",   region:"WGJ",city:"Ahmedabad",raId:"RA003",status:"Active",onboardedAt:"2026-02-02"},
+  {id:"D001",name:"Landmark Cars Ltd",   code:"108229",type:"NCD",oem:"Mercedes-Benz",region:"NDL",city:"Delhi",   raId:"RA001",status:"Active",onboardedAt:"2026-01-10",pan:"AABCL1234D",mobile:"9810712982",email:"accounts@landmarkcars.in"},
+  {id:"D002",name:"Raj Power Solutions", code:"138256",type:"NCD",oem:"Multi-Brand",  region:"UPE",city:"Lucknow", raId:"RA002",status:"Active",onboardedAt:"2026-01-18",pan:"AADCR5678E",mobile:"9839100200",email:"rajpower@gmail.com"},
+  {id:"D003",name:"Autobahn Automotive", code:"102341",type:"UCD",oem:"Volkswagen",   region:"WGJ",city:"Ahmedabad",raId:"RA003",status:"Active",onboardedAt:"2026-02-02",pan:"AABCA9012F",mobile:"9702309586",email:"info@autobahn.co.in"},
 ];
 const INIT_COUNTERS=[
   {id:"C001",dealerId:"D001",name:"Landmark - Delhi Main",     city:"Delhi",    ucmName:"Rahul Sharma", ucmMobile:"9811001001",raId:"RA001",status:"Active"},
@@ -114,8 +133,8 @@ const INIT_SAP_REQS=[
 // ═══════════════════════════════════════════════
 // DESIGN TOKENS
 // ═══════════════════════════════════════════════
-const T={bg:"#F0F4F8",card:"#FFFFFF",border:"#E2E8F0",text:"#0D1B2A",mid:"#475569",mute:"#94A3B8",accent:"#0F4C81",accentL:"#EBF4FF",accentD:"#0A3560",success:"#065F46",successL:"#ECFDF5",warn:"#92400E",warnL:"#FFFBEB",danger:"#991B1B",dangerL:"#FEF2F2",purple:"#5B21B6",purpleL:"#F5F3FF",orange:"#C2410C",orangeL:"#FFF7ED",sidebar:"#0D1B2E",sidebarB:"#182B44"};
-const SM={"Active":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Pending":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"Admin Panel Pending":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"OEM Tagging Pending":{bg:"#FFF7ED",c:"#C2410C",dot:"#F97316"},"Ops Review":{bg:"#EBF4FF",c:"#0F4C81",dot:"#3B82F6"},"Rejected":{bg:"#FEF2F2",c:"#991B1B",dot:"#EF4444"},"Auto-Approved":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Ops Approved":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"BH Review":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"BH Approved":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Released":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Submitted":{bg:"#EBF4FF",c:"#0F4C81",dot:"#3B82F6"},"Inspection Done":{bg:"#F5F3FF",c:"#5B21B6",dot:"#7C3AED"},"App_ID Created":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"SI Done":{bg:"#0A3560",c:"#7AB3F5",dot:"#3B82F6"},"Token Done":{bg:"#FFFBEB",c:"#92400E",dot:"#F59E0B"},"Delivery Released":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Lead Created":{bg:"#EBF4FF",c:"#0F4C81",dot:"#3B82F6"},"Validated":{bg:"#ECFDF5",c:"#065F46",dot:"#10B981"},"Validation_Failed":{bg:"#FEF2F2",c:"#991B1B",dot:"#EF4444"}};
+const T={bg:"#F5F6FA",card:"#FFFFFF",border:"#E5E7EB",text:"#111827",mid:"#374151",mute:"#9CA3AF",accent:"#4535F1",accentL:"#EEEDF9",accentD:"#3428C9",success:"#059669",successL:"#ECFDF5",warn:"#D97706",warnL:"#FFFBEB",danger:"#DC2626",dangerL:"#FEF2F2",purple:"#7C3AED",purpleL:"#F5F3FF",orange:"#EA580C",orangeL:"#FFF7ED",sidebar:"#111827",sidebarB:"#1F2937"};
+const SM={"Active":{bg:"#ECFDF5",c:"#059669",dot:"#10B981"},"Pending":{bg:"#FFFBEB",c:"#D97706",dot:"#F59E0B"},"Admin Panel Pending":{bg:"#FFFBEB",c:"#D97706",dot:"#F59E0B"},"OEM Tagging Pending":{bg:"#EEEDF9",c:"#EA580C",dot:"#4535F1"},"Ops Review":{bg:"#EEF2FF",c:"#4338CA",dot:"#6366F1"},"Rejected":{bg:"#FEF2F2",c:"#DC2626",dot:"#EF4444"},"Auto-Approved":{bg:"#ECFDF5",c:"#059669",dot:"#10B981"},"Ops Approved":{bg:"#ECFDF5",c:"#059669",dot:"#10B981"},"BH Review":{bg:"#F5F3FF",c:"#7C3AED",dot:"#8B5CF6"},"BH Approved":{bg:"#F5F3FF",c:"#7C3AED",dot:"#8B5CF6"},"Submitted":{bg:"#EEF2FF",c:"#4338CA",dot:"#6366F1"},"Released":{bg:"#ECFDF5",c:"#059669",dot:"#10B981"},"Finance Review":{bg:"#F5F3FF",c:"#7C3AED",dot:"#8B5CF6"},"Stock-In Pending":{bg:"#FFFBEB",c:"#D97706",dot:"#F59E0B"},"Inspection Done":{bg:"#EEF2FF",c:"#4338CA",dot:"#6366F1"},"Token Done":{bg:"#FFFBEB",c:"#D97706",dot:"#F59E0B"},"SI Done":{bg:"#ECFDF5",c:"#059669",dot:"#10B981"},"Lead Created":{bg:"#F9FAFB",c:"#9CA3AF",dot:"#D1D5DB"},"App_ID Created":{bg:"#EEF2FF",c:"#4338CA",dot:"#6366F1"},"Validated":{bg:"#ECFDF5",c:"#059669",dot:"#10B981"},"Validation_Failed":{bg:"#FEF2F2",c:"#DC2626",dot:"#EF4444"},"VALIDATION_FAILED":{bg:"#FEF2F2",c:"#DC2626",dot:"#EF4444"},"Inactive":{bg:"#FEF2F2",c:"#DC2626",dot:"#EF4444"}};
 
 const fmt=n=>"₹"+Number(n).toLocaleString("en-IN");
 const uid=()=>Math.random().toString(36).slice(2,7).toUpperCase();
@@ -126,42 +145,44 @@ function autoApprove(req,app,cfg){if(!app.stockIn)return{ok:false,route:"BLOCKED
 // ═══════════════════════════════════════════════
 // BASE COMPONENTS
 // ═══════════════════════════════════════════════
-function Badge({s,sm}){const m=SM[s]||{bg:"#F3F4F6",c:"#6B7280",dot:"#9CA3AF"};return <span style={{display:"inline-flex",alignItems:"center",gap:4,background:m.bg,color:m.c,padding:sm?"2px 7px":"3px 9px",borderRadius:20,fontSize:sm?9:11,fontWeight:800,whiteSpace:"nowrap"}}><span style={{width:5,height:5,borderRadius:"50%",background:m.dot,flexShrink:0}}/>{s}</span>;}
-function Card({children,style={},onClick}){return <div onClick={onClick} style={{background:T.card,borderRadius:12,border:`1px solid ${T.border}`,padding:14,...style,cursor:onClick?"pointer":undefined}}>{children}</div>;}
+function Badge({s,sm}){const m=SM[s]||{bg:"#F3F4F6",c:"#6B7280",dot:"#9CA3AF"};return <span style={{display:"inline-flex",alignItems:"center",gap:5,background:m.bg,color:m.c,padding:sm?"3px 8px":"4px 10px",borderRadius:20,fontSize:sm?9:11,fontWeight:800,whiteSpace:"nowrap",letterSpacing:0.2,border:`1px solid ${m.c}15`}}><span style={{width:sm?5:6,height:sm?5:6,borderRadius:"50%",background:m.dot,flexShrink:0}}/>{s}</span>;}
+function Card({children,style={},onClick}){return <div className="c24-card" onClick={onClick} style={{background:T.card,borderRadius:16,border:`1px solid rgba(0,0,0,0.06)`,padding:16,...style,cursor:onClick?"pointer":undefined}}>{children}</div>;}
 function Lbl({children,color}){return <div style={{fontSize:9,fontWeight:800,color:color||T.mute,letterSpacing:1.1,textTransform:"uppercase",marginBottom:8}}>{children}</div>;}
 function ST({children}){return <div style={{fontSize:12,fontWeight:800,color:T.accent,borderBottom:`2px solid ${T.accentL}`,paddingBottom:4,marginBottom:10,marginTop:8}}>{children}</div>;}
 function Row({label,value,mono}){return <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 0",borderBottom:`1px solid ${T.border}`}}><span style={{fontSize:12,color:T.mid,flexShrink:0,marginRight:8}}>{label}</span><span style={{fontSize:12,fontWeight:700,color:T.text,textAlign:"right",fontFamily:mono?"monospace":"inherit",wordBreak:"break-all"}}>{value}</span></div>;}
 function Alrt({type="info",children}){const m={info:{bg:T.accentL,b:"#BFDBFE",c:T.accentD,i:"ℹ"},success:{bg:T.successL,b:"#BBF7D0",c:T.success,i:"✓"},warning:{bg:T.warnL,b:"#FDE68A",c:T.warn,i:"⚠"},error:{bg:T.dangerL,b:"#FECACA",c:T.danger,i:"✕"}}[type];return <div style={{background:m.bg,border:`1px solid ${m.b}`,borderRadius:8,padding:"8px 11px",display:"flex",gap:8,marginBottom:10}}><span style={{color:m.c,fontWeight:900,fontSize:12,flexShrink:0}}>{m.i}</span><span style={{fontSize:11,color:m.c,lineHeight:1.5}}>{children}</span></div>;}
-function Btn({children,onClick,v="primary",disabled,sm,icon,full}){const V={primary:{bg:T.accent,c:"#fff",b:T.accent},secondary:{bg:"#fff",c:T.mid,b:T.border},success:{bg:T.success,c:"#fff",b:T.success},danger:{bg:T.danger,c:"#fff",b:T.danger},ghost:{bg:"transparent",c:T.mute,b:"transparent"},warning:{bg:T.warn,c:"#fff",b:T.warn}};const s=V[v]||V.primary;return <button onClick={onClick} disabled={disabled} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",gap:5,background:disabled?"#F1F5F9":s.bg,color:disabled?"#94A3B8":s.c,border:`1.5px solid ${disabled?T.border:s.b}`,borderRadius:8,padding:sm?"5px 11px":"9px 16px",fontSize:sm?11:12,fontWeight:700,cursor:disabled?"not-allowed":"pointer",fontFamily:"inherit",width:full?"100%":undefined}}>{icon&&<span>{icon}</span>}{children}</button>;}
-function Fld({label,value,onChange,type="text",disabled,hint,error,required,placeholder,maxLength}){return <div style={{marginBottom:10}}>{label&&<label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>{label}{required&&<span style={{color:T.danger}}> *</span>}</label>}<input value={value||""} onChange={e=>onChange&&onChange(e.target.value)} type={type} disabled={disabled} placeholder={placeholder} maxLength={maxLength} style={{width:"100%",padding:"9px 10px",border:`1.5px solid ${error?"#F87171":T.border}`,borderRadius:8,fontSize:13,background:disabled?"#F8FAFC":"#fff",color:disabled?T.mute:T.text,outline:"none",fontFamily:"inherit"}}/>{hint&&<p style={{fontSize:10,color:T.mute,marginTop:2}}>{hint}</p>}{error&&<p style={{fontSize:10,color:T.danger,marginTop:2}}>{error}</p>}</div>;}
-function Sel({label,value,onChange,options,disabled,placeholder,required}){return <div style={{marginBottom:10}}>{label&&<label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>{label}{required&&<span style={{color:T.danger}}> *</span>}</label>}<select value={value||""} onChange={e=>onChange&&onChange(e.target.value)} disabled={disabled} style={{width:"100%",padding:"9px 10px",border:`1.5px solid ${T.border}`,borderRadius:8,fontSize:13,background:disabled?"#F8FAFC":"#fff",color:value?T.text:T.mute,outline:"none",fontFamily:"inherit",cursor:disabled?"not-allowed":"pointer"}}>{placeholder&&<option value="">{placeholder}</option>}{options.map(o=><option key={o.value||o} value={o.value||o}>{o.label||o}</option>)}</select></div>;}
+function Btn({children,onClick,v="primary",disabled,sm,icon,full}){const V={primary:{bg:"linear-gradient(135deg,#4535F1 0%,#6558F5 50%,#3428C9 100%)",c:"#fff",b:"transparent"},secondary:{bg:"#fff",c:T.mid,b:T.border},success:{bg:"linear-gradient(135deg,#1B9E4B 0%,#27AE60 50%,#1B9E4B 100%)",c:"#fff",b:"transparent"},danger:{bg:"linear-gradient(135deg,#DC3545 0%,#E74C3C 50%,#C82333 100%)",c:"#fff",b:"transparent"},ghost:{bg:"transparent",c:T.mute,b:"transparent"},warning:{bg:"linear-gradient(135deg,#E8A317 0%,#F39C12 50%,#D68910 100%)",c:"#fff",b:"transparent"}};const s=V[v]||V.primary;return <button className="c24-btn" onClick={onClick} disabled={disabled} style={{display:"inline-flex",alignItems:"center",justifyContent:"center",gap:6,background:disabled?"#E4E7EC":s.bg,color:disabled?"#8896A6":s.c,border:`1.5px solid ${disabled?T.border:s.b}`,borderRadius:12,padding:sm?"7px 14px":"11px 20px",fontSize:sm?11:12,fontWeight:700,cursor:disabled?"not-allowed":"pointer",fontFamily:"inherit",width:full?"100%":undefined,letterSpacing:0.3}}>{icon&&<span>{icon}</span>}{children}</button>;}
+function Fld({label,value,onChange,type="text",disabled,hint,error,required,placeholder,maxLength}){return <div style={{marginBottom:12}}>{label&&<label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:5,letterSpacing:0.2}}>{label}{required&&<span style={{color:T.danger}}> *</span>}</label>}<input className="c24-input" value={value||""} onChange={e=>onChange&&onChange(e.target.value)} type={type} disabled={disabled} placeholder={placeholder} maxLength={maxLength} style={{width:"100%",padding:"11px 14px",border:`1.5px solid ${error?"#DC3545":T.border}`,borderRadius:12,fontSize:13,background:disabled?"#F8FAFB":"#FFFFFF",color:disabled?T.mute:T.text,outline:"none",fontFamily:"inherit",transition:"border-color 0.25s, box-shadow 0.25s"}}/>{hint&&<p style={{fontSize:10,color:T.mute,marginTop:4}}>{hint}</p>}{error&&<p style={{fontSize:10,color:T.danger,marginTop:4}}>{error}</p>}</div>;}
+function Sel({label,value,onChange,options,disabled,placeholder,required}){return <div style={{marginBottom:12}}>{label&&<label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:5,letterSpacing:0.2}}>{label}{required&&<span style={{color:T.danger}}> *</span>}</label>}<select className="c24-input" value={value||""} onChange={e=>onChange&&onChange(e.target.value)} disabled={disabled} style={{width:"100%",padding:"11px 14px",border:`1.5px solid ${T.border}`,borderRadius:12,fontSize:13,background:disabled?"#F8FAFB":"#FFFFFF",color:value?T.text:T.mute,outline:"none",fontFamily:"inherit",cursor:disabled?"not-allowed":"pointer",transition:"border-color 0.25s, box-shadow 0.25s"}}><option value="">{placeholder||""}</option>{options.map(o=><option key={o.value||o} value={o.value||o}>{o.label||o}</option>)}</select></div>;}
 function G2({children,gap=8}){return <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap}}>{children}</div>;}
 function StepBar({steps,cur}){return <div style={{display:"flex",alignItems:"center",marginBottom:14,overflowX:"auto",paddingBottom:2}}>{steps.map((s,i)=><div key={i} style={{display:"flex",alignItems:"center",flexShrink:0}}><div style={{display:"flex",alignItems:"center",gap:4}}><div style={{width:20,height:20,borderRadius:"50%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,fontWeight:900,background:i<cur?T.success:i===cur?T.accent:"#E2E8F0",color:i<=cur?"#fff":T.mute}}>{i<cur?"✓":i+1}</div><span style={{fontSize:9,fontWeight:700,color:i===cur?T.accent:i<cur?T.success:T.mute,whiteSpace:"nowrap"}}>{s}</span></div>{i<steps.length-1&&<div style={{width:10,height:1,background:i<cur?T.success:T.border,margin:"0 4px"}}/>}</div>)}</div>;}
 function FileInput({label,value,onChange,required,hint}){return <div style={{marginBottom:10}}>{label&&<label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:3}}>{label}{required&&<span style={{color:T.danger}}> *</span>}</label>}{hint&&<p style={{fontSize:10,color:T.mute,marginBottom:3}}>{hint}</p>}<div style={{display:"flex",alignItems:"center",gap:8}}><div style={{flex:1,border:`1.5px dashed ${value?"#10B981":T.border}`,borderRadius:8,padding:"8px 10px",background:value?T.successL:"#FAFAFA",cursor:"pointer"}} onClick={()=>{const n=prompt(`Enter filename for "${label}" (simulated upload):`);if(n)onChange(n);}}>{value?<span style={{fontSize:11,color:T.success,fontWeight:700}}>📄 {value}</span>:<span style={{fontSize:11,color:T.mute}}>Tap to upload (simulated)</span>}</div>{value&&<button onClick={()=>onChange("")} style={{background:"none",border:"none",color:T.danger,cursor:"pointer",fontSize:16,fontWeight:700}}>×</button>}</div></div>;}
 function MultiDealerSel({dealers,selected,onChange}){return <div style={{marginBottom:10}}><label style={{display:"block",fontSize:11,fontWeight:700,color:T.mid,marginBottom:4}}>Linked Dealers <span style={{color:T.danger}}>*</span></label><div style={{border:`1.5px solid ${T.border}`,borderRadius:8,padding:8,background:"#fff",minHeight:44}}><div style={{display:"flex",flexWrap:"wrap",gap:5,marginBottom:selected.length>0?5:0}}>{selected.map(id=>{const d=dealers.find(dd=>dd.id===id);return <span key={id} style={{display:"inline-flex",alignItems:"center",gap:4,background:T.accentL,color:T.accent,borderRadius:12,padding:"2px 8px",fontSize:11,fontWeight:700}}>{d?d.name:"?"}<button onClick={()=>onChange(selected.filter(x=>x!==id))} style={{background:"none",border:"none",color:T.accent,cursor:"pointer",fontSize:12,fontWeight:900}}>×</button></span>;})}</div><select value="" onChange={e=>{if(e.target.value&&!selected.includes(e.target.value))onChange([...selected,e.target.value]);}} style={{width:"100%",border:"none",outline:"none",fontSize:11,color:T.mute,background:"transparent",cursor:"pointer",fontFamily:"inherit"}}><option value="">+ Add dealer...</option>{dealers.filter(d=>d.status==="Active"&&!selected.includes(d.id)).map(d=><option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}</select></div><p style={{fontSize:10,color:T.mute,marginTop:2}}>Payee will be available for payout across all selected dealers</p></div>;}
-function Toast({msg,type,onDone}){useEffect(()=>{const t=setTimeout(onDone,2800);return()=>clearTimeout(t);},[]);const bg=type==="error"?T.danger:type==="warning"?T.warn:T.success;return <div style={{position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",background:bg,color:"#fff",padding:"10px 20px",borderRadius:10,fontSize:13,fontWeight:700,zIndex:9999,boxShadow:"0 6px 24px rgba(0,0,0,0.25)",maxWidth:340,textAlign:"center",whiteSpace:"nowrap"}}>{msg}</div>;}
+function Toast({msg,type,onDone}){useEffect(()=>{const t=setTimeout(onDone,3000);return()=>clearTimeout(t);},[]);const bg=type==="error"?"linear-gradient(135deg,#DC3545,#C82333)":type==="warning"?"linear-gradient(135deg,#E8A317,#D68910)":"linear-gradient(135deg,#1B9E4B,#27AE60)";return <div style={{position:"fixed",top:18,left:"50%",transform:"translateX(-50%)",background:bg,color:"#fff",padding:"14px 28px",borderRadius:14,fontSize:13,fontWeight:700,zIndex:9999,boxShadow:"0 8px 32px rgba(0,0,0,0.2),0 4px 12px rgba(0,0,0,0.1)",maxWidth:420,textAlign:"center",whiteSpace:"nowrap",animation:"slideUp 0.35s cubic-bezier(0.4,0,0.2,1)",letterSpacing:0.3,border:"1px solid rgba(255,255,255,0.15)"}}>{msg}</div>;}
 
 // ═══════════════════════════════════════════════
 // ROLE-BASED NAVIGATION CONFIG
 // ═══════════════════════════════════════════════
 const fieldNav=[
   {id:"dashboard",label:"Home",icon:"🏠"},
+  {id:"dealerperf",label:"Dealer Perf",icon:"📊"},
   {id:"leads",label:"Leads",icon:"📋"},
   {id:"appids",label:"App_IDs",icon:"🚗"},
   {id:"onboarding",label:"Dealers",icon:"🏢"},
   {id:"counter",label:"Counter",icon:"🔗"},
-  {id:"sap",label:"SAP",icon:"🏦"},
+  {id:"sap",label:"Payees",icon:"🏦"},
   {id:"payouts",label:"Payouts",icon:"💸"},
 ];
 const opsNav=[
   {id:"dashboard",label:"Dashboard",icon:"▦"},
+  {id:"dealerperf",label:"Dealer Perf",icon:"📊",roles:["TM","Central Ops","Business Head"]},
   {id:"payout",label:"Raise Payout",icon:"💸",roles:["TM"]},
   {id:"leads",label:"Leads",icon:"📋",roles:["TM","Central Ops","Business Head"]},
   {id:"appids",label:"App_IDs",icon:"🚗",roles:["TM","Central Ops","Business Head"]},
   {id:"override",label:"Ctr Override",icon:"🔄",roles:["TM","Central Ops","Business Head"]},
   {id:"onboarding",label:"Onboarding",icon:"🏢",badge:"ob"},
   {id:"counter",label:"Counter",icon:"🔗",badge:"ctr"},
-  {id:"sap",label:"SAP",icon:"🏦",badge:"sap"},
+  {id:"sap",label:"SAP",icon:"🏦",badge:"sap",roles:["TM","Central Ops","Business Head"]},
   {id:"approvals",label:"Approvals",icon:"✓",badge:"apr",roles:["Central Ops","Business Head","Finance"]},
   {id:"transfer",label:"Transfer",icon:"⚡",roles:["Central Ops","Business Head"]},
   {id:"config",label:"Config",icon:"⚙",roles:["Business Head"]},
@@ -171,23 +192,94 @@ const opsNav=[
 // RA/RM MODULES
 // ═══════════════════════════════════════════════
 function RADashboard({user,shared}){
-  const{apps,dealers,leads,onboarding,payoutRequests}=shared;
+  const{apps,dealers,leads,onboarding,payoutRequests,counters,setPage,setDeepLink}=shared;
   let raIds=[user.id];if(user.role==="RM"&&user.raIds)raIds=[user.id,...user.raIds];
-  const myLeads=leads.filter(l=>raIds.includes(l.raId));const myApps=apps.filter(a=>raIds.includes(a.raId));const myDealers=dealers.filter(d=>raIds.includes(d.raId));const myPR=payoutRequests.filter(p=>raIds.includes(p.raId));
+  const myLeads=leads.filter(l=>raIds.includes(l.raId));
+  const myApps=apps.filter(a=>raIds.includes(a.raId));
+  const myDealers=dealers.filter(d=>raIds.includes(d.raId));
+  const myPR=payoutRequests.filter(p=>raIds.includes(p.raId));
   const walBal=raIds.reduce((s,r)=>s+raWalBal(r,apps),0);
-  const kpis=[{icon:"📋",label:"Leads",value:myLeads.length,sub:`${myLeads.filter(l=>l.status==="App_ID Created").length} converted`,color:T.accent,bg:T.accentL},{icon:"🚗",label:"Stock-In Pending",value:myApps.filter(a=>!a.stockIn).length,sub:"of "+myApps.length+" apps",color:T.orange,bg:T.orangeL},{icon:"✅",label:"Active Deals",value:myApps.filter(a=>a.status==="Active").length,color:T.success,bg:T.successL},{icon:"⏳",label:"Pending Payouts",value:myPR.filter(p=>!["Auto-Approved","Released","Rejected"].includes(p.status)).length,color:T.warn,bg:T.warnL},{icon:"🏢",label:"Active Dealers",value:myDealers.filter(d=>d.status==="Active").length,color:T.purple,bg:T.purpleL},{icon:"💰",label:"Wallet",value:fmt(walBal),sub:"available",color:T.accentD,bg:T.accentL}];
+  const[drawer,setDrawer]=useState(null);
+  const[dealerDrawer,setDealerDrawer]=useState(null); // dealer-level stats drawer
+
+  function handleNavigate({page,id}){
+    if(setDeepLink&&id)setDeepLink({page,id});
+    if(setPage)setPage(page);
+  }
+
+  function openDealerDrawer(dealer){
+    const st=calcDealerMetrics(dealer.id,leads,apps,payoutRequests);
+    setDealerDrawer({dealer,stats:st});
+  }
+  function getDealerStats(dealerId){
+    return calcDealerMetrics(dealerId,leads,apps,payoutRequests);
+  }
+
+  function openDrawer(type){
+    if(type==="leads"){
+      const items=myLeads.map(l=>{const d=dealers.find(dd=>dd.id===l.dealerId);return{primary:`${l.make} ${l.model} ${l.year}`,badge:l.status,leadId:l.id,secondary:`${l.regNo} · ${d?d.name:"—"} · ${l.city}`,detail:`${l.createdAt}`,chips:[{label:`Lead ${l.id}`,page:"leads",id:l.id,color:T.accent}]};});
+      setDrawer({title:user.role==="RM"?"Team Leads":"My Leads",icon:"📋",color:T.accent,data:items});
+    } else if(type==="sipending"){
+      const items=myApps.filter(a=>!a.stockIn).map(a=>{const d=dealers.find(dd=>dd.id===a.dealerId);return{primary:`${a.id} — ${a.vehicle}`,appId:a.id,secondary:`Dealer: ${d?d.name:"—"} · Quote: ${fmt(a.quote)}`,detail:`GS: ${a.gsType}`,chips:[{label:`App ${a.id}`,page:"appids",id:a.id,color:T.orange}]};});
+      setDrawer({title:"SI Pending",icon:"🚗",color:T.orange,data:items});
+    } else if(type==="activedeals"){
+      const items=myApps.filter(a=>a.status==="Active").map(a=>{const d=dealers.find(dd=>dd.id===a.dealerId);const c=counters.find(cc=>cc.id===a.counterId);return{primary:`${a.id} — ${a.vehicle}`,appId:a.id,amount:fmt(a.otherCharges-a.splitReleased),secondary:`Dealer: ${d?d.name:"—"} · UCM: ${c?c.ucmName:"—"}`,detail:`SI: ${a.stockIn?"Done":"Pending"} · GS: ${a.gsType}`,chips:[{label:`App ${a.id}`,page:"appids",id:a.id,color:T.success}]};});
+      setDrawer({title:"Active Deals",icon:"✅",color:T.success,data:items});
+    } else if(type==="pendingpayouts"){
+      const items=myPR.filter(p=>!["Auto-Approved","Released","Rejected"].includes(p.status)).map(r=>{const a=apps.find(aa=>aa.id===r.appId);return{primary:`${r.id} — ${r.type}`,amount:fmt(r.amount),badge:r.status,payoutId:r.id,secondary:a?`${a.vehicle} · App: ${r.appId}`:r.appId,chips:[{label:`App ${r.appId}`,page:"appids",id:r.appId,color:T.accent},{label:"Payout Status",page:"payouts",id:r.id,color:T.warn}]};});
+      setDrawer({title:"Pending Payouts",icon:"⏳",color:T.warn,data:items});
+    } else if(type==="dealers"){
+      const items=myDealers.filter(d=>d.status==="Active").map(d=>{const st=getDealerStats(d.id);return{primary:d.name,badge:"Active",dealerId:d.id,secondary:`Code: ${d.code||"—"} · ${d.type} · ${d.oem}`,detail:`Leads: ${st.leads} | SI: ${st.si} | GS: ${st.gs} | Split: ${fmt(st.splits)} | Inc: ${fmt(st.incentives)}`,chips:[{label:"Onboarding",page:"onboarding",id:d.id,color:T.purple}]};});
+      setDrawer({title:user.role==="RM"?"Team Dealers":"My Dealers",icon:"🏢",color:T.purple,data:items});
+    } else if(type==="wallet"){
+      const items=myApps.filter(a=>a.otherCharges-a.splitReleased>0).map(a=>{const d=dealers.find(dd=>dd.id===a.dealerId);return{primary:`${a.id} — ${a.vehicle}`,amount:fmt(a.otherCharges-a.splitReleased),appId:a.id,secondary:`Dealer: ${d?d.name:"—"} · OC: ${fmt(a.otherCharges)} · Released: ${fmt(a.splitReleased)}`,chips:[{label:`App ${a.id}`,page:"appids",id:a.id,color:T.accentD}]};});
+      setDrawer({title:"Wallet Breakdown",icon:"💰",color:T.accentD,data:items});
+    }
+  }
+
   return <div>
-    <div style={{background:`linear-gradient(135deg,${T.accentD},${T.accent})`,borderRadius:14,padding:16,color:"#fff",marginBottom:12}}>
-      <div style={{fontSize:9,fontWeight:800,letterSpacing:1.2,opacity:0.7,marginBottom:4}}>{user.role==="RM"?"TEAM WALLET":"MY WALLET"} — OTHER CHARGES</div>
+    {drawer&&<DashboardDrawer {...drawer} onClose={()=>setDrawer(null)} onNavigate={handleNavigate}/>}
+    {dealerDrawer&&<TMDealerDetailPanel dealer={dealerDrawer.dealer} stats={dealerDrawer.stats} onClose={()=>setDealerDrawer(null)} onNavigate={handleNavigate} counters={counters} apps={apps} leads={leads}/>}
+    <div onClick={()=>openDrawer("wallet")} style={{background:`linear-gradient(135deg,#4535F1,#3428C9)`,borderRadius:16,padding:18,color:"#fff",marginBottom:14,boxShadow:"0 4px 20px rgba(69,53,241,0.25)",cursor:"pointer",transition:"transform 0.2s",position:"relative"}} onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"} onMouseLeave={e=>e.currentTarget.style.transform=""}>
+      <div style={{fontSize:9,fontWeight:800,letterSpacing:1.2,opacity:0.7,marginBottom:4}}>{user.role==="RM"?"TEAM WALLET":"MY WALLET"} — OTHER CHARGES · TAP TO VIEW BREAKDOWN</div>
       <div style={{fontSize:26,fontWeight:900}}>{fmt(walBal)}</div>
       <div style={{fontSize:11,opacity:0.7,marginTop:2}}>Available to split</div>
-      {user.role==="RM"&&user.raIds&&<div style={{marginTop:10,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.2)",display:"flex",gap:6,flexWrap:"wrap"}}>{[user.id,...user.raIds].map(rid=>{const ra=ALL_USERS.find(u=>u.id===rid);return <div key={rid} style={{background:"rgba(255,255,255,0.12)",borderRadius:8,padding:"4px 8px",fontSize:10}}><div style={{fontWeight:700}}>{ra&&ra.name.split(" ")[0]}</div><div style={{opacity:0.8}}>{fmt(raWalBal(rid,apps))}</div></div>;})} </div>}
+      <div style={{position:"absolute",top:18,right:18,fontSize:12,opacity:0.5}}>▶</div>
+      {user.role==="RM"&&user.raIds&&<div style={{marginTop:10,paddingTop:8,borderTop:"1px solid rgba(255,255,255,0.2)",display:"flex",gap:6,flexWrap:"wrap"}}>{[user.id,...user.raIds].map(rid=>{const ra=ALL_USERS.find(u=>u.id===rid);return <div key={rid} style={{background:"rgba(255,255,255,0.12)",borderRadius:8,padding:"4px 8px",fontSize:10}}><div style={{fontWeight:700}}>{ra&&ra.name.split(" ")[0]}</div><div style={{opacity:0.8}}>{fmt(raWalBal(rid,apps))}</div></div>;})}</div>}
     </div>
-    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:12}}>{kpis.map(k=><div key={k.label} style={{background:k.bg,borderRadius:10,padding:10,border:`1px solid ${k.color}22`}}><div style={{fontSize:16,marginBottom:3}}>{k.icon}</div><div style={{fontSize:18,fontWeight:900,color:T.text}}>{k.value}</div><div style={{fontSize:9,fontWeight:800,color:k.color,letterSpacing:0.7,textTransform:"uppercase",marginTop:1}}>{k.label}</div>{k.sub&&<div style={{fontSize:10,color:T.mute,marginTop:1}}>{k.sub}</div>}</div>)}</div>
-    {user.role==="RM"&&user.raIds&&<Card style={{marginBottom:10}}><Lbl>Team Breakdown</Lbl>{user.raIds.map(raId=>{const ra=ALL_USERS.find(u=>u.id===raId);const raL=leads.filter(l=>l.raId===raId);const raA=apps.filter(a=>a.raId===raId);return <div key={raId} style={{padding:"8px 0",borderBottom:`1px solid ${T.border}`}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><div style={{fontSize:12,fontWeight:800}}>{ra&&ra.name}</div><div style={{fontSize:13,fontWeight:800,color:T.accent}}>{fmt(raWalBal(raId,apps))}</div></div><div style={{display:"flex",gap:10}}><span style={{fontSize:10,color:T.mute}}>{raL.length} leads</span><span style={{fontSize:10,color:T.mute}}>{raA.length} apps</span></div></div>;})} </Card>}
-    <Card><Lbl>Recent Leads</Lbl>{myLeads.slice(-3).reverse().map(l=><div key={l.id} style={{padding:"6px 0",borderBottom:`1px solid ${T.border}`}}><div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,fontWeight:700}}>{l.make} {l.model} {l.year}</span><Badge s={l.status} sm/></div><div style={{fontSize:10,color:T.mute}}>{l.regNo} · {l.createdAt}</div></div>)}{myLeads.length===0&&<div style={{fontSize:11,color:T.mute,padding:"8px 0"}}>No leads yet</div>}</Card>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
+      <DashStatCard icon="📋" label="Leads" value={myLeads.length} color={T.accent} bg={T.accentL} onClick={()=>openDrawer("leads")}/>
+      <DashStatCard icon="🚗" label="SI Pending" value={myApps.filter(a=>!a.stockIn).length} color={T.orange} bg={T.orangeL} onClick={()=>openDrawer("sipending")}/>
+      <DashStatCard icon="✅" label="Active Deals" value={myApps.filter(a=>a.status==="Active").length} color={T.success} bg={T.successL} onClick={()=>openDrawer("activedeals")}/>
+      <DashStatCard icon="⏳" label="Pending Payouts" value={myPR.filter(p=>!["Auto-Approved","Released","Rejected"].includes(p.status)).length} color={T.warn} bg={T.warnL} onClick={()=>openDrawer("pendingpayouts")}/>
+      <DashStatCard icon="🏢" label="My Dealers" value={myDealers.filter(d=>d.status==="Active").length} color={T.purple} bg={T.purpleL} onClick={()=>openDrawer("dealers")}/>
+      <DashStatCard icon="💰" label="Wallet" value={fmt(walBal)} color={T.accentD} bg={T.accentL} onClick={()=>openDrawer("wallet")}/>
+    </div>
+    {user.role==="RM"&&user.raIds&&<Card style={{marginBottom:10}}><Lbl>Team Breakdown</Lbl>{user.raIds.map(raId=>{const ra=ALL_USERS.find(u=>u.id===raId);const raL=leads.filter(l=>l.raId===raId);const raA=apps.filter(a=>a.raId===raId);return <div key={raId} style={{padding:"8px 0",borderBottom:`1px solid ${T.border}`}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><div style={{fontSize:12,fontWeight:800}}>{ra&&ra.name}</div><div style={{fontSize:13,fontWeight:800,color:T.accent}}>{fmt(raWalBal(raId,apps))}</div></div><div style={{display:"flex",gap:10}}><span style={{fontSize:10,color:T.mute}}>{raL.length} leads</span><span style={{fontSize:10,color:T.mute}}>{raA.length} apps</span></div></div>;})}</Card>}
+    <Card style={{marginBottom:10}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><Lbl>Top Dealers</Lbl><button onClick={()=>{if(setPage)setPage("dealerperf");}} style={{background:T.accentL,border:"1px solid "+T.accent+"30",borderRadius:8,padding:"4px 10px",fontSize:10,fontWeight:700,cursor:"pointer",color:T.accent,fontFamily:"inherit"}}>View All →</button></div>
+      {myDealers.filter(d=>d.status==="Active").slice(0,3).map(d=>{
+        const st=getDealerStats(d.id);
+        return <div key={d.id} onClick={()=>openDealerDrawer(d)} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid "+T.border,cursor:"pointer"}}>
+          <div style={{flex:1}}>
+            <div style={{fontSize:12,fontWeight:800}}>{d.name}</div>
+            <div style={{display:"flex",gap:6,marginTop:3}}>
+              {[["L",st.leads,T.accent],["I",st.insp,T.purple],["SI",st.si,T.success],["GS",st.gs,"#0F766E"]].map(function(m){return <span key={m[0]} style={{fontSize:9,background:m[2]+"10",color:m[2],fontWeight:800,borderRadius:4,padding:"1px 5px"}}>{m[1]} {m[0]}</span>;})}
+            </div>
+          </div>
+          <div style={{textAlign:"right"}}>
+            <div style={{fontSize:12,fontWeight:900,color:T.accent}}>{fmt(st.splits+st.incentives)}</div>
+            <div style={{fontSize:8,color:T.mute,fontWeight:700}}>PAID</div>
+          </div>
+        </div>;
+      })}
+      {myDealers.filter(d=>d.status==="Active").length===0&&<div style={{fontSize:11,color:T.mute,padding:"8px 0"}}>No active dealers</div>}
+      {myDealers.filter(d=>d.status==="Active").length>3&&<div style={{textAlign:"center",paddingTop:8}}><button onClick={()=>{if(setPage)setPage("dealerperf");}} style={{background:"none",border:"none",color:T.accent,fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>+{myDealers.filter(d=>d.status==="Active").length-3} more dealers →</button></div>}
+    </Card>
+    <Card><Lbl>Recent Leads</Lbl>{myLeads.slice(-3).reverse().map(l=><div key={l.id} onClick={()=>{if(setDeepLink)setDeepLink({page:"leads",id:l.id});if(setPage)setPage("leads");}} style={{padding:"6px 0",borderBottom:`1px solid ${T.border}`,cursor:"pointer"}}><div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,fontWeight:700,color:T.accent}}>{l.make} {l.model} {l.year} ↗</span><Badge s={l.status} sm/></div><div style={{fontSize:10,color:T.mute}}>{l.regNo} · {l.createdAt}</div></div>)}{myLeads.length===0&&<div style={{fontSize:11,color:T.mute,padding:"8px 0"}}>No leads yet</div>}</Card>
   </div>;
 }
+
 
 // ═══════════════════════════════════════════════
 // STAGE DIALOG COMPONENT
@@ -349,12 +441,29 @@ function LeadsModule({user,shared}){
   }
 
   function saveStage(leadId,updates){
-    const lead=leads.find(l=>l.id===leadId)||leads.find(l=>l.id===pendingStageLeadId);
-    // if SI done, update linked App_ID
-    if(updates.siDone&&lead&&lead.appId){
-      setApps(prev=>prev.map(a=>a.id===lead.appId?{...a,stockIn:true,gsType:updates.siGsType||a.gsType,otherCharges:updates.otherCharges>0?updates.otherCharges:a.otherCharges,serviceCharge:updates.serviceCharge>0?updates.serviceCharge:a.serviceCharge,challan:updates.challan>0?updates.challan:a.challan}:a));
+    const actualId=leadId||pendingStageLeadId;
+    const lead=leads.find(l=>l.id===actualId);
+    if(!lead)return;
+    let newAppId=lead.appId;
+    // AUTO App_ID GENERATION: create App_ID on Inspection Done if none exists
+    if(updates.inspectionDone && !lead.appId){
+      const appUid=`APP${uid()}`;
+      const dealer=dealers.find(d=>d.id===lead.dealerId);
+      const counter=counters.find(c=>c.id===lead.counterId);
+      const newApp={id:appUid,dealerId:lead.dealerId,counterId:lead.counterId,raId:lead.raId,vehicle:`${lead.year} ${lead.make} ${lead.model}${lead.variant?" "+lead.variant:""}`,regNo:lead.regNo,quote:updates.c24Quote||lead.price,serviceCharge:updates.serviceCharge||0,challan:updates.challan||0,estRefurb:0,gsType:"",stockIn:false,otherCharges:0,splitReleased:0,incentiveReleased:0,status:"Active",inspectionDone:true,inspectionAt:updates.inspectionAt||"",inspectionNotes:updates.inspectionNotes||"",tokenDone:false,tokenAt:"",tokenAmount:0,tokenNotes:"",siDone:false,siAt:"",siNotes:"",siOtherCharges:0,siGsType:""};
+      setApps(prev=>[...prev,newApp]);
+      newAppId=appUid;
+      updates.appId=appUid;
     }
-    setLeads(prev=>prev.map(l=>(l.id===leadId||l.id===pendingStageLeadId)?{...l,...updates}:l));
+    // SYNC on Token Done: update linked App_ID with challan, otherCharges, token data
+    if(updates.tokenDone && newAppId){
+      setApps(prev=>prev.map(a=>a.id===newAppId?{...a,tokenDone:true,tokenAt:updates.tokenAt||a.tokenAt,tokenAmount:updates.tokenCount||a.tokenAmount,tokenNotes:"",challan:updates.challan>0?updates.challan:a.challan,otherCharges:updates.otherCharges>0?updates.otherCharges:a.otherCharges,serviceCharge:updates.serviceCharge>0?updates.serviceCharge:a.serviceCharge}:a));
+    }
+    // SYNC on SI Done: set stockIn, gsType, unlock wallet on linked App_ID
+    if(updates.siDone && newAppId){
+      setApps(prev=>prev.map(a=>a.id===newAppId?{...a,stockIn:true,siDone:true,siAt:updates.siAt||"",siNotes:updates.siNotes||"",siGsType:updates.siGsType||a.siGsType,gsType:updates.siGsType||a.gsType,otherCharges:updates.otherCharges>0?updates.otherCharges:a.otherCharges,serviceCharge:updates.serviceCharge>0?updates.serviceCharge:a.serviceCharge,challan:updates.challan>0?updates.challan:a.challan,siOtherCharges:updates.otherCharges>0?updates.otherCharges:a.siOtherCharges}:a));
+    }
+    setLeads(prev=>prev.map(l=>l.id===actualId?{...l,...updates}:l));
     setStageFor(null);setPendingStageLeadId(null);
   }
 
@@ -460,11 +569,14 @@ function AppIDsModule({user,shared}){
   const myApps=isOpsView?apps:apps.filter(a=>raIds.includes(a.raId));
 
   function saveStageFromApp(leadId,updates){
-    if(updates.siDone){
-      const lead=leads.find(l=>l.id===leadId);
-      if(lead&&lead.appId){
-        setApps(prev=>prev.map(a=>a.id===lead.appId?{...a,stockIn:true,gsType:updates.siGsType||a.gsType,otherCharges:updates.otherCharges>0?updates.otherCharges:a.otherCharges}:a));
-      }
+    const lead=leads.find(l=>l.id===leadId);
+    if(!lead)return;
+    const appId=lead.appId;
+    if(updates.tokenDone && appId){
+      setApps(prev=>prev.map(a=>a.id===appId?{...a,tokenDone:true,tokenAt:updates.tokenAt||a.tokenAt,challan:updates.challan>0?updates.challan:a.challan,otherCharges:updates.otherCharges>0?updates.otherCharges:a.otherCharges,serviceCharge:updates.serviceCharge>0?updates.serviceCharge:a.serviceCharge}:a));
+    }
+    if(updates.siDone && appId){
+      setApps(prev=>prev.map(a=>a.id===appId?{...a,stockIn:true,siDone:true,siAt:updates.siAt||"",siNotes:updates.siNotes||"",siGsType:updates.siGsType||a.siGsType,gsType:updates.siGsType||a.gsType,otherCharges:updates.otherCharges>0?updates.otherCharges:a.otherCharges,serviceCharge:updates.serviceCharge>0?updates.serviceCharge:a.serviceCharge,challan:updates.challan>0?updates.challan:a.challan,siOtherCharges:updates.otherCharges>0?updates.otherCharges:a.siOtherCharges}:a));
     }
     setLeads(prev=>prev.map(l=>l.id===leadId?{...l,...updates}:l));
     setStageFor(null);
@@ -483,7 +595,7 @@ function AppIDsModule({user,shared}){
     const d=dealers.find(dd=>dd.id===a.dealerId);const c=counters.find(cc=>cc.id===a.counterId);
     const lead=leads.find(l=>l.appId===a.id);
     const isOpen=sel===a.id;
-    const sc=STAGE_COLOR[lead?.status]||{bar:T.border,label:"No Lead"};
+    const sc=STAGE_COLOR[lead&&lead.status]||{bar:T.border,label:"No Lead"};
     return <Card key={a.id} style={{marginBottom:10,border:`1.5px solid ${isOpen?T.accent:T.border}`,background:isOpen?T.accentL:"#fff"}}>
       <div onClick={()=>setSel(isOpen?null:a.id)}>
         <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
@@ -500,12 +612,12 @@ function AppIDsModule({user,shared}){
           }[lead.status]||"0%"),transition:"width 0.3s"}}/></div>
         </div>}
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:5}}>
-          {[["Wallet",fmt(a.otherCharges-a.splitReleased)],["Quote",fmt(lead?.c24Quote||a.quote)],["GS",a.gsType]].map(([l,v])=><div key={l} style={{background:"#F8FAFC",borderRadius:6,padding:"5px 7px"}}><div style={{fontSize:9,color:T.mute,fontWeight:700}}>{l}</div><div style={{fontSize:10,fontWeight:800,marginTop:1}}>{v}</div></div>)}
+          {[["Wallet",fmt(a.otherCharges-a.splitReleased)],["Quote",fmt(lead&&lead.c24Quote||a.quote)],["GS",a.gsType]].map(([l,v])=><div key={l} style={{background:"#F8FAFC",borderRadius:6,padding:"5px 7px"}}><div style={{fontSize:9,color:T.mute,fontWeight:700}}>{l}</div><div style={{fontSize:10,fontWeight:800,marginTop:1}}>{v}</div></div>)}
         </div>
       </div>
       {isOpen&&<div style={{marginTop:10,borderTop:`1px solid ${T.border}`,paddingTop:10}}>
         <ST>App_ID Details</ST>
-        {[["Reg. No.",a.regNo],["Dealer",d&&d.name],["Dealer Code",d&&d.code],["Counter",c&&c.name],["City",c&&c.city],["UCM Name",c&&c.ucmName],["UCM Mobile",c&&c.ucmMobile],["C24 Quote",fmt(lead?.c24Quote||a.quote)],["Service Charge",fmt(lead?.serviceCharge||a.serviceCharge)],["Challan",fmt(lead?.challan||a.challan)],["Est. Refurb",fmt(a.estRefurb)],["Other Charges",fmt(lead?.otherCharges||a.otherCharges)],["Wallet Available",fmt(a.otherCharges-a.splitReleased)],["GS Type",a.gsType],["Stock-In",a.stockIn?"✓ Complete":"✗ Pending"],...(extra||[])].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}
+        {[["Reg. No.",a.regNo],["Dealer",d&&d.name],["Dealer Code",d&&d.code],["Counter",c&&c.name],["City",c&&c.city],["UCM Name",c&&c.ucmName],["UCM Mobile",c&&c.ucmMobile],["C24 Quote",fmt(lead&&lead.c24Quote||a.quote)],["Service Charge",fmt(lead&&lead.serviceCharge||a.serviceCharge)],["Challan",fmt(lead&&lead.challan||a.challan)],["Est. Refurb",fmt(a.estRefurb)],["Other Charges",fmt(lead&&lead.otherCharges||a.otherCharges)],["Wallet Available",fmt(a.otherCharges-a.splitReleased)],["GS Type",a.gsType],["Stock-In",a.stockIn?"✓ Complete":"✗ Pending"],...(extra||[])].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}
         {lead&&<><div style={{marginTop:8,marginBottom:6}}><ST>Lead Stage</ST></div>
           {lead.inspectionDone&&<>{[["C24 Quote",fmt(lead.c24Quote||0)],["Service Charge",fmt(lead.serviceCharge||0)],["Final Payable to CX",fmt(lead.finalPayableCx||0)]].map(([l,v])=><Row key={l} label={l} value={v}/>)}</>}
           {lead.tokenDone&&<>{[["Challan",fmt(lead.challan||0)],["Other Charges",fmt(lead.otherCharges||0)],["Delivery Payment",fmt(lead.deliveryPayment||0)],["Delivery Released",lead.deliveryReleased?"✅ Yes":"❌ No"]].map(([l,v])=><Row key={l} label={l} value={v}/>)}</>}
@@ -526,10 +638,10 @@ function AppIDsModule({user,shared}){
 
 function OnboardingModuleRA({user,shared}){
   const{dealers,onboarding,setOnboarding,setDealers}=shared;
-  const[view,setView]=useState("list");const[step,setStep]=useState(0);const[form,setForm]=useState({});const[docs,setDocs]=useState({gst:"",pan:"",bank:"",cancelledCheque:"",other:""});const[oemDocs,setOemDocs]=useState({franchiseAgreement:"",oemLetter:"",other:""});
+  const[view,setView]=useState("list");const[step,setStep]=useState(0);const[form,setForm]=useState({});const[docs,setDocs]=useState({gst:"",pan:"",cancelledCheque:"",other:""});const[oemDocs,setOemDocs]=useState({franchiseAgreement:"",oemLetter:"",other:""});
   let raIds=[user.id];if(user.role==="RM"&&user.raIds)raIds=[user.id,...user.raIds];
   const myOB=onboarding.filter(o=>raIds.includes(o.raId));const f=(k,v)=>setForm(p=>({...p,[k]:v}));
-  function submit(){setOnboarding(p=>[...p,{id:`OB${uid()}`,raId:user.id,submittedBy:user.role,...form,docs,oemDocs,status:"Admin Panel Pending",dealerCode:"",submittedAt:now()}]);setView("list");setStep(0);setForm({});setDocs({gst:"",pan:"",bank:"",cancelledCheque:"",other:""});setOemDocs({franchiseAgreement:"",oemLetter:"",other:""});alert("✓ Submitted! Auto-email sent to Admin Panel team. This now appears in Ops Panel queue.");}
+  function submit(){setOnboarding(p=>[...p,{id:`OB${uid()}`,raId:user.id,submittedBy:user.role,...form,docs,oemDocs,status:"Admin Panel Pending",dealerCode:"",submittedAt:now()}]);setView("list");setStep(0);setForm({});setDocs({gst:"",pan:"",cancelledCheque:"",other:""});setOemDocs({franchiseAgreement:"",oemLetter:"",other:""});alert("✓ Submitted! Auto-email sent to Admin Panel team. This now appears in Ops Panel queue.");}
   function simCode(id){const code=String(100000+Math.floor(Math.random()*99999));setOnboarding(p=>p.map(o=>o.id===id?{...o,dealerCode:code,status:"OEM Tagging Pending"}:o));alert(`Dealer code ${code} received from Admin Panel team.`);}
 
   if(view==="form")return <div>
@@ -538,21 +650,20 @@ function OnboardingModuleRA({user,shared}){
     {step===0&&<Card><ST>Dealer Information</ST>
       <Fld label="Dealer / Company Name" value={form.dealerName} onChange={v=>f("dealerName",v)} required placeholder="e.g. Landmark Cars Ltd"/>
       <G2><Sel label="Region" value={form.region} onChange={v=>f("region",v)} options={REGIONS} placeholder="Select region..." required/><Sel label="City" value={form.city} onChange={v=>f("city",v)} options={CITIES} placeholder="Select city..." required/></G2>
-      <G2><Fld label="Mobile" value={form.mobile} onChange={v=>f("mobile",v)} required/><Fld label="Email" value={form.email} onChange={v=>f("email",v)}/></G2>
+      <Fld label="Mobile" value={form.mobile} onChange={checkMobile} required/>{mobileCheck&&mobileCheck.found&&<div style={{background:"#FFF0E6",border:"1px solid #4535F1",borderRadius:7,padding:"7px 10px",marginBottom:6,fontSize:11}}><span style={{fontWeight:800,color:"#4535F1"}}>⚠ Mobile already registered!</span><div style={{fontSize:10,color:"#555",marginTop:2}}>Dealer: <strong>{mobileCheck.dealer.name}</strong> · Code: <strong>{mobileCheck.dealer.code||"Pending"}</strong> · Status: <strong>{mobileCheck.dealer.status}</strong></div></div>}{mobileCheck&&!mobileCheck.found&&<div style={{background:"#E6F7EF",border:"1px solid #1A7F4B",borderRadius:7,padding:"5px 10px",marginBottom:6,fontSize:10,color:"#1A7F4B",fontWeight:700}}>✓ Mobile not found in system</div>}<Fld label="Email" value={form.email} onChange={checkEmail}/>{emailCheck&&emailCheck.found&&<div style={{background:"#FFF0E6",border:"1px solid #4535F1",borderRadius:7,padding:"7px 10px",marginBottom:6,fontSize:11}}><span style={{fontWeight:800,color:"#4535F1"}}>⚠ Email already registered!</span><div style={{fontSize:10,color:"#555",marginTop:2}}>Dealer: <strong>{emailCheck.dealer.name}</strong> · Code: <strong>{emailCheck.dealer.code||"Pending"}</strong></div></div>}{emailCheck&&!emailCheck.found&&<div style={{background:"#E6F7EF",border:"1px solid #1A7F4B",borderRadius:7,padding:"5px 10px",marginBottom:6,fontSize:10,color:"#1A7F4B",fontWeight:700}}>✓ Email not found in system</div>}
       <Fld label="Full Address" value={form.address} onChange={v=>f("address",v)} required/>
       <div style={{display:"flex",justifyContent:"flex-end",marginTop:4}}><Btn disabled={!form.dealerName||!form.region||!form.city||!form.mobile||!form.address} onClick={()=>setStep(1)}>Next →</Btn></div>
     </Card>}
     {step===1&&<Card><ST>Bank & Tax Details</ST>
-      <G2><Fld label="PAN Number" value={form.pan} onChange={v=>f("pan",v.toUpperCase())} required maxLength={10}/><Fld label="GST Number" value={form.gst} onChange={v=>f("gst",v.toUpperCase())}/></G2>
+      <Fld label="PAN Number" value={form.pan} onChange={checkPAN} required maxLength={10} hint="10-char PAN — checked live against Cars24 Admin Panel"/>{panCheck&&panCheck.found&&<div style={{background:"#FFF0E6",border:"1px solid #4535F1",borderRadius:8,padding:"8px 12px",marginBottom:8}}><div style={{fontWeight:800,color:"#4535F1",fontSize:11}}>⚠ PAN already exists in Cars24 Admin Panel!</div><div style={{background:"#fff",borderRadius:6,padding:"6px 10px",marginTop:5,fontSize:11}}><div style={{display:"flex",justifyContent:"space-between"}}><span style={{color:"#555"}}>Dealer Name</span><strong>{panCheck.dealer.name}</strong></div><div style={{display:"flex",justifyContent:"space-between",marginTop:3}}><span style={{color:"#555"}}>Dealer Code</span><strong style={{color:"#4535F1"}}>{panCheck.dealer.code||"Pending"}</strong></div><div style={{display:"flex",justifyContent:"space-between",marginTop:3}}><span style={{color:"#555"}}>Status</span><strong>{panCheck.dealer.status}</strong></div><div style={{display:"flex",justifyContent:"space-between",marginTop:3}}><span style={{color:"#555"}}>Region</span><strong>{panCheck.dealer.region}</strong></div></div></div>}{panCheck&&!panCheck.found&&<div style={{background:"#E6F7EF",border:"1px solid #1A7F4B",borderRadius:7,padding:"5px 10px",marginBottom:8,fontSize:10,color:"#1A7F4B",fontWeight:700}}>✓ PAN not found in system — new dealer</div>}<G2><div/><Fld label="GST Number" value={form.gst} onChange={v=>f("gst",v.toUpperCase())}/></G2>
       <Sel label="Bank Name" value={form.bank} onChange={v=>f("bank",v)} options={BANK_LIST} placeholder="Select bank..." required/>
       <G2><Fld label="Account Number" value={form.account} onChange={v=>f("account",v)} required/><Fld label="IFSC Code" value={form.ifsc} onChange={v=>f("ifsc",v.toUpperCase())} required/></G2>
       <ST>Mandatory Documents</ST>
       <FileInput label="GST Certificate" value={docs.gst} onChange={v=>setDocs(p=>({...p,gst:v}))} required hint="GST registration certificate"/>
       <FileInput label="PAN Card" value={docs.pan} onChange={v=>setDocs(p=>({...p,pan:v}))} required hint="Company/proprietor PAN"/>
-      <FileInput label="Bank Statement (3 months)" value={docs.bank} onChange={v=>setDocs(p=>({...p,bank:v}))} required hint="Latest 3-month statement"/>
       <FileInput label="Cancelled Cheque" value={docs.cancelledCheque} onChange={v=>setDocs(p=>({...p,cancelledCheque:v}))} required hint="Account name must match dealer"/>
       <ST>Other (Optional)</ST><FileInput label="Other Document" value={docs.other} onChange={v=>setDocs(p=>({...p,other:v}))}/>
-      <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(0)}>← Back</Btn><Btn disabled={!form.pan||!form.bank||!form.account||!form.ifsc||!docs.gst||!docs.pan||!docs.bank||!docs.cancelledCheque} onClick={()=>setStep(2)}>Next →</Btn></div>
+      <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(0)}>← Back</Btn><Btn disabled={!form.pan||!form.bank||!form.account||!form.ifsc||!docs.gst||!docs.pan||!docs.cancelledCheque} onClick={()=>setStep(2)}>Next →</Btn></div>
     </Card>}
     {step===2&&<Card><ST>OEM & Dealer Type</ST>
       <Alrt type="info">OEM tagging processed by Central Ops ONLY after dealer code is confirmed.</Alrt>
@@ -569,10 +680,10 @@ function OnboardingModuleRA({user,shared}){
       <FileInput label="Franchise Agreement / Appointment Letter" value={oemDocs.franchiseAgreement} onChange={v=>setOemDocs(p=>({...p,franchiseAgreement:v}))} required/>
       <FileInput label="OEM Authorization Letter" value={oemDocs.oemLetter} onChange={v=>setOemDocs(p=>({...p,oemLetter:v}))} required/>
       <ST>Other OEM (Optional)</ST><FileInput label="Other OEM Document" value={oemDocs.other} onChange={v=>setOemDocs(p=>({...p,other:v}))}/>
-      <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(1)}>← Back</Btn><Btn disabled={!form.type||!form.oem||!form.oemType||!oemDocs.franchiseAgreement||!oemDocs.oemLetter} onClick={()=>setStep(3)}>Review →</Btn></div>
+      <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(1)}>← Back</Btn><Btn disabled={!form.type||!form.oem||!form.companyCode||!oemDocs.franchiseAgreement||!oemDocs.oemLetter} onClick={()=>setStep(3)}>Review →</Btn></div>
     </Card>}
     {step===3&&<Card><ST>Review & Submit</ST>
-      {[["Dealer",form.dealerName],["Region",form.region],["City",form.city],["Type",form.type],["OEM",form.oem],["Company Code",form.companyCode],["Lat",form.lat||"—"],["Long",form.long||"—"],["PAN",form.pan],["Bank",form.bank],["GST Doc",docs.gst],["PAN Doc",docs.pan],["Franchise Agr.",oemDocs.franchiseAgreement],["OEM Letter",oemDocs.oemLetter]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}
+      {[["Dealer",form.dealerName],["Region",form.region],["City",form.city],["Type",form.type],["OEM",form.oem],["Company Code",form.companyCode],["Lat",form.lat||"—"],["Long",form.long||"—"],["PAN",form.pan],["Bank",form.bank],["GST Doc",docs.gst],["PAN Doc",docs.pan],["CC",docs.cancelledCheque],["Franchise Agr.",oemDocs.franchiseAgreement],["OEM Letter",oemDocs.oemLetter]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}
       <Alrt type="warning">Submitting triggers auto-email to Admin Panel team AND adds to Ops Panel queue.</Alrt>
       <div style={{display:"flex",justifyContent:"space-between",marginTop:10}}><Btn v="secondary" onClick={()=>setStep(2)}>← Edit</Btn><Btn v="success" icon="✓" onClick={submit}>Submit</Btn></div>
     </Card>}
@@ -606,29 +717,132 @@ function CounterModuleRA({user,shared}){
 }
 
 function SAPModuleRA({user,shared}){
-  const{dealers,sapReqs,setSapReqs}=shared;
-  const[show,setShow]=useState(false);const[form,setForm]=useState({});const[selD,setSelD]=useState([]);const[docs,setDocs]=useState({pan:"",cancelledCheque:"",other:""});const f=(k,v)=>setForm(p=>({...p,[k]:v}));
-  let raIds=[user.id];if(user.role==="RM"&&user.raIds)raIds=[user.id,...user.raIds];
-  const myReqs=sapReqs.filter(r=>raIds.includes(r.raId));const myDealers=dealers.filter(d=>raIds.includes(d.raId)&&d.status==="Active");
-  function submit(){if(!form.payeeName||!form.pan||!form.bank||!form.account||!form.ifsc||selD.length===0){alert("Fill all required fields");return;}if(!docs.pan||!docs.cancelledCheque){alert("PAN card and Cancelled Cheque are mandatory");return;}setSapReqs(p=>[...p,{id:`SR${uid()}`,raId:user.id,dealerIds:selD,payeeName:form.payeeName,pan:form.pan,bank:form.bank,account:form.account,ifsc:form.ifsc,mobile:form.mobile||"",docs,status:"Ops Review",submittedAt:now(),sapCode:""}]);setShow(false);setForm({});setSelD([]);setDocs({pan:"",cancelledCheque:"",other:""});}
+  // READ-ONLY for RA/RM — shows payee status for their dealers
+  const{payees,sapReqs,dealers,counters}=shared;
+  let raIds=[user.id];
+  if(user.role==="RM"&&user.raIds)raIds=[user.id,...user.raIds];
+
+  // All dealers this RA/RM manages
+  const myDealers=dealers.filter(d=>raIds.includes(d.raId));
+  const myDealerIds=myDealers.map(d=>d.id);
+
+  // Payees linked to my dealers (from active payees)
+  const myPayees=payees.filter(p=>p.dealerIds&&p.dealerIds.some(id=>myDealerIds.includes(id)));
+
+  // SAP requests submitted (by TM/Ops) for my dealers
+  const myReqs=sapReqs.filter(r=>r.dealerIds&&r.dealerIds.some(id=>myDealerIds.includes(id)));
+
+  // Summary counts
+  const validated=myPayees.filter(p=>p.fluxStatus==="Validated").length;
+  const failed=myPayees.filter(p=>p.fluxStatus!=="Validated").length;
+  const pending=myReqs.filter(r=>r.status==="Ops Review").length;
+
+  // Per-dealer payee map
+  function getPayeesForDealer(dealerId){
+    return myPayees.filter(p=>p.dealerIds&&p.dealerIds.includes(dealerId));
+  }
+  function getPendingReqsForDealer(dealerId){
+    return myReqs.filter(r=>r.dealerIds&&r.dealerIds.includes(dealerId)&&r.status==="Ops Review");
+  }
+
   return <div>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}><Lbl>SAP / Payee Requests ({myReqs.length})</Lbl><Btn sm icon="+" onClick={()=>setShow(!show)}>New Payee</Btn></div>
-    {show&&<Card style={{marginBottom:12,border:`1.5px solid ${T.accent}`}}><ST>SAP Creation Form</ST>
-      <Alrt type="info">A payee can be linked to multiple dealers.</Alrt>
-      <MultiDealerSel dealers={myDealers} selected={selD} onChange={setSelD}/>
-      <Fld label="Payee Name" value={form.payeeName} onChange={v=>f("payeeName",v)} required/>
-      <G2><Fld label="PAN" value={form.pan} onChange={v=>f("pan",v.toUpperCase())} required maxLength={10}/><Fld label="Mobile" value={form.mobile} onChange={v=>f("mobile",v)}/></G2>
-      <Sel label="Bank" value={form.bank} onChange={v=>f("bank",v)} options={BANK_LIST} placeholder="Select bank..." required/>
-      <G2><Fld label="Account No." value={form.account} onChange={v=>f("account",v)} required/><Fld label="IFSC" value={form.ifsc} onChange={v=>f("ifsc",v.toUpperCase())} required/></G2>
-      <ST>Mandatory Documents</ST>
-      <FileInput label="PAN Card" value={docs.pan} onChange={v=>setDocs(p=>({...p,pan:v}))} required hint="Payee PAN card copy"/>
-      <FileInput label="Cancelled Cheque" value={docs.cancelledCheque} onChange={v=>setDocs(p=>({...p,cancelledCheque:v}))} required hint="Account name must match payee"/>
-      <ST>Other (Optional)</ST><FileInput label="Other Document" value={docs.other} onChange={v=>setDocs(p=>({...p,other:v}))}/>
-      <div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:4}}><Btn v="secondary" sm onClick={()=>{setShow(false);setForm({});setSelD([]);}}>Cancel</Btn><Btn sm icon="✓" onClick={submit}>Submit</Btn></div>
-    </Card>}
-    {myReqs.map(r=>{const ds=r.dealerIds.map(id=>dealers.find(d=>d.id===id)).filter(Boolean);return <Card key={r.id} style={{marginBottom:8}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><span style={{fontSize:13,fontWeight:800}}>{r.payeeName}</span><Badge s={r.status} sm/></div><div style={{fontSize:11,color:T.mute,marginBottom:2}}>{r.bank} · {r.pan}</div><div style={{fontSize:10,color:T.accent,fontWeight:700}}>Linked: {ds.map(d=>d.name).join(", ")}</div>{r.sapCode&&<div style={{fontSize:11,fontWeight:800,color:T.success,fontFamily:"monospace",marginTop:2}}>{r.sapCode}</div>}</Card>;})}
+    {/* Header banner */}
+    <div style={{background:`linear-gradient(135deg,${T.accentD},${T.accent})`,borderRadius:14,padding:16,color:"#fff",marginBottom:14}}>
+      <div style={{fontSize:9,fontWeight:800,letterSpacing:1.2,opacity:0.7,marginBottom:4}}>SAP / PAYEE VISIBILITY — {user.role==="RM"?"TEAM":"MY"} DEALERS</div>
+      <div style={{display:"flex",gap:20,marginTop:4}}>
+        <div><div style={{fontSize:22,fontWeight:900}}>{myPayees.length}</div><div style={{fontSize:10,opacity:0.7}}>Total Payees</div></div>
+        <div><div style={{fontSize:22,fontWeight:900,color:"#86EFAC"}}>{validated}</div><div style={{fontSize:10,opacity:0.7}}>Validated ✓</div></div>
+        <div><div style={{fontSize:22,fontWeight:900,color:"#FCA5A5"}}>{failed}</div><div style={{fontSize:10,opacity:0.7}}>Failed / Pending</div></div>
+        <div><div style={{fontSize:22,fontWeight:900,color:"#FDE68A"}}>{pending}</div><div style={{fontSize:10,opacity:0.7}}>Reqs in Queue</div></div>
+      </div>
+    </div>
+
+    {/* Info notice */}
+    <Alrt type="info">SAP / Payee creation is handled by TM or Central Ops. This view shows current payee status for your dealers. Contact your TM if any payee shows as failed or missing.</Alrt>
+
+    {/* Per-dealer breakdown */}
+    {myDealers.map(d=>{
+      const dPayees=getPayeesForDealer(d.id);
+      const dPending=getPendingReqsForDealer(d.id);
+      const hasValidated=dPayees.some(p=>p.fluxStatus==="Validated");
+      const hasFailed=dPayees.some(p=>p.fluxStatus!=="Validated");
+      const borderColor=dPayees.length===0?"#E5E5E5":hasFailed?T.danger:T.success;
+
+      return <div key={d.id} style={{background:"#fff",border:`1.5px solid ${borderColor}`,borderRadius:12,marginBottom:10,overflow:"hidden"}}>
+        {/* Dealer header */}
+        <div style={{background:dPayees.length===0?"#F5F5F5":hasValidated&&!hasFailed?T.successL:hasFailed?T.dangerL:"#F5F5F5",padding:"10px 14px",borderBottom:`1px solid ${borderColor}30`}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div>
+              <div style={{fontSize:13,fontWeight:800}}>{d.name}</div>
+              <div style={{fontSize:10,color:T.mute}}>{d.code||"Code Pending"} · {d.type} · {d.oem}</div>
+            </div>
+            <div style={{textAlign:"right"}}>
+              {dPayees.length===0&&dPending.length===0&&<span style={{background:"#F0F0F0",color:T.mute,fontSize:10,fontWeight:700,padding:"3px 8px",borderRadius:20}}>No Payee</span>}
+              {dPayees.length>0&&<span style={{background:hasValidated&&!hasFailed?T.successL:"#FEF2F2",color:hasValidated&&!hasFailed?T.success:T.danger,fontSize:10,fontWeight:800,padding:"3px 8px",borderRadius:20,border:`1px solid ${hasValidated&&!hasFailed?T.success:T.danger}30`}}>{dPayees.length} Payee{dPayees.length>1?"s":""}</span>}
+              {dPending.length>0&&<div style={{fontSize:9,color:T.warn,fontWeight:700,marginTop:2}}>⏳ {dPending.length} pending</div>}
+            </div>
+          </div>
+        </div>
+
+        {/* Active payees */}
+        {dPayees.length>0&&<div style={{padding:"8px 14px"}}>
+          {dPayees.map(p=>{
+            const isValid=p.fluxStatus==="Validated";
+            return <div key={p.id} style={{padding:"8px 0",borderBottom:`1px solid ${T.border}`}}>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+                <div>
+                  <div style={{fontSize:12,fontWeight:800,color:T.text}}>{p.payeeName}</div>
+                  <div style={{fontSize:10,color:T.mute}}>SAP Code: <span style={{fontFamily:"monospace",fontWeight:700,color:p.sapCode?T.success:T.mute}}>{p.sapCode||"—"}</span></div>
+                </div>
+                <div style={{textAlign:"right"}}>
+                  <div style={{display:"inline-flex",alignItems:"center",gap:4,background:isValid?T.successL:T.dangerL,border:`1px solid ${isValid?T.success:T.danger}30`,borderRadius:20,padding:"3px 9px"}}>
+                    <div style={{width:6,height:6,borderRadius:"50%",background:isValid?T.success:T.danger,flexShrink:0}}/>
+                    <span style={{fontSize:10,fontWeight:800,color:isValid?T.success:T.danger}}>{isValid?"Validated":"Failed"}</span>
+                  </div>
+                </div>
+              </div>
+              <div style={{display:"flex",gap:12,flexWrap:"wrap"}}>
+                <span style={{fontSize:10,color:T.mid}}>🏦 {p.bank}</span>
+                <span style={{fontSize:10,color:T.mid}}>PAN: <span style={{fontFamily:"monospace"}}>{p.pan}</span></span>
+                <span style={{fontSize:10,color:T.mid}}>A/C: ···{p.account&&p.account.slice(-4)}</span>
+              </div>
+              {!isValid&&<div style={{marginTop:6,background:T.dangerL,border:`1px solid ${T.danger}30`,borderRadius:6,padding:"5px 8px",fontSize:10,color:T.danger,fontWeight:700}}>
+                ⚠ Flux validation failed — contact your TM to raise a new SAP request with correct bank details
+              </div>}
+            </div>;
+          })}
+        </div>}
+
+        {/* Pending SAP requests */}
+        {dPending.length>0&&<div style={{padding:"8px 14px",background:T.warnL,borderTop:`1px solid ${T.warn}20`}}>
+          {dPending.map(r=><div key={r.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 0"}}>
+            <div>
+              <div style={{fontSize:11,fontWeight:700,color:T.text}}>{r.payeeName}</div>
+              <div style={{fontSize:10,color:T.mute}}>{r.bank} · PAN: {r.pan} · Submitted {r.submittedAt}</div>
+            </div>
+            <span style={{background:T.warnL,border:`1px solid ${T.warn}40`,borderRadius:20,fontSize:9,fontWeight:800,color:T.warn,padding:"2px 8px"}}>⏳ Ops Review</span>
+          </div>)}
+        </div>}
+
+        {/* No payee and no pending */}
+        {dPayees.length===0&&dPending.length===0&&<div style={{padding:"10px 14px",fontSize:11,color:T.mute}}>
+          No payee created yet. TM can raise a SAP request for this dealer.
+        </div>}
+      </div>;
+    })}
+
+    {/* Summary at bottom if any failed */}
+    {failed>0&&<Alrt type="error">
+      {failed} payee{failed>1?"s":""} failed Flux validation. Payments to these UCMs will be blocked until a corrected SAP request is submitted by your TM and approved by Central Ops.
+    </Alrt>}
+    {myDealers.length===0&&<div style={{textAlign:"center",padding:40,color:T.mute}}>
+      <div style={{fontSize:32,marginBottom:8}}>🏦</div>
+      <div style={{fontSize:13,fontWeight:700}}>No active dealers yet</div>
+      <div style={{fontSize:11,marginTop:4}}>Once you onboard dealers, their payee status will appear here</div>
+    </div>}
   </div>;
 }
+
 
 function PayoutsModule({user,shared}){
   const{apps,dealers,counters,payoutRequests}=shared;
@@ -642,38 +856,511 @@ function PayoutsModule({user,shared}){
 // ═══════════════════════════════════════════════
 // OPS PANEL MODULES
 // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// DASHBOARD DRAWER — clickable drill-down
+// ═══════════════════════════════════════════════
+function DashboardDrawer({title,icon,color,data,onClose,onNavigate}){
+  if(!data)return null;
+  // onNavigate({page, id}) called when a clickable chip is tapped
+  function NavChip({label,page,id,chipColor}){
+    if(!onNavigate||!page)return <span style={{fontSize:10,color:T.mid}}>{label}</span>;
+    return <span onClick={e=>{e.stopPropagation();onNavigate({page,id});onClose();}} style={{display:"inline-flex",alignItems:"center",gap:3,fontSize:10,fontWeight:700,color:chipColor||T.accent,background:(chipColor||T.accent)+"15",border:"1px solid "+(chipColor||T.accent)+"30",borderRadius:6,padding:"1px 7px",cursor:"pointer",transition:"all 0.12s"}} onMouseEnter={e=>{e.currentTarget.style.background=(chipColor||T.accent)+"28";}} onMouseLeave={e=>{e.currentTarget.style.background=(chipColor||T.accent)+"15";}}>
+      ↗ {label}
+    </span>;
+  }
+  return <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:9400,display:"flex",alignItems:"flex-end",justifyContent:"center",animation:"fadeIn 0.2s ease"}} onClick={e=>{if(e.target===e.currentTarget)onClose();}}>
+    <div style={{width:"100%",maxWidth:600,background:"#fff",borderRadius:"20px 20px 0 0",maxHeight:"75vh",overflowY:"auto",animation:"slideUp 0.3s cubic-bezier(0.4,0,0.2,1)"}}>
+      <div style={{background:`linear-gradient(135deg,${color}dd,${color})`,padding:"14px 18px",display:"flex",justifyContent:"space-between",alignItems:"center",borderRadius:"20px 20px 0 0",position:"sticky",top:0,zIndex:1}}>
+        <div style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:22}}>{icon}</span><span style={{color:"#fff",fontSize:14,fontWeight:800}}>{title}</span><span style={{background:"rgba(255,255,255,0.2)",color:"#fff",padding:"2px 8px",borderRadius:10,fontSize:10,fontWeight:800}}>{data.length}</span></div>
+        <button onClick={onClose} style={{background:"rgba(255,255,255,0.15)",border:"none",color:"#fff",width:30,height:30,borderRadius:8,cursor:"pointer",fontSize:16,fontWeight:700,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"inherit"}}>×</button>
+      </div>
+      <div style={{padding:"12px 16px 24px"}}>
+        {data.length===0&&<div style={{textAlign:"center",padding:32,color:T.mute}}><div style={{fontSize:28,marginBottom:8}}>📭</div>No items</div>}
+        {data.map((row,i)=>{
+          const hasNav=onNavigate&&(row.navPage||row.appId||row.dealerId||row.leadId||row.payoutId);
+          return <div key={i} style={{padding:"10px 12px",borderBottom:`1px solid ${T.border}`,background:i%2===0?"#FAFBFC":"#fff",borderRadius:i===0?"8px 8px 0 0":i===data.length-1?"0 0 8px 8px":0,cursor:hasNav?"pointer":"default",transition:"background 0.12s"}} onClick={hasNav?()=>{const pg=row.navPage||(row.appId?"appids":row.dealerId?"onboarding":row.leadId?"leads":row.payoutId?"approvals":null);const id=row.navId||row.appId||row.dealerId||row.leadId||row.payoutId;if(pg&&onNavigate){onNavigate({page:pg,id});onClose();}}:undefined} onMouseEnter={e=>{if(hasNav)e.currentTarget.style.background="#F0F7FF";}} onMouseLeave={e=>{e.currentTarget.style.background=i%2===0?"#FAFBFC":"#fff";}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+              <span style={{fontSize:12,fontWeight:800,color:hasNav?T.accent:T.text}}>{row.primary}{hasNav&&<span style={{fontSize:9,color:T.accent,marginLeft:5}}>↗</span>}</span>
+              <div style={{display:"flex",alignItems:"center",gap:5}}>
+                {row.badge&&<Badge s={row.badge} sm/>}
+                {row.amount&&<span style={{fontSize:13,fontWeight:900,color:color}}>{row.amount}</span>}
+              </div>
+            </div>
+            {row.secondary&&<div style={{fontSize:11,color:T.mid,marginBottom:row.chips?4:0}}>{row.secondary}</div>}
+            {row.detail&&<div style={{fontSize:10,color:T.mute,marginTop:2,marginBottom:row.chips?4:0}}>{row.detail}</div>}
+            {row.chips&&<div style={{display:"flex",gap:5,flexWrap:"wrap",marginTop:4}}>
+              {row.chips.map((c,ci)=><NavChip key={ci} label={c.label} page={c.page} id={c.id} chipColor={c.color}/>)}
+            </div>}
+          </div>;
+        })}
+      </div>
+    </div>
+  </div>;
+}
+
+function DashStatCard({icon,label,value,color,bg,onClick}){
+  return <div onClick={onClick} style={{background:bg,borderRadius:12,padding:14,border:`1px solid ${color}22`,cursor:onClick?"pointer":"default",transition:"all 0.25s cubic-bezier(0.4,0,0.2,1)",position:"relative",overflow:"hidden"}} onMouseEnter={e=>{if(onClick){e.currentTarget.style.transform="translateY(-3px)";e.currentTarget.style.boxShadow=`0 8px 24px ${color}20`;}}} onMouseLeave={e=>{e.currentTarget.style.transform="";e.currentTarget.style.boxShadow="";}}>
+    <div style={{fontSize:20,marginBottom:4}}>{icon}</div>
+    <div style={{fontSize:20,fontWeight:900,color:T.text}}>{value}</div>
+    <div style={{fontSize:9,fontWeight:800,color:color,letterSpacing:0.7,textTransform:"uppercase",marginTop:2}}>{label}</div>
+    {onClick&&<div style={{position:"absolute",top:8,right:8,fontSize:10,color:color,opacity:0.5}}>▶</div>}
+  </div>;
+}
+
+// ═══════════════════════════════════════════════
+// TM/CH DEALER PERFORMANCE DASHBOARD COMPONENTS
+// ═══════════════════════════════════════════════
+function calcDealerMetrics(dealerId,leads,apps,payoutRequests){
+  var dLeads=leads.filter(function(l){return l.dealerId===dealerId;});
+  var dApps=apps.filter(function(a){return a.dealerId===dealerId;});
+  var dPR=payoutRequests.filter(function(r){var a=apps.find(function(aa){return aa.id===r.appId;});return a&&a.dealerId===dealerId;});
+  var inspDone=dLeads.filter(function(l){return ["Inspection Done","Token Done","SI Done"].indexOf(l.status)!==-1;}).length;
+  var siDone=dLeads.filter(function(l){return l.status==="SI Done";}).length;
+  var tokenDone=dLeads.filter(function(l){return ["Token Done","SI Done"].indexOf(l.status)!==-1;}).length;
+  var gsCount=dApps.filter(function(a){return a.gsType==="GS";}).length;
+  var nonGsCount=dApps.filter(function(a){return a.gsType==="Non-GS";}).length;
+  var splits=dPR.filter(function(r){return r.type==="Split"&&["Released","Auto-Approved"].indexOf(r.status)!==-1;}).reduce(function(s,r){return s+r.amount;},0);
+  var incentives=dPR.filter(function(r){return r.type==="Incentive"&&["Released","Auto-Approved"].indexOf(r.status)!==-1;}).reduce(function(s,r){return s+r.amount;},0);
+  var pendingSplits=dPR.filter(function(r){return r.type==="Split"&&["Released","Auto-Approved","Rejected"].indexOf(r.status)===-1;}).reduce(function(s,r){return s+r.amount;},0);
+  var pendingIncentives=dPR.filter(function(r){return r.type==="Incentive"&&["Released","Auto-Approved","Rejected"].indexOf(r.status)===-1;}).reduce(function(s,r){return s+r.amount;},0);
+  var walletAvail=dApps.filter(function(a){return a.stockIn;}).reduce(function(s,a){return s+a.otherCharges-a.splitReleased;},0);
+  return{leads:dLeads.length,insp:inspDone,token:tokenDone,si:siDone,gs:gsCount,nonGs:nonGsCount,splits:splits,incentives:incentives,pendingSplits:pendingSplits,pendingIncentives:pendingIncentives,apps:dApps.length,wallet:walletAvail,allApps:dApps,allLeads:dLeads,allPR:dPR};
+}
+
+function TMDealerDetailPanel({dealer,stats,onClose,onNavigate,counters,apps,leads}){
+  var dCounters=counters.filter(function(c){return c.dealerId===dealer.id;});
+  var ra=ALL_USERS.find(function(u){return u.id===dealer.raId;});
+  var rm=ra&&ra.rmId?ALL_USERS.find(function(u){return u.id===ra.rmId;}):null;
+  var[expandedSection,setExpandedSection]=useState("");
+  function toggleSection(sec){setExpandedSection(function(prev){return prev===sec?"":sec;});}
+
+  var metricCards=[
+    {icon:"📋",label:"Total Leads",val:stats.leads,color:T.accent},
+    {icon:"🔍",label:"Inspections",val:stats.insp,color:T.purple},
+    {icon:"🤝",label:"Tokens",val:stats.token,color:T.warn},
+    {icon:"✅",label:"SI Done",val:stats.si,color:T.success},
+    {icon:"🌟",label:"GS Cars",val:stats.gs,color:"#0F766E"},
+    {icon:"🚗",label:"Non-GS",val:stats.nonGs,color:T.orange},
+  ];
+
+  var financialCards=[
+    {icon:"💸",label:"Splits Released",val:fmt(stats.splits),color:T.success,bg:T.successL},
+    {icon:"🎁",label:"Incentives Earned",val:fmt(stats.incentives),color:T.purple,bg:T.purpleL},
+    {icon:"💰",label:"Wallet Available",val:fmt(stats.wallet),color:T.accent,bg:T.accentL},
+    {icon:"⏳",label:"Pending Payouts",val:fmt(stats.pendingSplits+stats.pendingIncentives),color:T.warn,bg:T.warnL},
+  ];
+
+  function SectionToggle({title,icon,secKey,count}){
+    var isOpen=expandedSection===secKey;
+    return React.createElement("div",{onClick:function(){toggleSection(secKey);},style:{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"10px 14px",background:isOpen?"#F0F1FF":"#F8FAFC",border:"1px solid "+(isOpen?T.accent+"30":T.border),borderRadius:isOpen?"10px 10px 0 0":10,cursor:"pointer",marginTop:8,transition:"all 0.2s"}},
+      React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+        React.createElement("span",{style:{fontSize:16}},icon),
+        React.createElement("span",{style:{fontSize:12,fontWeight:800,color:isOpen?T.accent:T.text}},title),
+        count>0&&React.createElement("span",{style:{background:T.accent+"18",color:T.accent,fontSize:9,fontWeight:800,padding:"2px 7px",borderRadius:10}},count)
+      ),
+      React.createElement("span",{style:{fontSize:12,color:T.mute,transition:"transform 0.2s",transform:isOpen?"rotate(180deg)":""}},isOpen?"▲":"▼")
+    );
+  }
+
+  return React.createElement("div",{onClick:function(e){if(e.target===e.currentTarget)onClose();},style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.55)",zIndex:9300,display:"flex",alignItems:"flex-end",justifyContent:"center"}},
+    React.createElement("div",{style:{width:"100%",maxWidth:580,background:"#fff",borderRadius:"20px 20px 0 0",maxHeight:"90vh",overflowY:"auto",paddingBottom:32}},
+      // Header
+      React.createElement("div",{style:{background:"linear-gradient(135deg,#4535F1,#3428C9)",padding:"16px 18px",borderRadius:"20px 20px 0 0",display:"flex",justifyContent:"space-between",alignItems:"center",position:"sticky",top:0,zIndex:1}},
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontSize:9,color:"rgba(255,255,255,0.5)",fontWeight:800,letterSpacing:1.5}},"DEALER PERFORMANCE ANALYTICS"),
+          React.createElement("div",{style:{color:"#fff",fontSize:16,fontWeight:900,marginTop:2}},dealer.name),
+          React.createElement("div",{style:{color:"rgba(255,255,255,0.6)",fontSize:10,marginTop:2,display:"flex",gap:8,flexWrap:"wrap"}},
+            React.createElement("span",null,dealer.code||"Code Pending"),
+            React.createElement("span",null," · "+dealer.type),
+            React.createElement("span",null," · "+dealer.oem),
+            ra&&React.createElement("span",{style:{background:"rgba(255,255,255,0.15)",borderRadius:6,padding:"1px 6px"}},"RA: "+ra.name)
+          )
+        ),
+        React.createElement("button",{onClick:onClose,style:{background:"rgba(255,255,255,0.15)",border:"none",color:"#fff",width:32,height:32,borderRadius:8,cursor:"pointer",fontSize:18,fontWeight:700,fontFamily:"inherit"}},"×")
+      ),
+      React.createElement("div",{style:{padding:"14px 16px"}},
+        // RA/RM info card
+        ra&&React.createElement("div",{style:{background:"#F0F1FF",border:"1px solid "+T.accent+"20",borderRadius:10,padding:"10px 14px",marginBottom:12,display:"flex",justifyContent:"space-between",alignItems:"center"}},
+          React.createElement("div",null,
+            React.createElement("div",{style:{fontSize:9,fontWeight:800,color:T.accent,letterSpacing:1}},"RELATIONSHIP ASSOCIATE"),
+            React.createElement("div",{style:{fontSize:13,fontWeight:800,marginTop:2}},ra.name),
+            rm&&React.createElement("div",{style:{fontSize:10,color:T.mute,marginTop:1}},"RM: "+rm.name)
+          ),
+          React.createElement("div",{style:{textAlign:"right"}},
+            React.createElement("div",{style:{fontSize:9,color:T.mute,fontWeight:700}},dealer.region),
+            React.createElement("div",{style:{fontSize:9,color:T.mute}},(dealer.city||""))
+          )
+        ),
+        // Metric cards grid
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:14}},
+          metricCards.map(function(k){return React.createElement("div",{key:k.label,style:{background:k.color+"10",border:"1px solid "+k.color+"25",borderRadius:10,padding:"10px 8px",textAlign:"center",transition:"transform 0.15s"}},
+            React.createElement("div",{style:{fontSize:16,marginBottom:2}},k.icon),
+            React.createElement("div",{style:{fontSize:20,fontWeight:900,color:T.text}},k.val),
+            React.createElement("div",{style:{fontSize:8,fontWeight:800,color:k.color,letterSpacing:0.4,textTransform:"uppercase"}},k.label)
+          );})
+        ),
+        // Financial summary cards
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:12}},
+          financialCards.map(function(k){return React.createElement("div",{key:k.label,style:{background:k.bg,border:"1px solid "+k.color+"25",borderRadius:10,padding:"10px 12px"}},
+            React.createElement("div",{style:{fontSize:10,fontWeight:700,color:k.color,marginBottom:3,display:"flex",alignItems:"center",gap:4}},k.icon," ",k.label),
+            React.createElement("div",{style:{fontSize:18,fontWeight:900,color:T.text}},k.val)
+          );})
+        ),
+        // Expandable: Counters & UCMs
+        React.createElement(SectionToggle,{title:"Counters & UCMs",icon:"🏪",secKey:"counters",count:dCounters.length}),
+        expandedSection==="counters"&&React.createElement("div",{style:{border:"1px solid "+T.accent+"20",borderTop:"none",borderRadius:"0 0 10px 10px",padding:10,background:"#FAFBFE"}},
+          dCounters.length===0?React.createElement("div",{style:{fontSize:11,color:T.mute,textAlign:"center",padding:12}},"No counters found"):
+          dCounters.map(function(c){return React.createElement("div",{key:c.id,style:{background:"#fff",borderRadius:8,padding:"8px 12px",marginBottom:6,border:"1px solid "+T.border}},
+            React.createElement("div",{style:{display:"flex",justifyContent:"space-between"}},
+              React.createElement("span",{style:{fontSize:12,fontWeight:700}},c.name),
+              React.createElement(Badge,{s:c.status,sm:true})
+            ),
+            React.createElement("div",{style:{fontSize:10,color:T.mute,marginTop:2}},"UCM: "+c.ucmName+" · "+c.ucmMobile+" · "+c.city)
+          );})
+        ),
+        // Expandable: App_IDs
+        React.createElement(SectionToggle,{title:"App_IDs & Vehicles",icon:"🚗",secKey:"appids",count:stats.allApps.length}),
+        expandedSection==="appids"&&React.createElement("div",{style:{border:"1px solid "+T.accent+"20",borderTop:"none",borderRadius:"0 0 10px 10px",padding:10,background:"#FAFBFE"}},
+          stats.allApps.length===0?React.createElement("div",{style:{fontSize:11,color:T.mute,textAlign:"center",padding:12}},"No App_IDs"):
+          stats.allApps.map(function(a){var lead=leads.find(function(l){return l.appId===a.id;});var walBal=a.otherCharges-a.splitReleased;return React.createElement("div",{key:a.id,style:{background:"#fff",borderRadius:8,padding:"8px 12px",marginBottom:6,border:"1px solid "+T.border,cursor:"pointer"},onClick:function(){if(onNavigate)onNavigate({page:"appids",id:a.id});onClose();}},
+            React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
+              React.createElement("span",{style:{fontSize:12,fontWeight:800,color:T.accent}},a.id+" ↗"),
+              React.createElement(Badge,{s:a.stockIn?"Active":"Stock-In Pending",sm:true})
+            ),
+            React.createElement("div",{style:{fontSize:11,fontWeight:700}},a.vehicle),
+            React.createElement("div",{style:{fontSize:10,color:T.mute}},a.regNo),
+            React.createElement("div",{style:{display:"flex",gap:8,marginTop:4,flexWrap:"wrap"}},
+              React.createElement("span",{style:{fontSize:10,background:T.accentL,color:T.accent,borderRadius:6,padding:"1px 6px",fontWeight:700}},"GS: "+a.gsType),
+              React.createElement("span",{style:{fontSize:10,background:T.successL,color:T.success,borderRadius:6,padding:"1px 6px",fontWeight:700}},"Wallet: "+fmt(walBal)),
+              lead&&React.createElement("span",{style:{fontSize:10,background:T.warnL,color:T.warn,borderRadius:6,padding:"1px 6px",fontWeight:700}},lead.status)
+            )
+          );})
+        ),
+        // Expandable: Payout History
+        React.createElement(SectionToggle,{title:"Payout History",icon:"💸",secKey:"payouts",count:stats.allPR.length}),
+        expandedSection==="payouts"&&React.createElement("div",{style:{border:"1px solid "+T.accent+"20",borderTop:"none",borderRadius:"0 0 10px 10px",padding:10,background:"#FAFBFE"}},
+          stats.allPR.length===0?React.createElement("div",{style:{fontSize:11,color:T.mute,textAlign:"center",padding:12}},"No payout history"):
+          stats.allPR.slice().reverse().map(function(r){return React.createElement("div",{key:r.id,style:{background:"#fff",borderRadius:8,padding:"8px 12px",marginBottom:6,border:"1px solid "+T.border,display:"flex",justifyContent:"space-between",alignItems:"center"}},
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontSize:12,fontWeight:700}},r.id+" — "+r.type),
+              React.createElement("div",{style:{fontSize:10,color:T.mute}},r.appId+" · "+r.createdAt),
+              r.utr&&React.createElement("div",{style:{fontSize:9,color:T.success,fontWeight:700,marginTop:1}},"UTR: "+r.utr)
+            ),
+            React.createElement("div",{style:{textAlign:"right"}},
+              React.createElement("div",{style:{fontSize:14,fontWeight:900,color:T.text}},fmt(r.amount)),
+              React.createElement(Badge,{s:r.status,sm:true})
+            )
+          );})
+        ),
+        // Action buttons
+        React.createElement("div",{style:{display:"flex",gap:8,flexWrap:"wrap",marginTop:14}},
+          React.createElement("button",{onClick:function(){if(onNavigate)onNavigate({page:"leads"});onClose();},style:{flex:1,background:T.accentL,border:"1px solid "+T.accent+"30",borderRadius:8,padding:8,fontSize:11,fontWeight:700,cursor:"pointer",color:T.accent,fontFamily:"inherit"}},"↗ View Leads"),
+          React.createElement("button",{onClick:function(){if(onNavigate)onNavigate({page:"appids"});onClose();},style:{flex:1,background:T.successL,border:"1px solid "+T.success+"30",borderRadius:8,padding:8,fontSize:11,fontWeight:700,cursor:"pointer",color:T.success,fontFamily:"inherit"}},"↗ View App_IDs"),
+          React.createElement("button",{onClick:function(){if(onNavigate)onNavigate({page:"onboarding"});onClose();},style:{flex:1,background:T.purpleL,border:"1px solid "+T.purple+"30",borderRadius:8,padding:8,fontSize:11,fontWeight:700,cursor:"pointer",color:T.purple,fontFamily:"inherit"}},"↗ Onboarding")
+        )
+      )
+    )
+  );
+}
+
+function TMDealerDashSection({dealers,leads,apps,payoutRequests,counters,onNavigate}){
+  var[viewMode,setViewMode]=useState("flat");
+  var[selDealer,setSelDealer]=useState(null);
+  var[searchTerm,setSearchTerm]=useState("");
+  var activeDealers=dealers.filter(function(d){return d.status==="Active";});
+  var filtered=activeDealers.filter(function(d){
+    if(!searchTerm)return true;
+    var q=searchTerm.toLowerCase();
+    return d.name.toLowerCase().indexOf(q)!==-1||(d.code||"").indexOf(q)!==-1||(d.oem||"").toLowerCase().indexOf(q)!==-1;
+  });
+
+  function openDetail(dealer){
+    var st=calcDealerMetrics(dealer.id,leads,apps,payoutRequests);
+    setSelDealer({dealer:dealer,stats:st});
+  }
+
+  // group by RA
+  var raGroups={};
+  filtered.forEach(function(d){
+    var key=d.raId||"unassigned";
+    if(!raGroups[key])raGroups[key]={ra:ALL_USERS.find(function(u){return u.id===key;}),dealers:[]};
+    raGroups[key].dealers.push(d);
+  });
+
+  function DealerCard({d}){
+    var st=calcDealerMetrics(d.id,leads,apps,payoutRequests);
+    var ra=ALL_USERS.find(function(u){return u.id===d.raId;});
+    var convRate=st.leads>0?Math.round((st.si/st.leads)*100):0;
+    return React.createElement("div",{key:d.id,onClick:function(){openDetail(d);},style:{background:"#fff",border:"1px solid "+T.border,borderRadius:14,padding:"14px 16px",cursor:"pointer",transition:"all 0.2s"},onMouseEnter:function(e){e.currentTarget.style.boxShadow="0 6px 20px "+T.accent+"15";e.currentTarget.style.borderColor=T.accent+"50";e.currentTarget.style.transform="translateY(-2px)";},onMouseLeave:function(e){e.currentTarget.style.boxShadow="";e.currentTarget.style.borderColor=T.border;e.currentTarget.style.transform="";}},
+      // Top row: name + badge
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}},
+        React.createElement("div",{style:{flex:1}},
+          React.createElement("div",{style:{fontSize:14,fontWeight:800,color:T.text}},d.name),
+          React.createElement("div",{style:{fontSize:10,color:T.mute,marginTop:1}},
+            (d.code||"Code Pending")+" · "+d.type+" · "+d.oem
+          )
+        ),
+        React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:3}},
+          React.createElement(Badge,{s:"Active",sm:true}),
+          viewMode==="flat"&&ra&&React.createElement("span",{style:{fontSize:9,color:T.accent,fontWeight:700,background:T.accentL,borderRadius:6,padding:"1px 6px"}},"RA: "+ra.name.split(" ")[0])
+        )
+      ),
+      // Stats row as mini cards
+      React.createElement("div",{style:{display:"flex",gap:5,flexWrap:"wrap",marginBottom:8}},
+        [{l:"Leads",v:st.leads,c:T.accent},{l:"Insp",v:st.insp,c:T.purple},{l:"SI",v:st.si,c:T.success},{l:"GS",v:st.gs,c:"#0F766E"},{l:"Non-GS",v:st.nonGs,c:T.orange}].map(function(m){
+          return React.createElement("div",{key:m.l,style:{background:m.c+"10",borderRadius:6,padding:"3px 8px",fontSize:10,display:"flex",alignItems:"center",gap:3}},
+            React.createElement("span",{style:{color:m.c,fontWeight:800}},m.v),
+            React.createElement("span",{style:{color:T.mute}},m.l)
+          );
+        })
+      ),
+      // Financial row
+      React.createElement("div",{style:{display:"flex",gap:10,alignItems:"center"}},
+        React.createElement("span",{style:{fontSize:10,color:T.mid}},"💸 Split: "),
+        React.createElement("strong",{style:{fontSize:11,color:T.text}},fmt(st.splits)),
+        React.createElement("span",{style:{fontSize:10,color:T.mid,marginLeft:4}},"🎁 Inc: "),
+        React.createElement("strong",{style:{fontSize:11,color:T.text}},fmt(st.incentives)),
+        st.wallet>0&&React.createElement("span",{style:{fontSize:9,color:T.accent,fontWeight:700,marginLeft:"auto",background:T.accentL,borderRadius:6,padding:"1px 6px"}},"Wallet: "+fmt(st.wallet))
+      ),
+      // Conversion bar
+      React.createElement("div",{style:{marginTop:8}},
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
+          React.createElement("span",{style:{fontSize:9,color:T.mute,fontWeight:700}},"CONVERSION (Lead → SI)"),
+          React.createElement("span",{style:{fontSize:9,fontWeight:800,color:convRate>=50?T.success:convRate>=25?T.warn:T.danger}},convRate+"%")
+        ),
+        React.createElement("div",{style:{height:4,background:"#F1F5F9",borderRadius:4}},
+          React.createElement("div",{style:{height:4,background:convRate>=50?T.success:convRate>=25?T.warn:T.danger,borderRadius:4,width:Math.min(convRate,100)+"%",transition:"width 0.3s"}})
+        )
+      ),
+      // Click hint
+      React.createElement("div",{style:{textAlign:"right",marginTop:6}},
+        React.createElement("span",{style:{fontSize:9,color:T.accent,fontWeight:700}},"Tap for full analytics ▶")
+      )
+    );
+  }
+
+  return React.createElement("div",{style:{marginTop:16}},
+    // Section header with toggle
+    React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12}},
+      React.createElement("div",null,
+        React.createElement("div",{style:{fontSize:14,fontWeight:900,color:T.text}},"Dealer Performance"),
+        React.createElement("div",{style:{fontSize:10,color:T.mute,marginTop:1}},activeDealers.length+" active dealers · Tap any card for full analytics")
+      ),
+      React.createElement("div",{style:{display:"flex",gap:4}},
+        React.createElement("button",{onClick:function(){setViewMode("flat");},style:{background:viewMode==="flat"?T.accent:"#F1F5F9",color:viewMode==="flat"?"#fff":T.mid,border:"none",borderRadius:8,padding:"6px 12px",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s"}},"All"),
+        React.createElement("button",{onClick:function(){setViewMode("grouped");},style:{background:viewMode==="grouped"?T.accent:"#F1F5F9",color:viewMode==="grouped"?"#fff":T.mid,border:"none",borderRadius:8,padding:"6px 12px",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"inherit",transition:"all 0.2s"}},"By RA")
+      )
+    ),
+    // Search
+    React.createElement("div",{style:{marginBottom:12}},
+      React.createElement("input",{className:"c24-input",value:searchTerm,onChange:function(e){setSearchTerm(e.target.value);},placeholder:"Search dealer name, code or OEM...",style:{width:"100%",padding:"9px 14px",borderRadius:10,fontSize:12}})
+    ),
+    // Detail modal
+    selDealer&&React.createElement(TMDealerDetailPanel,{dealer:selDealer.dealer,stats:selDealer.stats,onClose:function(){setSelDealer(null);},onNavigate:onNavigate,counters:counters,apps:apps,leads:leads}),
+    // Cards
+    viewMode==="flat"?
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr",gap:10}},
+        filtered.map(function(d){return React.createElement(DealerCard,{key:d.id,d:d});})
+      ):
+      Object.keys(raGroups).map(function(raId){
+        var group=raGroups[raId];
+        var raName=group.ra?group.ra.name:"Unassigned";
+        var raRole=group.ra?group.ra.role:"";
+        var raRegion=group.ra?group.ra.region:"";
+        return React.createElement("div",{key:raId,style:{marginBottom:16}},
+          React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8,marginBottom:8,padding:"8px 12px",background:"linear-gradient(135deg,#F0F1FF,#E8E6FE)",borderRadius:10,border:"1px solid "+T.accent+"15"}},
+            React.createElement("div",{style:{width:32,height:32,borderRadius:10,background:"linear-gradient(135deg,"+T.accent+",#6558F5)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:900,fontSize:13}},raName.charAt(0)),
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontSize:12,fontWeight:800}},raName),
+              React.createElement("div",{style:{fontSize:9,color:T.mute}},raRole+" · "+raRegion+" · "+group.dealers.length+" dealers")
+            )
+          ),
+          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr",gap:10,paddingLeft:8}},
+            group.dealers.map(function(d){return React.createElement(DealerCard,{key:d.id,d:d});})
+          )
+        );
+      }),
+    filtered.length===0&&React.createElement("div",{style:{textAlign:"center",padding:32,color:T.mute}},
+      React.createElement("div",{style:{fontSize:28,marginBottom:8}},"🔍"),
+      React.createElement("div",null,"No dealers found matching your search")
+    )
+  );
+}
+
+// ═══════════════════════════════════════════════
+// DEALER PERF MODULE — Dedicated page for all roles
+// ═══════════════════════════════════════════════
+function DealerPerfModule({user,shared}){
+  var apps=shared.apps,dealers=shared.dealers,leads=shared.leads,payoutRequests=shared.payoutRequests,counters=shared.counters,setPage=shared.setPage,setDeepLink=shared.setDeepLink;
+  function handleNavigate(nav){
+    if(setDeepLink&&nav.id)setDeepLink({page:nav.page,id:nav.id});
+    if(setPage)setPage(nav.page);
+  }
+  // Role-based filtering
+  var isField=["RA","RM"].indexOf(user.role)!==-1;
+  var raIds=[user.id];
+  if(user.role==="RM"&&user.raIds)raIds=[user.id].concat(user.raIds);
+  var myDealers=isField?dealers.filter(function(d){return raIds.indexOf(d.raId)!==-1;}):dealers;
+  var myLeads=isField?leads.filter(function(l){return raIds.indexOf(l.raId)!==-1;}):leads;
+  var myApps=isField?apps.filter(function(a){return raIds.indexOf(a.raId)!==-1;}):apps;
+  var myPR=isField?payoutRequests.filter(function(p){return raIds.indexOf(p.raId)!==-1;}):payoutRequests;
+
+  // Summary stats
+  var activeDealers=myDealers.filter(function(d){return d.status==="Active";});
+  var totalLeads=myLeads.length;
+  var totalSI=myLeads.filter(function(l){return l.status==="SI Done";}).length;
+  var totalInsp=myLeads.filter(function(l){return ["Inspection Done","Token Done","SI Done"].indexOf(l.status)!==-1;}).length;
+  var gsCount=myApps.filter(function(a){return a.gsType==="GS";}).length;
+  var nonGsCount=myApps.filter(function(a){return a.gsType==="Non-GS";}).length;
+  var totalSplits=myPR.filter(function(r){return r.type==="Split"&&["Released","Auto-Approved"].indexOf(r.status)!==-1;}).reduce(function(s,r){return s+r.amount;},0);
+  var totalIncentives=myPR.filter(function(r){return r.type==="Incentive"&&["Released","Auto-Approved"].indexOf(r.status)!==-1;}).reduce(function(s,r){return s+r.amount;},0);
+  var convRate=totalLeads>0?Math.round((totalSI/totalLeads)*100):0;
+
+  return React.createElement("div",null,
+    // Page header
+    React.createElement("div",{style:{marginBottom:16}},
+      React.createElement("div",{style:{fontSize:18,fontWeight:900,color:T.text}},"Dealer Performance"),
+      React.createElement("div",{style:{fontSize:11,color:T.mute,marginTop:2}},isField?(user.role==="RM"?"Team dealer analytics across your RAs":"Your dealer portfolio analytics"):"All dealer analytics across the organisation")
+    ),
+    // Aggregate overview cards
+    React.createElement("div",{style:{background:"linear-gradient(135deg,#4535F1,#3428C9)",borderRadius:16,padding:18,color:"#fff",marginBottom:16,boxShadow:"0 4px 20px rgba(69,53,241,0.2)"}},
+      React.createElement("div",{style:{fontSize:9,fontWeight:800,letterSpacing:1.2,opacity:0.6,marginBottom:10}},isField?(user.role==="RM"?"TEAM OVERVIEW":"MY OVERVIEW"):"ORGANISATION OVERVIEW"),
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8}},
+        [{l:"Dealers",v:activeDealers.length},{l:"Total Leads",v:totalLeads},{l:"Inspections",v:totalInsp},{l:"SI Done",v:totalSI}].map(function(k){
+          return React.createElement("div",{key:k.l,style:{background:"rgba(255,255,255,0.1)",borderRadius:10,padding:"8px",textAlign:"center"}},
+            React.createElement("div",{style:{fontSize:18,fontWeight:900}},k.v),
+            React.createElement("div",{style:{fontSize:8,fontWeight:700,opacity:0.7,letterSpacing:0.5,textTransform:"uppercase",marginTop:2}},k.l)
+          );
+        })
+      ),
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8,marginTop:8}},
+        [{l:"GS Cars",v:gsCount},{l:"Non-GS",v:nonGsCount},{l:"Splits",v:fmt(totalSplits)},{l:"Incentives",v:fmt(totalIncentives)}].map(function(k){
+          return React.createElement("div",{key:k.l,style:{background:"rgba(255,255,255,0.1)",borderRadius:10,padding:"8px",textAlign:"center"}},
+            React.createElement("div",{style:{fontSize:14,fontWeight:900}},k.v),
+            React.createElement("div",{style:{fontSize:8,fontWeight:700,opacity:0.7,letterSpacing:0.5,textTransform:"uppercase",marginTop:2}},k.l)
+          );
+        })
+      ),
+      React.createElement("div",{style:{marginTop:12}},
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
+          React.createElement("span",{style:{fontSize:9,fontWeight:700,opacity:0.7}},"OVERALL CONVERSION (Lead → SI)"),
+          React.createElement("span",{style:{fontSize:11,fontWeight:900}},convRate+"%")
+        ),
+        React.createElement("div",{style:{height:5,background:"rgba(255,255,255,0.15)",borderRadius:4}},
+          React.createElement("div",{style:{height:5,background:"#fff",borderRadius:4,width:Math.min(convRate,100)+"%",transition:"width 0.4s"}})
+        )
+      )
+    ),
+    // Full dealer cards section
+    React.createElement(TMDealerDashSection,{dealers:myDealers,leads:leads,apps:apps,payoutRequests:payoutRequests,counters:counters,onNavigate:handleNavigate})
+  );
+}
+
 function OpsDashboard({user,shared}){
-  const{apps,dealers,onboarding,payoutRequests,counterReqs,sapReqs,configs}=shared;
+  const{apps,dealers,onboarding,payoutRequests,counterReqs,sapReqs,configs,leads,setPage,setDeepLink,counters}=shared;
   const allRAs=ALL_USERS.filter(u=>u.role==="RA");
   const totalWallet=allRAs.reduce((s,ra)=>s+raWalBal(ra.id,apps),0);
   const pendingApprovals=payoutRequests.filter(r=>!["Released","Auto-Approved","Rejected"].includes(r.status)).length;
   const obPending=onboarding.filter(o=>["Admin Panel Pending","OEM Tagging Pending","Ops Review"].includes(o.status)).length;
+  const[drawer,setDrawer]=useState(null);
   const isBH=user.role==="Business Head";
+  const isTM=user.role==="TM";
+  function handleNavigate({page,id}){
+    if(setDeepLink&&id)setDeepLink({page,id});
+    if(setPage)setPage(page);
+  }
+
+  function openDrawer(type){
+    if(type==="wallet"){
+      const items=apps.filter(a=>a.otherCharges-a.splitReleased>0).map(a=>{const d=dealers.find(dd=>dd.id===a.dealerId);return{primary:`${a.id} — ${a.vehicle}`,amount:fmt(a.otherCharges-a.splitReleased),appId:a.id,secondary:`Dealer: ${d?d.name:"—"} · Other Charges: ${fmt(a.otherCharges)} · Released: ${fmt(a.splitReleased)}`,detail:`GS: ${a.gsType} · Stock-In: ${a.stockIn?"✓":"✗"}`,chips:[{label:`App ${a.id}`,page:"appids",id:a.id,color:T.accent},{label:d?d.name:"Dealer",page:"onboarding",id:d&&d.id,color:T.success}]};});
+      setDrawer({title:"Wallet Breakdown",icon:"💰",color:T.accent,data:items});
+    } else if(type==="approvals"){
+      const items=payoutRequests.filter(r=>!["Released","Auto-Approved","Rejected"].includes(r.status)).map(r=>{const a=apps.find(aa=>aa.id===r.appId);return{primary:`${r.id} — ${r.type}`,amount:fmt(r.amount),badge:r.status,payoutId:r.id,secondary:a?`${a.vehicle} · ${a.id}`:"—",chips:[{label:`App ${r.appId}`,page:"appids",id:r.appId,color:T.accent},{label:`Approvals`,page:"approvals",id:r.id,color:T.warn}]};});
+      setDrawer({title:"Pending Approvals",icon:"⏳",color:T.warn,data:items});
+    } else if(type==="dealers"){
+      const items=dealers.filter(d=>d.status==="Active").map(d=>{const ra=ALL_USERS.find(u=>u.id===d.raId);return{primary:d.name,badge:"Active",dealerId:d.id,secondary:`Code: ${d.code||"—"} · ${d.type} · ${d.oem}`,detail:`RA: ${ra?ra.name:"—"} · ${d.region}`,chips:[{label:"Onboarding",page:"onboarding",id:d.id,color:T.success}]};});
+      setDrawer({title:"Active Dealers",icon:"🏢",color:T.success,data:items});
+    } else if(type==="appids"){
+      const items=apps.filter(a=>a.status==="Active").map(a=>{const d=dealers.find(dd=>dd.id===a.dealerId);return{primary:`${a.id} — ${a.vehicle}`,amount:fmt(a.otherCharges-a.splitReleased),appId:a.id,secondary:`Dealer: ${d?d.name:"—"} · Quote: ${fmt(a.quote)}`,detail:`GS: ${a.gsType} · SI: ${a.stockIn?"Done":"Pending"}`,chips:[{label:`App ${a.id}`,page:"appids",id:a.id,color:T.accent},{label:d?d.name:"Dealer",page:"onboarding",id:d&&d.id,color:T.success}]};});
+      setDrawer({title:"Active App_IDs",icon:"🚗",color:T.success,data:items});
+    } else if(type==="onboarding"){
+      const items=onboarding.filter(o=>["Admin Panel Pending","OEM Tagging Pending","Ops Review"].includes(o.status)).map(o=>{const ra=ALL_USERS.find(u=>u.id===o.raId);return{primary:o.dealerName,badge:o.status,dealerId:o.id,secondary:`${o.type} · ${o.oem} · ${o.region}`,detail:`By: ${ra?ra.name:"—"} · ${o.submittedAt}`,chips:[{label:"Onboarding Queue",page:"onboarding",id:o.id,color:T.purple}]};});
+      setDrawer({title:"Onboarding Queue",icon:"🏢",color:T.purple,data:items});
+    } else if(type==="counters"){
+      const items=counterReqs.filter(r=>r.status==="Ops Review").map(r=>{const d=dealers.find(dd=>dd.id===r.dealerId);return{primary:r.counterName,badge:"Ops Review",secondary:`${d?d.name:"—"} · ${r.city} · UCM: ${r.ucmName}`};});
+      setDrawer({title:"Counter Requests",icon:"🔗",color:T.orange,data:items});
+    } else if(type==="sap"){
+      const items=sapReqs.filter(r=>r.status==="Ops Review").map(r=>({primary:r.payeeName,badge:"Ops Review",secondary:`${r.bank} · PAN: ${r.pan}`}));
+      setDrawer({title:"SAP Requests",icon:"🏦",color:T.accent,data:items});
+    } else if(type==="released"){
+      const items=payoutRequests.filter(r=>["Released","Auto-Approved"].includes(r.status)).map(r=>{const a=apps.find(aa=>aa.id===r.appId);return{primary:`${r.id}`,amount:fmt(r.amount),badge:r.status,payoutId:r.id,secondary:a?`${a.vehicle} · ${r.type}`:r.type,detail:r.utr?`UTR: ${r.utr}`:"",chips:[{label:`App ${r.appId}`,page:"appids",id:r.appId,color:T.accent}]};});
+      setDrawer({title:"Released Payouts",icon:"💸",color:T.success,data:items});
+    } else if(type==="pipeline"){
+      const items=payoutRequests.filter(r=>!["Released","Auto-Approved","Rejected"].includes(r.status)).map(r=>({primary:r.id,amount:fmt(r.amount),badge:r.status,payoutId:r.id,secondary:`${r.type} · ${r.appId}`,chips:[{label:`App ${r.appId}`,page:"appids",id:r.appId,color:T.accent},{label:"Approvals",page:"approvals",id:r.id,color:T.warn}]}));
+      setDrawer({title:"Payout Pipeline",icon:"🔄",color:T.warn,data:items});
+    }
+  }
+
   if(isBH){
     const bhPend=payoutRequests.filter(r=>["BH Review","Ops Approved"].includes(r.status)).length;
     const releasedMTD=payoutRequests.filter(r=>["Released","Auto-Approved"].includes(r.status)).reduce((s,r)=>s+r.amount,0);
     const pipeAmt=payoutRequests.filter(r=>!["Released","Auto-Approved","Rejected"].includes(r.status)).reduce((s,r)=>s+r.amount,0);
     return <div>
-      <div style={{background:`linear-gradient(135deg,${T.accentD},${T.accent})`,borderRadius:12,padding:16,color:"#fff",marginBottom:14}}>
-        <div style={{fontSize:10,fontWeight:800,letterSpacing:1,opacity:0.7,marginBottom:4}}>TEAM WALLET — ALL RAs</div>
+      {drawer&&<DashboardDrawer {...drawer} onClose={()=>setDrawer(null)} onNavigate={handleNavigate}/>}
+      <div onClick={()=>openDrawer("wallet")} style={{background:`linear-gradient(135deg,${T.accentD},${T.accent})`,borderRadius:14,padding:18,color:"#fff",marginBottom:14,cursor:"pointer",transition:"transform 0.2s",position:"relative"}} onMouseEnter={e=>e.currentTarget.style.transform="translateY(-2px)"} onMouseLeave={e=>e.currentTarget.style.transform=""}>
+        <div style={{fontSize:10,fontWeight:800,letterSpacing:1,opacity:0.7,marginBottom:4}}>TEAM WALLET — ALL RAs · TAP TO VIEW BREAKDOWN</div>
         <div style={{fontSize:30,fontWeight:900}}>{fmt(totalWallet)}</div>
         <div style={{fontSize:12,opacity:0.7,marginTop:2}}>Total available across all RA portfolios</div>
+        <div style={{position:"absolute",top:18,right:18,fontSize:12,opacity:0.5}}>▶</div>
       </div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
-        {[{icon:"⏳",l:"BH Approvals",v:bhPend,c:bhPend>0?T.warn:T.success,bg:bhPend>0?T.warnL:T.successL},{icon:"💸",l:"Released MTD",v:fmt(releasedMTD),c:T.success,bg:T.successL},{icon:"🔄",l:"Payout Pipeline",v:fmt(pipeAmt),c:T.warn,bg:T.warnL},{icon:"🏢",l:"Active Dealers",v:dealers.filter(d=>d.status==="Active").length,c:T.success,bg:T.successL}].map(k=><div key={k.l} style={{background:k.bg,borderRadius:10,padding:12,border:`1px solid ${k.c}22`}}><div style={{fontSize:18,marginBottom:3}}>{k.icon}</div><div style={{fontSize:18,fontWeight:900,color:T.text}}>{k.v}</div><div style={{fontSize:9,fontWeight:800,color:k.c,letterSpacing:0.7,textTransform:"uppercase",marginTop:1}}>{k.l}</div></div>)}
+        <DashStatCard icon="⏳" label="BH Approvals" value={bhPend} color={bhPend>0?T.warn:T.success} bg={bhPend>0?T.warnL:T.successL} onClick={()=>openDrawer("approvals")}/>
+        <DashStatCard icon="💸" label="Released MTD" value={fmt(releasedMTD)} color={T.success} bg={T.successL} onClick={()=>openDrawer("released")}/>
+        <DashStatCard icon="🔄" label="Payout Pipeline" value={fmt(pipeAmt)} color={T.warn} bg={T.warnL} onClick={()=>openDrawer("pipeline")}/>
+        <DashStatCard icon="🏢" label="Active Dealers" value={dealers.filter(d=>d.status==="Active").length} color={T.success} bg={T.successL} onClick={()=>openDrawer("dealers")}/>
       </div>
       <Card style={{marginBottom:14}}><Lbl>Team Wallet by RA</Lbl>
         {allRAs.map(ra=>{const rApps=apps.filter(a=>a.raId===ra.id);const bal=raWalBal(ra.id,apps);const released=rApps.reduce((s,a)=>s+a.splitReleased,0);return <div key={ra.id} style={{padding:"8px 0",borderBottom:`1px solid ${T.border}`}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}><div style={{fontSize:12,fontWeight:800}}>{ra.name} <span style={{fontSize:10,color:T.mute,fontWeight:400}}>({ra.region})</span></div><div style={{fontSize:14,fontWeight:900,color:bal>0?T.accent:T.danger}}>{fmt(bal)}</div></div><div style={{display:"flex",gap:10}}><span style={{fontSize:10,color:T.mute}}>{rApps.length} apps</span><span style={{fontSize:10,color:T.mute}}>Released: {fmt(released)}</span></div></div>;})}
       </Card>
       <Card><Lbl>Recent Payout Activity</Lbl>{payoutRequests.slice(-4).reverse().map(r=>{const a=apps.find(aa=>aa.id===r.appId);return <div key={r.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 0",borderBottom:`1px solid ${T.border}`}}><div><div style={{fontSize:12,fontWeight:700}}>{r.id} — {fmt(r.amount)}</div><div style={{fontSize:10,color:T.mute}}>{a&&a.vehicle} · {r.type}</div></div><Badge s={r.status} sm/></div>;})} </Card>
+      <Card style={{marginTop:14}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><Lbl>Active Dealers ({dealers.filter(d=>d.status==="Active").length})</Lbl><button onClick={()=>{if(setPage)setPage("dealerperf");}} style={{background:T.accentL,border:"1px solid "+T.accent+"30",borderRadius:8,padding:"4px 10px",fontSize:10,fontWeight:700,cursor:"pointer",color:T.accent,fontFamily:"inherit"}}>Dealer Perf →</button></div>{dealers.filter(d=>d.status==="Active").slice(0,3).map(d=>{const st=calcDealerMetrics(d.id,leads,apps,payoutRequests);const ra=ALL_USERS.find(u=>u.id===d.raId);return <div key={d.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 0",borderBottom:"1px solid "+T.border}}><div><div style={{fontSize:12,fontWeight:700}}>{d.name}</div><div style={{fontSize:9,color:T.mute}}>RA: {ra&&ra.name} · {st.leads}L · {st.si}SI · {st.gs}GS</div></div><div style={{fontSize:12,fontWeight:900,color:T.accent}}>{fmt(st.splits+st.incentives)}</div></div>;})}</Card>
     </div>;
   }
   return <div>
+    {drawer&&<DashboardDrawer {...drawer} onClose={()=>setDrawer(null)} onNavigate={handleNavigate}/>}
+    {isTM&&<div style={{marginBottom:14}}>
+      <div style={{background:`linear-gradient(135deg,${T.accentD},${T.accent})`,borderRadius:14,padding:16,color:"#fff",marginBottom:10}}>
+        <div style={{fontSize:9,fontWeight:800,letterSpacing:1,opacity:0.7,marginBottom:4}}>CITY PAYOUT OVERVIEW — TM / CITY HEAD</div>
+        <div style={{display:"flex",gap:20}}>
+          <div><div style={{fontSize:22,fontWeight:900}}>{fmt(totalWallet)}</div><div style={{fontSize:10,opacity:0.7}}>Wallet Available</div></div>
+          <div><div style={{fontSize:22,fontWeight:900}}>{fmt(payoutRequests.filter(r=>["Released","Auto-Approved"].includes(r.status)).reduce((s,r)=>s+r.amount,0))}</div><div style={{fontSize:10,opacity:0.7}}>Released MTD</div></div>
+        </div>
+      </div>
+      <div style={{background:T.purpleL,border:`1px solid ${T.purple}22`,borderRadius:12,padding:"12px 14px",marginBottom:10}}>
+        <div style={{fontSize:10,fontWeight:800,color:T.purple,marginBottom:8}}>🎁 INCENTIVE SUMMARY</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8}}>
+          {[
+            {label:"Total Incentives",val:fmt(payoutRequests.filter(r=>r.type==="Incentive"&&["Released","Auto-Approved"].includes(r.status)).reduce((s,r)=>s+r.amount,0)),color:T.purple},
+            {label:"Pending BH",val:payoutRequests.filter(r=>r.type==="Incentive"&&["BH Review","Submitted"].includes(r.status)).length+" req",color:T.warn},
+            {label:"Non-GS Released",val:fmt(payoutRequests.filter(r=>r.type==="Incentive"&&["Released","Auto-Approved"].includes(r.status)).reduce((s,r)=>s+r.amount,0)),color:T.success},
+          ].map(k=><div key={k.label} style={{background:"#fff",borderRadius:8,padding:"8px 10px",border:`1px solid ${k.color}22`}}>
+            <div style={{fontSize:15,fontWeight:900,color:T.text}}>{k.val}</div>
+            <div style={{fontSize:8,fontWeight:800,color:k.color,textTransform:"uppercase",letterSpacing:0.5,marginTop:1}}>{k.label}</div>
+          </div>)}
+        </div>
+      </div>
+    </div>}
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}}>
-      {[{icon:"💰",l:"Team Wallet",v:fmt(totalWallet),c:T.accent,bg:T.accentL},{icon:"⏳",l:"Pending Approvals",v:pendingApprovals,c:pendingApprovals>0?T.warn:T.success,bg:pendingApprovals>0?T.warnL:T.successL},{icon:"🏢",l:"Onboarding Pending",v:obPending,c:T.purple,bg:T.purpleL},{icon:"🔗",l:"Counter Requests",v:counterReqs.filter(r=>r.status==="Ops Review").length,c:T.orange,bg:T.orangeL},{icon:"🏦",l:"SAP Pending",v:sapReqs.filter(r=>r.status==="Ops Review").length,c:T.accent,bg:T.accentL},{icon:"🚗",l:"Active App_IDs",v:apps.filter(a=>a.status==="Active").length,c:T.success,bg:T.successL}].map(k=><div key={k.l} style={{background:k.bg,borderRadius:10,padding:12,border:`1px solid ${k.c}22`}}><div style={{fontSize:18,marginBottom:3}}>{k.icon}</div><div style={{fontSize:18,fontWeight:900,color:T.text}}>{k.v}</div><div style={{fontSize:9,fontWeight:800,color:k.c,letterSpacing:0.7,textTransform:"uppercase",marginTop:1}}>{k.l}</div></div>)}
+      <DashStatCard icon="💰" label="Team Wallet" value={fmt(totalWallet)} color={T.accent} bg={T.accentL} onClick={()=>openDrawer("wallet")}/>
+      <DashStatCard icon="⏳" label="Pending Approvals" value={pendingApprovals} color={pendingApprovals>0?T.warn:T.success} bg={pendingApprovals>0?T.warnL:T.successL} onClick={()=>openDrawer("approvals")}/>
+      <DashStatCard icon="🏢" label="Onboarding Pending" value={obPending} color={T.purple} bg={T.purpleL} onClick={()=>openDrawer("onboarding")}/>
+      <DashStatCard icon="🔗" label="Counter Requests" value={counterReqs.filter(r=>r.status==="Ops Review").length} color={T.orange} bg={T.orangeL} onClick={()=>openDrawer("counters")}/>
+      <DashStatCard icon="🏦" label="SAP Pending" value={sapReqs.filter(r=>r.status==="Ops Review").length} color={T.accent} bg={T.accentL} onClick={()=>openDrawer("sap")}/>
+      <DashStatCard icon="🚗" label="Active App_IDs" value={apps.filter(a=>a.status==="Active").length} color={T.success} bg={T.successL} onClick={()=>openDrawer("appids")}/>
     </div>
     <Card style={{marginBottom:14}}><Lbl>RA Snapshot</Lbl>{ALL_USERS.filter(u=>["RA","RM"].includes(u.role)).map(u=>{const uApps=apps.filter(a=>a.raId===u.id);const bal=raWalBal(u.id,apps);return <div key={u.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 0",borderBottom:`1px solid ${T.border}`}}><div><div style={{fontSize:12,fontWeight:700}}>{u.name} <span style={{background:u.role==="RM"?T.purpleL:T.accentL,color:u.role==="RM"?T.purple:T.accent,padding:"0 5px",borderRadius:6,fontSize:9,fontWeight:800}}>{u.role}</span></div><div style={{fontSize:10,color:T.mute}}>{u.region} · {uApps.length} apps</div></div><div style={{fontSize:13,fontWeight:800,color:bal>0?T.accent:T.danger}}>{fmt(bal)}</div></div>;})} </Card>
     <Card><Lbl>Onboarding Pipeline</Lbl>{onboarding.map(ob=>{const ra=ALL_USERS.find(u=>u.id===ob.raId);return <div key={ob.id} style={{display:"flex",justifyContent:"space-between",padding:"7px 0",borderBottom:`1px solid ${T.border}`}}><div><div style={{fontSize:12,fontWeight:700}}>{ob.dealerName}</div><div style={{fontSize:10,color:T.mute}}>By: {ra&&ra.name} ({ob.submittedBy}) · {ob.submittedAt}</div></div><Badge s={ob.status} sm/></div>;})} </Card>
+    {isTM&&<Card style={{marginTop:14}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><Lbl>Active Dealers ({dealers.filter(d=>d.status==="Active").length})</Lbl><button onClick={()=>{if(setPage)setPage("dealerperf");}} style={{background:T.accentL,border:"1px solid "+T.accent+"30",borderRadius:8,padding:"4px 10px",fontSize:10,fontWeight:700,cursor:"pointer",color:T.accent,fontFamily:"inherit"}}>Dealer Perf →</button></div>{dealers.filter(d=>d.status==="Active").slice(0,3).map(d=>{const st=calcDealerMetrics(d.id,leads,apps,payoutRequests);const ra=ALL_USERS.find(u=>u.id===d.raId);return <div key={d.id} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"7px 0",borderBottom:"1px solid "+T.border}}><div><div style={{fontSize:12,fontWeight:700}}>{d.name}</div><div style={{fontSize:9,color:T.mute}}>RA: {ra&&ra.name} · {st.leads}L · {st.si}SI · {st.gs}GS</div></div><div style={{fontSize:12,fontWeight:900,color:T.accent}}>{fmt(st.splits+st.incentives)}</div></div>;})}</Card>}
   </div>;
 }
 
@@ -682,7 +1369,7 @@ function RaisePayoutModule({user,shared}){
   const[step,setStep]=useState(0);const[appId,setAppId]=useState("");const[payeeId,setPayeeId]=useState("");const[type,setType]=useState("");const[amount,setAmount]=useState("");const[reason,setReason]=useState("");const[ackCross,setAckCross]=useState(false);const[result,setResult]=useState(null);const[done,setDone]=useState(false);
   if(user.role!=="TM")return <div style={{textAlign:"center",padding:60,color:T.mute}}><div style={{fontSize:40,marginBottom:12}}>🔒</div><div style={{fontSize:14,fontWeight:700,color:T.text}}>Only TM / City Head can raise payments.</div></div>;
   const selApp=apps.find(a=>a.id===appId);const selDealer=selApp?dealers.find(d=>d.id===selApp.dealerId):null;const selCounter=selApp?counters.find(ct=>ct.id===selApp.counterId):null;const selRA=selApp?ALL_USERS.find(u=>u.id===selApp.raId):null;const walBal=selApp?raWalBal(selApp.raId,apps):0;const avail=selApp?selApp.otherCharges-selApp.splitReleased:0;
-  const dealerPayees=selApp?payees.filter(p=>p.status==="Active"&&p.dealerIds&&p.dealerIds.includes(selApp.dealerId)):[];
+  const dealerPayees=selApp?payees.filter(p=>p.status==="Active"&&p.fluxStatus==="Validated"&&p.dealerIds&&p.dealerIds.includes(selApp.dealerId)):[];
   const selPayee=payees.find(p=>p.id===payeeId);const isCross=selPayee&&selApp&&!selPayee.dealerIds.includes(selApp.dealerId);
   const base=selApp?selApp.quote-(selApp.serviceCharge+selApp.challan+selApp.estRefurb):0;
   const calcInc=selApp?Math.min((configs.NONGS_RATE/100)*base,configs.NONGS_CAP):0;
@@ -705,7 +1392,7 @@ function RaisePayoutModule({user,shared}){
         </div>
         {!selApp.stockIn&&<Alrt type="error">Stock-In not complete — payouts blocked.</Alrt>}
         <Sel label="Payout Type" value={type} onChange={setType} options={[{value:"Split",label:"Split Payment (Other Charges bucket)"},{value:"Incentive",label:"Incentive"}]} placeholder="Select type..." required/>
-        {type==="Split"&&<div style={{background:walBal>0?T.accentL:T.dangerL,border:`1px solid ${walBal>0?"#BFDBFE":"#FECACA"}`,borderRadius:8,padding:12,marginBottom:10}}><div style={{fontSize:10,fontWeight:800,color:walBal>0?T.accentD:T.danger,marginBottom:2}}>RA WALLET (SPLIT ONLY)</div><div style={{fontSize:22,fontWeight:900,color:walBal>0?T.accent:T.danger}}>{fmt(walBal)}</div><div style={{fontSize:11,color:T.mute,marginTop:2}}>Bucket available: {fmt(avail)}</div></div>}
+        {type==="Split"&&<WalletDrillDown apps={apps} dealers={dealers} raId={selApp.raId} walBal={walBal} avail={avail} currentAppId={appId}/>}
         {type&&<><Sel label="Payee (linked to this dealer)" value={payeeId} onChange={setPayeeId} options={dealerPayees.map(p=>({value:p.id,label:`${p.payeeName} — ${p.bank} · ${p.fluxStatus}`}))} placeholder="Select payee..." required/>{dealerPayees.length===0&&<Alrt type="warning">No active payees linked to this dealer. Ask RA/RM to submit a SAP request.</Alrt>}
         {type==="Incentive"&&selApp.gsType==="Non-GS"&&<div style={{background:T.successL,borderRadius:8,padding:10,marginBottom:10}}><Lbl color={T.success}>Non-GS Calculation</Lbl><Row label="Base Amount" value={fmt(base)}/><Row label={`${configs.NONGS_RATE}% of Base`} value={fmt((configs.NONGS_RATE/100)*base)}/><Row label="Cap" value={fmt(configs.NONGS_CAP)}/><Row label="Pre-filled" value={fmt(calcInc)}/></div>}
         <Fld label="Amount (₹)" value={amount} onChange={setAmount} type="number" required hint={type==="Split"?`Bucket: ${fmt(avail)}`:""} error={amtErr||walErr}/>
@@ -741,7 +1428,7 @@ function OnboardingModuleOps({user,shared}){
     <StepBar steps={["Dealer Info","Bank & Docs","OEM Details","Review"]} cur={step}/>
     {step===0&&<Card><ST>Dealer Information</ST><Fld label="Dealer / Company Name" value={form.dealerName} onChange={v=>f("dealerName",v)} required/><G2><Sel label="Region" value={form.region} onChange={v=>f("region",v)} options={REGIONS} placeholder="Select..." required/><Sel label="City" value={form.city} onChange={v=>f("city",v)} options={CITIES} placeholder="Select..." required/></G2><G2><Fld label="Mobile" value={form.mobile} onChange={v=>f("mobile",v)} required/><Fld label="Email" value={form.email} onChange={v=>f("email",v)}/></G2><Fld label="Full Address" value={form.address} onChange={v=>f("address",v)} required/><div style={{display:"flex",justifyContent:"flex-end",marginTop:4}}><Btn disabled={!form.dealerName||!form.region||!form.city||!form.mobile||!form.address} onClick={()=>setStep(1)}>Next →</Btn></div></Card>}
     {step===1&&<Card><ST>Bank & Tax</ST><G2><Fld label="PAN" value={form.pan} onChange={v=>f("pan",v.toUpperCase())} required maxLength={10}/><Fld label="GST" value={form.gst} onChange={v=>f("gst",v.toUpperCase())}/></G2><Sel label="Bank" value={form.bank} onChange={v=>f("bank",v)} options={BANK_LIST} placeholder="Select bank..." required/><G2><Fld label="Account No." value={form.account} onChange={v=>f("account",v)} required/><Fld label="IFSC" value={form.ifsc} onChange={v=>f("ifsc",v.toUpperCase())} required/></G2><ST>Mandatory Documents</ST><FileInput label="GST Certificate" value={docs.gst} onChange={v=>setDocs(p=>({...p,gst:v}))} required/><FileInput label="PAN Card" value={docs.pan} onChange={v=>setDocs(p=>({...p,pan:v}))} required/><FileInput label="Bank Statement" value={docs.bank} onChange={v=>setDocs(p=>({...p,bank:v}))} required/><FileInput label="Cancelled Cheque" value={docs.cancelledCheque} onChange={v=>setDocs(p=>({...p,cancelledCheque:v}))} required/><ST>Other (Optional)</ST><FileInput label="Other" value={docs.other} onChange={v=>setDocs(p=>({...p,other:v}))}/><div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(0)}>← Back</Btn><Btn disabled={!form.pan||!form.bank||!form.account||!form.ifsc||!docs.gst||!docs.pan||!docs.bank||!docs.cancelledCheque} onClick={()=>setStep(2)}>Next →</Btn></div></Card>}
-    {step===2&&<Card><ST>OEM & Dealer Type</ST><G2><Sel label="Dealer Type" value={form.type} onChange={v=>f("type",v)} options={DEALER_TYPES} placeholder="Select..." required/><Sel label="OEM Brand" value={form.oem} onChange={v=>f("oem",v)} options={OEM_BRANDS} placeholder="Select..." required/></G2><Sel label="Company Code" value={form.companyCode} onChange={v=>f("companyCode",v)} options={COMPANY_CODES} placeholder="Select company code..." required/><ST>Dealer Location</ST><div style={{display:"flex",gap:8,marginBottom:8}}><Btn v={form.latMode==="auto"?"primary":"secondary"} sm onClick={()=>{f("latMode","auto");if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>{f("lat",pos.coords.latitude.toFixed(6));f("long",pos.coords.longitude.toFixed(6));},()=>alert("Location access denied"));}}}>📍 Auto-detect</Btn><Btn v={form.latMode==="manual"?"primary":"secondary"} sm onClick={()=>f("latMode","manual")}>✏️ Enter manually</Btn></div>{(form.latMode==="manual"||form.lat)&&<G2><Fld label="Latitude" value={form.lat} onChange={v=>f("lat",v)} placeholder="e.g. 28.6139" required={form.latMode==="manual"}/><Fld label="Longitude" value={form.long} onChange={v=>f("long",v)} placeholder="e.g. 77.2090" required={form.latMode==="manual"}/></G2>}{form.lat&&form.long&&<div style={{background:"#ECFDF5",border:"1px solid #BBF7D0",borderRadius:7,padding:"6px 10px",marginBottom:8,fontSize:11,color:"#065F46",fontWeight:700}}>📍 {form.lat}, {form.long}</div>}<ST>OEM Documents</ST><FileInput label="Franchise Agreement" value={oemDocs.franchiseAgreement} onChange={v=>setOemDocs(p=>({...p,franchiseAgreement:v}))} required/><FileInput label="OEM Authorization Letter" value={oemDocs.oemLetter} onChange={v=>setOemDocs(p=>({...p,oemLetter:v}))} required/><ST>Other (Optional)</ST><FileInput label="Other OEM Doc" value={oemDocs.other} onChange={v=>setOemDocs(p=>({...p,other:v}))}/><div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(1)}>← Back</Btn><Btn disabled={!form.type||!form.oem||!form.oemType||!oemDocs.franchiseAgreement||!oemDocs.oemLetter} onClick={()=>setStep(3)}>Review →</Btn></div></Card>}
+    {step===2&&<Card><ST>OEM & Dealer Type</ST><G2><Sel label="Dealer Type" value={form.type} onChange={v=>f("type",v)} options={DEALER_TYPES} placeholder="Select..." required/><Sel label="OEM Brand" value={form.oem} onChange={v=>f("oem",v)} options={OEM_BRANDS} placeholder="Select..." required/></G2><Sel label="Company Code" value={form.companyCode} onChange={v=>f("companyCode",v)} options={COMPANY_CODES} placeholder="Select company code..." required/><ST>Dealer Location</ST><div style={{display:"flex",gap:8,marginBottom:8}}><Btn v={form.latMode==="auto"?"primary":"secondary"} sm onClick={()=>{f("latMode","auto");if(navigator.geolocation){navigator.geolocation.getCurrentPosition(pos=>{f("lat",pos.coords.latitude.toFixed(6));f("long",pos.coords.longitude.toFixed(6));},()=>alert("Location access denied"));}}}>📍 Auto-detect</Btn><Btn v={form.latMode==="manual"?"primary":"secondary"} sm onClick={()=>f("latMode","manual")}>✏️ Enter manually</Btn></div>{(form.latMode==="manual"||form.lat)&&<G2><Fld label="Latitude" value={form.lat} onChange={v=>f("lat",v)} placeholder="e.g. 28.6139" required={form.latMode==="manual"}/><Fld label="Longitude" value={form.long} onChange={v=>f("long",v)} placeholder="e.g. 77.2090" required={form.latMode==="manual"}/></G2>}{form.lat&&form.long&&<div style={{background:"#ECFDF5",border:"1px solid #BBF7D0",borderRadius:7,padding:"6px 10px",marginBottom:8,fontSize:11,color:"#065F46",fontWeight:700}}>📍 {form.lat}, {form.long}</div>}<ST>OEM Documents</ST><FileInput label="Franchise Agreement" value={oemDocs.franchiseAgreement} onChange={v=>setOemDocs(p=>({...p,franchiseAgreement:v}))} required/><FileInput label="OEM Authorization Letter" value={oemDocs.oemLetter} onChange={v=>setOemDocs(p=>({...p,oemLetter:v}))} required/><ST>Other (Optional)</ST><FileInput label="Other OEM Doc" value={oemDocs.other} onChange={v=>setOemDocs(p=>({...p,other:v}))}/><div style={{display:"flex",justifyContent:"space-between",marginTop:4}}><Btn v="secondary" onClick={()=>setStep(1)}>← Back</Btn><Btn disabled={!form.type||!form.oem||!form.companyCode||!oemDocs.franchiseAgreement||!oemDocs.oemLetter} onClick={()=>setStep(3)}>Review →</Btn></div></Card>}
     {step===3&&<Card><ST>Review & Submit</ST>{[["Dealer",form.dealerName],["Region",form.region],["City",form.city],["Type",form.type],["OEM",form.oem]].map(([l,v])=><Row key={l} label={l} value={v||"—"}/>)}<Alrt type="warning">Submitting adds to Ops Panel queue and sends auto-email to Admin Panel.</Alrt><div style={{display:"flex",justifyContent:"space-between",marginTop:10}}><Btn v="secondary" onClick={()=>setStep(2)}>← Edit</Btn><Btn v="success" icon="✓" onClick={submitTMForm}>Submit</Btn></div></Card>}
   </div>;
 
@@ -1019,8 +1706,8 @@ function CounterUCMOverride({user,shared}){
     const entry={
       id:`OVR${Math.random().toString(36).slice(2,7).toUpperCase()}`,
       appId:selAppId,vehicle:selApp.vehicle,
-      prevDealer:currentDealer?.name,prevCounter:currentCounter?.name,prevUCM:currentCounter?.ucmName,
-      newDealer:targetDealer?.name,newCounter:newCounter?.name,newUCM:newCounter?.ucmName,
+      prevDealer:currentDealer&&currentDealer.name,prevCounter:currentCounter&&currentCounter.name,prevUCM:currentCounter&&currentCounter.ucmName,
+      newDealer:targetDealer&&targetDealer.name,newCounter:newCounter&&newCounter.name,newUCM:newCounter&&newCounter.ucmName,
       reason,by:user.role,at:new Date().toLocaleString("en-IN",{hour12:false}).slice(0,16)
     };
     setApps(prev=>prev.map(a=>a.id===selAppId?{...a,dealerId:newDealerId,counterId:newCounterId}:a));
@@ -1038,7 +1725,7 @@ function CounterUCMOverride({user,shared}){
       {selApp&&<div style={{background:T.accentL,borderRadius:9,padding:12,marginTop:8}}>
         <div style={{fontSize:10,fontWeight:800,color:T.accent,marginBottom:6}}>CURRENT MAPPING</div>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
-          {[["Dealer",currentDealer?.name],["Dealer Code",currentDealer?.code],["Counter",currentCounter?.name],["UCM Name",currentCounter?.ucmName],["UCM Mobile",currentCounter?.ucmMobile],["City",currentCounter?.city]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:T.accent,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800}}>{v||"—"}</div></div>)}
+          {[["Dealer",currentDealer&&currentDealer.name],["Dealer Code",currentDealer&&currentDealer.code],["Counter",currentCounter&&currentCounter.name],["UCM Name",currentCounter&&currentCounter.ucmName],["UCM Mobile",currentCounter&&currentCounter.ucmMobile],["City",currentCounter&&currentCounter.city]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:T.accent,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800}}>{v||"—"}</div></div>)}
         </div>
       </div>}
     </Card>
@@ -1053,7 +1740,7 @@ function CounterUCMOverride({user,shared}){
         {newCounter&&<div style={{background:T.successL,border:"1px solid #BBF7D0",borderRadius:9,padding:12,marginBottom:10}}>
           <div style={{fontSize:10,fontWeight:800,color:T.success,marginBottom:6}}>NEW MAPPING PREVIEW</div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6}}>
-            {[["Dealer",targetDealer?.name],["Counter",newCounter.name],["UCM Name",newCounter.ucmName],["UCM Mobile",newCounter.ucmMobile],["City",newCounter.city]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:T.success,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800}}>{v||"—"}</div></div>)}
+            {[["Dealer",targetDealer&&targetDealer.name],["Counter",newCounter.name],["UCM Name",newCounter.ucmName],["UCM Mobile",newCounter.ucmMobile],["City",newCounter.city]].map(([l,v])=><div key={l} style={{background:"rgba(255,255,255,0.7)",borderRadius:6,padding:"5px 8px"}}><div style={{fontSize:9,color:T.success,fontWeight:700}}>{l.toUpperCase()}</div><div style={{fontSize:11,fontWeight:800}}>{v||"—"}</div></div>)}
           </div>
           {newDealerId!==selApp.dealerId&&<div style={{fontSize:10,color:T.orange,fontWeight:700,marginTop:6}}>⚠ Dealer is changing — this will also update the App_ID's dealer mapping</div>}
         </div>}
@@ -1148,7 +1835,7 @@ function RoleGuide({user,onClose}){
 // ═══════════════════════════════════════════════
 // ROLE META
 // ═══════════════════════════════════════════════
-const ROLE_COLOR={"RA":"#0F4C81","RM":"#5B21B6","TM":"#065F46","Central Ops":"#92400E","Business Head":"#C2410C","Finance":"#991B1B"};
+const ROLE_COLOR={"RA":"#FF6B00","RM":"#7C3AED","TM":"#059669","Central Ops":"#D97706","Business Head":"#DC2626","Finance":"#0284C7"};
 const isFieldRole=r=>["RA","RM"].includes(r);
 const isOpsRole=r=>["TM","Central Ops","Business Head","Finance"].includes(r);
 
@@ -1160,11 +1847,42 @@ function getNavForUser(user){
 // ═══════════════════════════════════════════════
 // MAIN APP
 // ═══════════════════════════════════════════════
+// ═══════════════════════════════════════════════
+// WALLET DRILL-DOWN — expandable in Raise Payout
+// ═══════════════════════════════════════════════
+function WalletDrillDown({apps,dealers,raId,walBal,avail,currentAppId}){
+  const[open,setOpen]=useState(false);
+  const raApps=apps.filter(a=>a.raId===raId&&(a.otherCharges-a.splitReleased)>0);
+  return <div style={{marginBottom:10}}>
+    <div onClick={()=>setOpen(!open)} style={{background:walBal>0?T.accentL:T.dangerL,border:`1px solid ${walBal>0?"#BFDBFE":"#FECACA"}`,borderRadius:10,padding:14,cursor:"pointer",transition:"all 0.25s"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div>
+          <div style={{fontSize:10,fontWeight:800,color:walBal>0?T.accentD:T.danger,marginBottom:2}}>RA WALLET (SPLIT ONLY) · TAP TO EXPAND</div>
+          <div style={{fontSize:24,fontWeight:900,color:walBal>0?T.accent:T.danger}}>{fmt(walBal)}</div>
+          <div style={{fontSize:11,color:T.mute,marginTop:2}}>Bucket available: {fmt(avail)}</div>
+        </div>
+        <div style={{fontSize:18,color:walBal>0?T.accent:T.danger,transition:"transform 0.2s",transform:open?"rotate(90deg)":""}}>{open?"▼":"▶"}</div>
+      </div>
+    </div>
+    {open&&<div style={{border:`1px solid ${T.border}`,borderTop:"none",borderRadius:"0 0 10px 10px",overflow:"hidden",animation:"fadeIn 0.25s ease"}}>
+      <div style={{background:"#F8FAFC",padding:"8px 12px",fontSize:9,fontWeight:800,color:T.mute,letterSpacing:1,display:"grid",gridTemplateColumns:"2fr 1fr 1fr 1fr"}}>  <span>APP_ID / VEHICLE</span><span style={{textAlign:"right"}}>CHARGES</span><span style={{textAlign:"right"}}>RELEASED</span><span style={{textAlign:"right"}}>AVAILABLE</span></div>
+      {raApps.map(a=>{const d=dealers.find(dd=>dd.id===a.dealerId);const bal=a.otherCharges-a.splitReleased;const isCurrent=a.id===currentAppId;return <div key={a.id} style={{padding:"8px 12px",borderTop:`1px solid ${T.border}`,display:"grid",gridTemplateColumns:"2fr 1fr 1fr 1fr",alignItems:"center",background:isCurrent?T.accentL:"#fff"}}>
+        <div><div style={{fontSize:11,fontWeight:isCurrent?800:600,color:isCurrent?T.accent:T.text}}>{a.id}</div><div style={{fontSize:9,color:T.mute}}>{a.vehicle}{d?` · ${d.name}`:""}</div></div>
+        <div style={{textAlign:"right",fontSize:11,fontWeight:600}}>{fmt(a.otherCharges)}</div>
+        <div style={{textAlign:"right",fontSize:11,fontWeight:600,color:T.mute}}>{fmt(a.splitReleased)}</div>
+        <div style={{textAlign:"right",fontSize:12,fontWeight:800,color:bal>0?T.accent:T.danger}}>{fmt(bal)}</div>
+      </div>;})}
+      {raApps.length===0&&<div style={{padding:16,textAlign:"center",color:T.mute,fontSize:11}}>No App_IDs with available balance</div>}
+    </div>}
+  </div>;
+}
+
 function App(){
   const[userId,setUserId]=useState("RA001");
   const[page,setPage]=useState("dashboard");
   const[toast,setToast]=useState(null);
   const[guideOpen,setGuideOpen]=useState(true);
+  const[deepLink,setDeepLink]=useState(null); // {page,id} — used by dashboard cards to navigate+highlight
 
   // SHARED STATE — single source of truth for ALL roles
   const[apps,setApps]=useState(INIT_APPS);
@@ -1178,104 +1896,114 @@ function App(){
   const[sapReqs,setSapReqs]=useState(INIT_SAP_REQS);
   const[configs,setConfigs]=useState({...CONFIGS_DEFAULT});
 
-  const shared={apps,setApps,dealers,setDealers,counters,setCounters,leads,setLeads,payees,setPayees,payoutRequests,setPayoutRequests,onboarding,setOnboarding,counterReqs,setCounterReqs,sapReqs,setSapReqs,configs,setConfigs};
+  const shared={apps,setApps,dealers,setDealers,counters,setCounters,leads,setLeads,payees,setPayees,payoutRequests,setPayoutRequests,onboarding,setOnboarding,counterReqs,setCounterReqs,sapReqs,setSapReqs,configs,setConfigs,setPage,deepLink,setDeepLink};
 
   const user=ALL_USERS.find(u=>u.id===userId);
   const nav=getNavForUser(user);
   const roleColor=ROLE_COLOR[user.role]||T.accent;
 
+  // FIX: Compute valid page SYNCHRONOUSLY during render (prevents white page crash)
+  const isPageValid=nav.some(n=>n.id===page);
+  const activePage=isPageValid?page:(nav[0]&&nav[0].id||"dashboard");
+
   // Badges for ops nav
   const badges={apr:payoutRequests.filter(r=>{if(user.role==="Central Ops")return r.status==="Submitted";if(user.role==="Business Head")return["BH Review","Ops Approved"].includes(r.status);if(user.role==="Finance")return r.status==="BH Approved"&&r.amount>=configs.FINANCE_GATE;return false;}).length,ob:onboarding.filter(o=>["Admin Panel Pending","OEM Tagging Pending","Ops Review"].includes(o.status)).length,ctr:counterReqs.filter(r=>r.status==="Ops Review").length,sap:sapReqs.filter(r=>r.status==="Ops Review").length};
 
-  useEffect(()=>{const firstPage=nav[0]&&nav[0].id;setPage(firstPage||"dashboard");setGuideOpen(true);},[userId]);
+  // Sync page state after role change (only to persist in state, activePage is already correct)
+  useEffect(()=>{if(activePage!==page)setPage(activePage);setGuideOpen(true);},[userId]);
 
   const showToast=useCallback((msg,type="success")=>setToast({msg,type,k:Date.now()}),[]);
 
-  const TITLES={dashboard:"Dashboard",leads:"Leads",appids:"App_IDs",override:"Counter & UCM Override",onboarding:"Dealer Onboarding",counter:"Counter & UCM",sap:"SAP & Payees",payouts:"Payout Status",payout:"Raise Payout",approvals:"Approvals",transfer:"Data Transfer",config:"Config Keys"};
+  const TITLES={dashboard:"Dashboard",dealerperf:"Dealer Performance",leads:"Leads",appids:"App_IDs",override:"Counter & UCM Override",onboarding:"Dealer Onboarding",counter:"Counter & UCM",sap:"SAP & Payees",payouts:"Payout Status",payout:"Raise Payout",approvals:"Approvals",transfer:"Data Transfer",config:"Config Keys",stages:"Stage Marking"};
 
   function renderPage(){
+    try{
     if(isFieldRole(user.role)){
-      if(page==="dashboard")return <RADashboard user={user} shared={shared}/>;
-      if(page==="leads")     return <LeadsModule user={user} shared={shared}/>;
-      if(page==="appids")    return <AppIDsModule user={user} shared={shared}/>;
-      if(page==="stages")    return <StageModule user={user} shared={shared}/>;
-      if(page==="onboarding")return <OnboardingModuleRA user={user} shared={shared}/>;
-      if(page==="counter")   return <CounterModuleRA user={user} shared={shared}/>;
-      if(page==="sap")       return <SAPModuleRA user={user} shared={shared}/>;
-      if(page==="payouts")   return <PayoutsModule user={user} shared={shared}/>;
+      if(activePage==="dashboard")return <RADashboard user={user} shared={shared}/>;
+      if(activePage==="dealerperf")return <DealerPerfModule user={user} shared={shared}/>;
+      if(activePage==="leads")     return <LeadsModule user={user} shared={shared}/>;
+      if(activePage==="appids")    return <AppIDsModule user={user} shared={shared}/>;
+      if(activePage==="stages")    return <StageModule user={user} shared={shared}/>;
+      if(activePage==="onboarding")return <OnboardingModuleRA user={user} shared={shared}/>;
+      if(activePage==="counter")   return <CounterModuleRA user={user} shared={shared}/>;
+      if(activePage==="sap")       return <SAPModuleRA user={user} shared={shared}/>;
+      if(activePage==="payouts")   return <PayoutsModule user={user} shared={shared}/>;
     } else {
-      if(page==="dashboard") return <OpsDashboard user={user} shared={shared}/>;
-      if(page==="payout")    return <RaisePayoutModule user={user} shared={shared}/>;
-      if(page==="leads")     return <LeadsModule user={user} shared={shared}/>;
-      if(page==="appids")    return <AppIDsModule user={user} shared={shared}/>;
-      if(page==="override")  return <CounterUCMOverride user={user} shared={shared}/>;
-      if(page==="onboarding")return <OnboardingModuleOps user={user} shared={shared}/>;
-      if(page==="counter")   return <CounterModuleOps user={user} shared={shared}/>;
-      if(page==="sap")       return <SAPModuleOps user={user} shared={shared}/>;
-      if(page==="approvals") return <ApprovalsModule user={user} shared={shared}/>;
-      if(page==="transfer")  return <DataTransferModule user={user} shared={shared}/>;
-      if(page==="config")    return <ConfigModule user={user} shared={shared}/>;
+      if(activePage==="dashboard") return <OpsDashboard user={user} shared={shared}/>;
+      if(activePage==="dealerperf")return <DealerPerfModule user={user} shared={shared}/>;
+      if(activePage==="payout")    return <RaisePayoutModule user={user} shared={shared}/>;
+      if(activePage==="leads")     return <LeadsModule user={user} shared={shared}/>;
+      if(activePage==="appids")    return <AppIDsModule user={user} shared={shared}/>;
+      if(activePage==="override")  return <CounterUCMOverride user={user} shared={shared}/>;
+      if(activePage==="onboarding")return <OnboardingModuleOps user={user} shared={shared}/>;
+      if(activePage==="counter")   return <CounterModuleOps user={user} shared={shared}/>;
+      if(activePage==="sap")       return <SAPModuleOps user={user} shared={shared}/>;
+      if(activePage==="approvals") return <ApprovalsModule user={user} shared={shared}/>;
+      if(activePage==="transfer")  return <DataTransferModule user={user} shared={shared}/>;
+      if(activePage==="config")    return <ConfigModule user={user} shared={shared}/>;
     }
-    return null;
+    }catch(err){console.error("Render error:",err);return <div style={{textAlign:"center",padding:60,color:T.danger}}><div style={{fontSize:40,marginBottom:12}}>⚠️</div><div style={{fontSize:14,fontWeight:700}}>Something went wrong</div><div style={{fontSize:12,color:T.mute,marginTop:4}}>{String(err.message||err)}</div><div style={{marginTop:12}}><Btn sm onClick={()=>setPage("dashboard")}>← Back to Dashboard</Btn></div></div>;}
+    return <div style={{textAlign:"center",padding:60,color:T.mute}}><div style={{fontSize:40,marginBottom:12}}>📭</div><div style={{fontSize:14,fontWeight:700}}>Page not found</div><div style={{marginTop:12}}><Btn sm onClick={()=>setPage("dashboard")}>← Dashboard</Btn></div></div>;
   }
 
   return <div style={{background:T.bg,minHeight:"100vh",display:"flex",flexDirection:"column"}}>
     {toast&&<Toast key={toast.k} msg={toast.msg} type={toast.type} onDone={()=>setToast(null)}/>}
     {guideOpen&&<RoleGuide user={user} onClose={()=>setGuideOpen(false)}/>}
 
-    {/* TOP HEADER */}
-    <div style={{background:T.accentD,padding:"0 14px",height:52,display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0,position:"sticky",top:0,zIndex:100}}>
-      <div style={{display:"flex",alignItems:"center",gap:10}}>
-        <div style={{background:"rgba(255,255,255,0.15)",borderRadius:7,padding:"4px 10px"}}><span style={{color:"#fff",fontWeight:900,fontSize:13}}>C24</span></div>
-        <div>
-          <div style={{color:"#fff",fontSize:12,fontWeight:800}}>B2B Procurement</div>
-          <div style={{color:"rgba(255,255,255,0.5)",fontSize:9}}>{TITLES[page]||"Dashboard"}</div>
+    {/* TOP HEADER — Cars24 Branded */}
+    <div style={{background:"linear-gradient(135deg,#0D1B2A 0%,#162D44 50%,#1B3A5C 100%)",padding:"0 20px",height:60,display:"flex",alignItems:"center",justifyContent:"space-between",flexShrink:0,position:"sticky",top:0,zIndex:100,boxShadow:"0 4px 24px rgba(0,0,0,0.2),0 1px 4px rgba(0,0,0,0.1)",borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
+      <div style={{display:"flex",alignItems:"center",gap:14}}>
+        <div style={{background:"#fff",borderRadius:10,padding:"4px 10px",boxShadow:"0 2px 12px rgba(69,53,241,0.15)",display:"flex",alignItems:"center"}}><img src={C24_LOGO} alt="Cars24" style={{height:28,objectFit:"contain"}}/></div>
+        <div style={{borderLeft:"1px solid rgba(255,255,255,0.1)",paddingLeft:14}}>
+          <div style={{color:"#fff",fontSize:14,fontWeight:800,letterSpacing:0.4}}>B2B Procurement</div>
+          <div style={{color:"rgba(255,255,255,0.4)",fontSize:10,fontWeight:600,letterSpacing:0.5,marginTop:1}}>{TITLES[activePage]||"Dashboard"}</div>
         </div>
       </div>
-      <div style={{display:"flex",alignItems:"center",gap:8}}>
+      <div style={{display:"flex",alignItems:"center",gap:12}}>
         <div style={{textAlign:"right"}}>
-          <div style={{color:"#fff",fontSize:11,fontWeight:800}}>{user.name}</div>
-          <div style={{fontSize:9,padding:"1px 6px",borderRadius:8,background:`${roleColor}33`,color:roleColor,fontWeight:800,marginTop:1,textAlign:"center"}}>{user.role}</div>
+          <div style={{color:"#fff",fontSize:12,fontWeight:700}}>{user.name}</div>
+          <div style={{fontSize:9,padding:"3px 10px",borderRadius:12,background:`${roleColor}18`,color:roleColor,fontWeight:800,marginTop:2,textAlign:"center",border:`1px solid ${roleColor}30`,letterSpacing:0.5}}>{user.role}</div>
         </div>
-        <button onClick={()=>setGuideOpen(true)} title="Show guide" style={{background:"rgba(255,255,255,0.15)",border:"1px solid rgba(255,255,255,0.3)",borderRadius:7,padding:"5px 10px",color:"#fff",cursor:"pointer",fontSize:13,fontWeight:900,fontFamily:"inherit"}}>?</button>
-        <select value={userId} onChange={e=>setUserId(e.target.value)} style={{background:"rgba(255,255,255,0.12)",color:"#fff",border:"1px solid rgba(255,255,255,0.25)",borderRadius:7,padding:"5px 8px",fontSize:11,fontWeight:700,cursor:"pointer",fontFamily:"inherit",outline:"none",maxWidth:130}}>
-          <optgroup label="── Field Team ──" style={{color:"#000"}}>
-            {ALL_USERS.filter(u=>isFieldRole(u.role)).map(u=><option key={u.id} value={u.id} style={{color:"#000"}}>{u.name} ({u.role})</option>)}
+        <div style={{width:38,height:38,borderRadius:13,background:"linear-gradient(135deg,#4535F1,#6558F5)",display:"flex",alignItems:"center",justifyContent:"center",color:"#fff",fontWeight:900,fontSize:14,boxShadow:"0 4px 12px rgba(69,53,241,0.3),0 0 0 2px rgba(69,53,241,0.1)",border:"2px solid rgba(255,255,255,0.1)"}}>{user.name.charAt(0)}</div>
+        <button onClick={()=>setGuideOpen(true)} title="Show guide" style={{background:"rgba(255,255,255,0.06)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:11,padding:"7px 13px",color:"#6558F5",cursor:"pointer",fontSize:14,fontWeight:900,fontFamily:"inherit",transition:"all 0.25s",backdropFilter:"blur(8px)"}}>?</button>
+        <select value={userId} onChange={e=>setUserId(e.target.value)} style={{background:"rgba(255,255,255,0.06)",color:"#fff",border:"1px solid rgba(255,255,255,0.12)",borderRadius:11,padding:"7px 12px",fontSize:11,fontWeight:600,cursor:"pointer",fontFamily:"inherit",outline:"none",maxWidth:155,backdropFilter:"blur(8px)",transition:"all 0.25s"}}>
+          <optgroup label="── Field Team ──" style={{color:"#0D1B2A"}}>
+            {ALL_USERS.filter(u=>isFieldRole(u.role)).map(u=><option key={u.id} value={u.id} style={{color:"#0D1B2A"}}>{u.name} ({u.role})</option>)}
           </optgroup>
-          <optgroup label="── Ops / Management ──" style={{color:"#000"}}>
-            {ALL_USERS.filter(u=>isOpsRole(u.role)).map(u=><option key={u.id} value={u.id} style={{color:"#000"}}>{u.name} ({u.role})</option>)}
+          <optgroup label="── Ops / Management ──" style={{color:"#0D1B2A"}}>
+            {ALL_USERS.filter(u=>isOpsRole(u.role)).map(u=><option key={u.id} value={u.id} style={{color:"#0D1B2A"}}>{u.name} ({u.role})</option>)}
           </optgroup>
         </select>
       </div>
     </div>
 
     {/* SIMULATION BANNER */}
-    <div style={{background:"#FF4B2B",padding:"3px 0",textAlign:"center",flexShrink:0}}><span style={{fontSize:9,fontWeight:800,color:"#fff",letterSpacing:1}}>SIMULATION — NO REAL PAYOUTS · SHARED STATE — ALL ROLES SEE SAME DATA</span></div>
+    <div style={{background:"linear-gradient(90deg,#4535F1 0%,#6558F5 50%,#3428C9 100%)",padding:"5px 0",textAlign:"center",flexShrink:0,boxShadow:"0 2px 8px rgba(69,53,241,0.2)"}}><span style={{fontSize:9,fontWeight:800,color:"#fff",letterSpacing:1.5,textTransform:"uppercase"}}>✦ SIMULATION — NO REAL PAYOUTS · SHARED STATE — ALL ROLES SEE SAME DATA ✦</span></div>
 
     {/* DESKTOP SIDEBAR + MAIN */}
     <div className="desktop-only" style={{flex:1,display:"flex",minHeight:0}}>
-      {/* Sidebar */}
-      <div style={{width:200,background:T.sidebar,display:"flex",flexDirection:"column",flexShrink:0,overflowY:"auto"}}>
-        <nav style={{flex:1,padding:"10px 8px"}}>
-          {nav.map(n=>{const active=page===n.id;const cnt=n.badge?badges[n.badge]:0;return <button key={n.id} onClick={()=>setPage(n.id)} style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,padding:"9px 10px",borderRadius:7,border:"none",cursor:"pointer",background:active?"rgba(15,76,129,0.3)":"transparent",color:active?"#7AB3F5":"#6B8CAE",marginBottom:2,textAlign:"left",fontFamily:"inherit"}}><div style={{display:"flex",alignItems:"center",gap:8}}><span style={{fontSize:16}}>{n.icon}</span><span style={{fontSize:11,fontWeight:active?800:500}}>{n.label}</span></div>{cnt>0&&<span style={{background:T.danger,color:"#fff",fontSize:9,fontWeight:900,padding:"1px 5px",borderRadius:10,minWidth:16,textAlign:"center"}}>{cnt}</span>}</button>;})}
+      {/* Sidebar — Dark themed with blue accents */}
+      <div style={{width:240,background:"linear-gradient(180deg,#0D1B2A 0%,#0F2132 40%,#132B42 100%)",display:"flex",flexDirection:"column",flexShrink:0,overflowY:"auto",borderRight:"1px solid rgba(255,255,255,0.04)"}}>
+        <nav style={{flex:1,padding:"16px 12px"}}>
+          {nav.map((n,i)=>{const active=activePage===n.id;const cnt=n.badge?badges[n.badge]:0;return <button key={n.id} onClick={()=>setPage(n.id)} className={`c24-nav-item ${active?"c24-nav-active":""}`} style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",gap:10,padding:"11px 14px",borderRadius:12,border:"none",cursor:"pointer",background:active?"linear-gradient(135deg,rgba(69,53,241,0.12),rgba(69,53,241,0.06))":"transparent",color:active?"#6558F5":"#6B7F96",marginBottom:4,textAlign:"left",fontFamily:"inherit",animationDelay:`${i*0.03}s`}}><div style={{display:"flex",alignItems:"center",gap:10}}><span style={{fontSize:18,filter:active?"none":"grayscale(0.3)",transition:"filter 0.25s"}}>{n.icon}</span><span style={{fontSize:12,fontWeight:active?800:500,letterSpacing:active?0.3:0,transition:"all 0.25s"}}>{n.label}</span></div>{cnt>0&&<span style={{background:"linear-gradient(135deg,#DC3545,#C82333)",color:"#fff",fontSize:8,fontWeight:900,padding:"2px 7px",borderRadius:10,minWidth:18,textAlign:"center",boxShadow:"0 2px 6px rgba(220,53,69,0.3)",animation:"pulseGlow 2s infinite"}}>{cnt}</span>}</button>;})}
         </nav>
-        <div style={{padding:"8px 10px 14px",borderTop:`1px solid ${T.sidebarB}`}}><div style={{background:"rgba(255,75,43,0.12)",border:"1px solid rgba(255,75,43,0.3)",borderRadius:7,padding:"7px 10px"}}><div style={{fontSize:9,fontWeight:800,color:"#FF7A5C",letterSpacing:0.8}}>SIMULATION MODE</div><div style={{fontSize:9,color:"#A0694A",marginTop:2}}>Data shared across all roles in real time</div></div></div>
+        <div style={{padding:"12px 14px 18px",borderTop:"1px solid rgba(255,255,255,0.04)"}}><div style={{background:"linear-gradient(135deg,rgba(69,53,241,0.06),rgba(69,53,241,0.02))",border:"1px solid rgba(69,53,241,0.1)",borderRadius:12,padding:"11px 14px"}}><div style={{fontSize:9,fontWeight:800,color:"#6558F5",letterSpacing:1}}>✦ SIMULATION MODE</div><div style={{fontSize:9,color:"#5A7088",marginTop:4,lineHeight:1.5}}>Data shared across all roles in real time</div></div></div>
       </div>
       {/* Content */}
-      <div style={{flex:1,overflowY:"auto",padding:20}}>{renderPage()}</div>
+      <div style={{flex:1,overflowY:"auto",padding:28,background:"linear-gradient(180deg,#F0F2F5 0%,#E8ECF1 100%)"}}>{renderPage()}</div>
     </div>
 
     {/* MOBILE — CONTENT + BOTTOM NAV */}
     <div className="mobile-only" style={{flex:1,flexDirection:"column",minHeight:0}}>
-      <div style={{flex:1,overflowY:"auto",padding:12,paddingBottom:80}}>{renderPage()}</div>
-      <div style={{position:"fixed",bottom:0,left:0,right:0,background:"#fff",borderTop:`1px solid ${T.border}`,display:"flex",zIndex:100,overflowX:"auto",WebkitOverflowScrolling:"touch"}}>
-        {nav.map(n=>{const active=page===n.id;const cnt=n.badge?badges[n.badge]:0;return <button key={n.id} onClick={()=>setPage(n.id)} style={{flex:1,minWidth:52,padding:"8px 4px 6px",background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:1,position:"relative"}}><span style={{fontSize:18}}>{n.icon}</span><span style={{fontSize:8,fontWeight:700,color:active?T.accent:T.mute,whiteSpace:"nowrap"}}>{n.label}</span>{active&&<div style={{position:"absolute",bottom:0,left:"50%",transform:"translateX(-50%)",width:20,height:2,background:T.accent,borderRadius:2}}/>}{cnt>0&&<div style={{position:"absolute",top:4,right:6,background:T.danger,color:"#fff",fontSize:8,fontWeight:900,borderRadius:8,minWidth:14,height:14,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 3px"}}>{cnt}</div>}</button>;})}
+      <div style={{flex:1,overflowY:"auto",padding:14,paddingBottom:85}}>{renderPage()}</div>
+      <div style={{position:"fixed",bottom:0,left:0,right:0,background:"rgba(255,255,255,0.92)",backdropFilter:"blur(16px)",WebkitBackdropFilter:"blur(16px)",borderTop:"1px solid rgba(0,0,0,0.06)",display:"flex",zIndex:100,overflowX:"auto",WebkitOverflowScrolling:"touch",boxShadow:"0 -4px 20px rgba(0,0,0,0.06)",padding:"2px 0 4px"}}>
+        {nav.map(n=>{const active=activePage===n.id;const cnt=n.badge?badges[n.badge]:0;return <button key={n.id} onClick={()=>setPage(n.id)} style={{flex:1,minWidth:52,padding:"8px 4px 6px",background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:2,position:"relative",transition:"all 0.2s"}}><span style={{fontSize:19,transition:"transform 0.2s",transform:active?"scale(1.1)":"scale(1)"}}>{n.icon}</span><span style={{fontSize:8,fontWeight:active?800:600,color:active?T.accent:T.mute,whiteSpace:"nowrap",letterSpacing:active?0.3:0,transition:"all 0.2s"}}>{n.label}</span>{active&&<div style={{position:"absolute",bottom:0,left:"50%",transform:"translateX(-50%)",width:24,height:3,background:"linear-gradient(90deg,#4535F1,#6558F5)",borderRadius:3,boxShadow:"0 0 8px rgba(69,53,241,0.4)"}}/>}{cnt>0&&<div style={{position:"absolute",top:3,right:4,background:"linear-gradient(135deg,#DC3545,#C82333)",color:"#fff",fontSize:7,fontWeight:900,borderRadius:8,minWidth:15,height:15,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 3px",boxShadow:"0 2px 6px rgba(220,53,69,0.3)"}}>{cnt}</div>}</button>;})}
       </div>
     </div>
   </div>;
 }
 
-ReactDOM.render(<App/>,document.getElementById("root"));
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
 </script>
 </body>
 </html>
