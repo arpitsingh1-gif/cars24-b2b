@@ -338,7 +338,7 @@ const INIT_APPS=[
   {id:"APP008",dealerId:"D002",dealerName:"Tiwari Auto",regNo:"UP14BT6633",make:"Maruti",model:"Baleno",year:2021,color:"Blue",appStatus:"Approved",raId:"RA002",createdAt:"2026-01-25 14:00",price:550000,otherCharges:7000,tokenAmt:12000,siDone:true,siDate:"2026-02-03",bbnp:true,walletBal:28000,walletSIDate:"2026-02-03"},
   {id:"APP009",dealerId:"D005",dealerName:"Reddy Traders",regNo:"KA01MN9988",make:"Hyundai",model:"Venue",year:2022,color:"Black",appStatus:"Pending",raId:"RA002",createdAt:"2026-03-25 09:00",price:720000,otherCharges:9000,tokenAmt:16000,siDone:false,siDate:null,bbnp:false,walletBal:0,walletSIDate:null},
   {id:"APP010",dealerId:"D006",dealerName:"Joshi Motors",regNo:"MH02CK7744",make:"Tata",model:"Punch",year:2023,color:"Orange",appStatus:"Pending",raId:"RA003",createdAt:"2026-03-28 10:00",price:680000,otherCharges:8000,tokenAmt:14000,siDone:false,siDate:null,bbnp:false,walletBal:0,walletSIDate:null},
-  {id:"APP011",dealerId:"D004",dealerName:"Kumar Automobiles",regNo:"DL9AB3322",make:"Honda",model:"Amaze",year:2020,color:"White",appStatus:"Approved",raId:"RA001",createdAt:"2025-12-10 10:00",price:520000,otherCharges:6000,tokenAmt:11000,siDone:true,siDate:"2025-12-22",bbnp:true,walletBal:0,walletSIDate:"2025-12-22"},
+  {id:"APP011",dealerId:"D004",dealerName:"Kumar Automobiles",regNo:"DL9AB3322",make:"Honda",model:"Amaze",year:2020,color:"White",appStatus:"Approved",raId:"RA001",createdAt:"2025-12-10 10:00",price:520000,otherCharges:6000,tokenAmt:11000,siDone:true,siDate:"2025-12-22",bbnp:true,walletBal:18000,walletSIDate:"2025-12-22"},
   {id:"APP012",dealerId:"D003",dealerName:"Patil Cars",regNo:"GJ03PQ5566",make:"Maruti",model:"Ertiga",year:2021,color:"Silver",appStatus:"Pending",raId:"RA003",createdAt:"2026-03-30 08:30",price:820000,otherCharges:10000,tokenAmt:19000,siDone:false,siDate:null,bbnp:false,walletBal:0,walletSIDate:null},
 ];
 
@@ -830,8 +830,8 @@ function getNavItems(role){
     RA:[{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"ai_insights",icon:"🧠",label:"AI Insights"},{id:"leads",icon:"🚗",label:"Lead Journey"},{id:"dealers",icon:"🏪",label:"Dealers"},{id:"counter",icon:"🏧",label:"Counter"},{id:"payees",icon:"👤",label:"Payees"},{id:"payouts",icon:"💸",label:"Payouts"},{id:"grievances",icon:"📋",label:"Grievances"}],
     RM:[{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"ai_insights",icon:"🧠",label:"AI Insights"},{id:"leads",icon:"🚗",label:"Lead Journey"},{id:"dealers",icon:"🏪",label:"Dealers"},{id:"counter",icon:"🏧",label:"Counter"},{id:"payees",icon:"👤",label:"Payees"},{id:"payouts",icon:"💸",label:"Payouts"},{id:"grievances",icon:"📋",label:"Grievances"}],
     TM:[{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"ai_insights",icon:"🧠",label:"AI Insights"},{id:"leads",icon:"🚗",label:"Lead Journey"},{id:"dealers",icon:"🏪",label:"Dealers"},{id:"counter",icon:"🏧",label:"Counter"},{id:"payouts",icon:"💸",label:"Raise Payout"},{id:"sap",icon:"🔗",label:"SAP"},{id:"approvals",icon:"✅",label:"Approvals"},{id:"counter_override",icon:"⚙️",label:"Counter Override"},{id:"grievances",icon:"📋",label:"Grievances"}],
-    "Central Ops":[{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"ai_insights",icon:"🧠",label:"AI Insights"},{id:"leads",icon:"🚗",label:"Lead Journey"},{id:"dealers",icon:"🏪",label:"Dealers"},{id:"counter",icon:"🏧",label:"Counter"},{id:"sap",icon:"🔗",label:"SAP"},{id:"approvals",icon:"✅",label:"Approvals"},{id:"data_transfer",icon:"🔄",label:"Data Transfer"},{id:"counter_override",icon:"⚙️",label:"Counter Override"},{id:"grievances",icon:"📋",label:"Grievances"}],
-    "Business Head":[{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"ai_insights",icon:"🧠",label:"AI Insights"},{id:"leads",icon:"🚗",label:"Lead Journey"},{id:"dealers",icon:"🏪",label:"Dealers"},{id:"counter",icon:"🏧",label:"Counter"},{id:"sap",icon:"🔗",label:"SAP"},{id:"approvals",icon:"✅",label:"Approvals"},{id:"data_transfer",icon:"🔄",label:"Data Transfer"},{id:"config",icon:"⚙️",label:"Config"},{id:"grievances",icon:"📋",label:"Grievances"}],
+    "Central Ops":[{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"ai_insights",icon:"🧠",label:"AI Insights"},{id:"leads",icon:"🚗",label:"Lead Journey"},{id:"dealers",icon:"🏪",label:"Dealers"},{id:"counter",icon:"🏧",label:"Counter"},{id:"payees",icon:"👤",label:"Payees"},{id:"sap",icon:"🔗",label:"SAP"},{id:"approvals",icon:"✅",label:"Approvals"},{id:"data_transfer",icon:"🔄",label:"Data Transfer"},{id:"counter_override",icon:"⚙️",label:"Counter Override"},{id:"grievances",icon:"📋",label:"Grievances"}],
+    "Business Head":[{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"ai_insights",icon:"🧠",label:"AI Insights"},{id:"leads",icon:"🚗",label:"Lead Journey"},{id:"dealers",icon:"🏪",label:"Dealers"},{id:"counter",icon:"🏧",label:"Counter"},{id:"payees",icon:"👤",label:"Payees"},{id:"sap",icon:"🔗",label:"SAP"},{id:"approvals",icon:"✅",label:"Approvals"},{id:"data_transfer",icon:"🔄",label:"Data Transfer"},{id:"config",icon:"⚙️",label:"Config"},{id:"grievances",icon:"📋",label:"Grievances"}],
     Finance:[{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"approvals",icon:"✅",label:"Approvals"}],
     "Support Ops":[{id:"dashboard",icon:"📊",label:"Dashboard"},{id:"ai_insights",icon:"🧠",label:"AI Insights"},{id:"tickets",icon:"🎫",label:"Tickets"},{id:"search",icon:"🔍",label:"Search"},{id:"outreach",icon:"📢",label:"Outreach"}],
     Dealer:[{id:"home",icon:"🏠",label:"Home"},{id:"leads",icon:"🚗",label:"My Leads"},{id:"notifications",icon:"🔔",label:"Notifications"}],
@@ -1007,6 +1007,9 @@ function DashboardRA({user,leads,apps,dealers,grievances,payouts,configs,setPage
   var totalEarnings=currStats.splitEarnings+currStats.incentiveEarnings;
   var prevEarnings=prevStats.splitEarnings+prevStats.incentiveEarnings;
   var totalWal=myApps.reduce(function(s,a){var w=raWalBal(a.id,apps,configs);return s+(w.valid?w.bal:0)},0);
+  var expiredWal=myApps.reduce(function(s,a){var w=raWalBal(a.id,apps,configs);return s+(w.expired?w.raw:0)},0);
+  var activeWalApps=myApps.filter(function(a){var w=raWalBal(a.id,apps,configs);return w.valid&&w.bal>0}).length;
+  var expiredWalApps=myApps.filter(function(a){var w=raWalBal(a.id,apps,configs);return w.expired}).length;
 
   // Section insights
   var stuckLeads=myLeads.filter(function(l){var d=new Date()-new Date(l.createdAt);return d>15*86400000&&stageIdx(l.stage)<6}).length;
@@ -1085,7 +1088,9 @@ function DashboardRA({user,leads,apps,dealers,grievances,payouts,configs,setPage
       React.createElement("div",{className:"card",style:{cursor:"pointer"},onClick:function(){setPage("applications")}},
         React.createElement("div",{className:"card-hd",style:{marginBottom:8}},"💰 Wallet Balance"),
         React.createElement("div",{style:{fontSize:18,fontWeight:800,color:"#4535F1"}},fmt(totalWal)),
-        React.createElement("div",{style:{fontSize:11,color:"#64748b",marginTop:4}},myApps.filter(function(a){var w=raWalBal(a.id,apps,configs);return w.valid&&w.bal>0}).length+" active wallets"),
+        React.createElement("div",{style:{fontSize:11,color:"#64748b",marginTop:2}},activeWalApps+" active wallet"+(activeWalApps!==1?"s":"")),
+        expiredWal>0&&React.createElement("div",{style:{fontSize:12,color:"#dc2626",marginTop:4,fontWeight:600}},fmt(expiredWal)+" expired · "+expiredWalApps+" app"+(expiredWalApps!==1?"s":"")),
+        expiredWal>0&&React.createElement("div",{style:{fontSize:10,color:"#dc2626",marginTop:1}},"Cannot be used for payouts"),
         React.createElement("div",{style:{fontSize:11,color:"#4535F1",marginTop:6,fontWeight:600}},"View apps →")
       )
     ),
@@ -2317,6 +2322,24 @@ function DealersModule({user,dealers,setDealers,onboarding,setOnboarding,addToas
 
   function setObField(k,v){setObForm(function(f){var n=Object.assign({},f);n[k]=v;return n})}
 
+  function nudgeOnboarding(id){
+    setOnboarding(function(prev){return prev.map(function(o){
+      if(o.id!==id)return o;
+      var u={};for(var k in o)u[k]=o[k];
+      u.nudgeCount=(u.nudgeCount||0)+1;u.nudgedAt=nowTs();return u;
+    })});
+    addToast("Nudge sent for "+id+"! Ops team will be notified.");
+  }
+
+  function withdrawOnboarding(id){
+    setOnboarding(function(prev){return prev.map(function(o){
+      if(o.id!==id)return o;
+      var u={};for(var k in o)u[k]=o[k];
+      u.status="Withdrawn";u.withdrawnAt=nowTs();return u;
+    })});
+    addToast("Onboarding request "+id+" withdrawn.");
+  }
+
   function submitOnboarding(){
     if(!obForm.dealerName.trim())return setObErr("Dealer name is required");
     if(!obForm.ownerName.trim())return setObErr("Owner name is required");
@@ -2424,7 +2447,25 @@ function DealersModule({user,dealers,setDealers,onboarding,setOnboarding,addToas
             React.createElement("span",{style:{fontSize:11,padding:"2px 8px",borderRadius:6,background:o.docs.gst?"#f0fdf4":"#fef2f2",color:o.docs.gst?"#166534":"#991b1b",fontWeight:500}},"GST "+(o.docs.gst?"✓":"✗")),
             React.createElement("span",{style:{fontSize:11,padding:"2px 8px",borderRadius:6,background:o.docs.cancelledCheque?"#f0fdf4":"#fef2f2",color:o.docs.cancelledCheque?"#166534":"#991b1b",fontWeight:500}},"Cheque "+(o.docs.cancelledCheque?"✓":"✗"))
           ),
-          o.remarks&&React.createElement("div",{style:{fontSize:11,color:"#92400e",marginTop:6,background:"#fffbeb",padding:"4px 8px",borderRadius:4}},o.remarks)
+          o.remarks&&React.createElement("div",{style:{fontSize:11,color:"#92400e",marginTop:6,background:"#fffbeb",padding:"4px 8px",borderRadius:4}},o.remarks),
+          (function(){
+            var isPending=o.status==="Pending";
+            var canAct=canRaise&&(o.raId===user.id||["RM","TM"].indexOf(user.role)!==-1);
+            var canNudge=isPending&&canAct&&(o.nudgeCount||0)<3;
+            var canWithdraw=isPending&&canAct;
+            if(!canNudge&&!canWithdraw&&!(o.nudgeCount>0))return null;
+            return React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:8,paddingTop:8,borderTop:"1px solid var(--brd)"}},
+              React.createElement("div",null,
+                (o.nudgeCount||0)>0&&React.createElement("span",{style:{background:"#fffbeb",color:"#d97706",border:"1px solid #fde68a",padding:"2px 7px",borderRadius:10,fontSize:11,fontWeight:700}},
+                  "📣 Nudged "+(o.nudgeCount||0)+"x"+(o.nudgedAt?" · "+(o.nudgedAt||"").slice(5,16):"")
+                )
+              ),
+              React.createElement("div",{style:{display:"flex",gap:6}},
+                canNudge&&React.createElement("button",{style:{fontSize:11,padding:"4px 10px",borderRadius:6,border:"1px solid #d97706",background:"#fffbeb",color:"#d97706",cursor:"pointer",fontWeight:600},onClick:function(){nudgeOnboarding(o.id)}},"📣 Nudge"),
+                canWithdraw&&React.createElement("button",{style:{fontSize:11,padding:"4px 10px",borderRadius:6,border:"1px solid #dc2626",background:"#fef2f2",color:"#dc2626",cursor:"pointer",fontWeight:600},onClick:function(){if(window.confirm("Withdraw this onboarding request?"))withdrawOnboarding(o.id)}},"✕ Withdraw")
+              )
+            );
+          })()
         );
       })
     ),
@@ -2548,6 +2589,24 @@ function CounterModule({user,counters,counterReqs,setCounterReqs,dealers,addToas
   var set=function(k,v){setF(function(p){var n={};for(var x in p)n[x]=p[x];n[k]=v;return n})};
   var isOps=["Central Ops","Business Head"].indexOf(user.role)!==-1;
 
+  function nudgeCounter(id){
+    setCounterReqs(function(prev){return prev.map(function(r){
+      if(r.id!==id)return r;
+      var u={};for(var k in r)u[k]=r[k];
+      u.nudgeCount=(u.nudgeCount||0)+1;u.nudgedAt=nowTs();return u;
+    })});
+    addToast("Nudge sent! Ops team will be notified.");
+  }
+
+  function withdrawCounter(id){
+    setCounterReqs(function(prev){return prev.map(function(r){
+      if(r.id!==id)return r;
+      var u={};for(var k in r)u[k]=r[k];
+      u.status="Withdrawn";u.withdrawnAt=nowTs();return u;
+    })});
+    addToast("Counter request withdrawn.");
+  }
+
   function submitCounter(){
     if(!f.name){addToast("Fill counter name","error");return}
     var req={id:uid("CREQ"),counterId:null,type:"New Counter",amount:0,requestedBy:user.id,requestedAt:nowTs(),status:"Pending",
@@ -2588,34 +2647,72 @@ function CounterModule({user,counters,counterReqs,setCounterReqs,dealers,addToas
     ),
     React.createElement(Card,{style:{marginTop:12}},
       React.createElement("div",{className:"card-hd"},"Counter Requests"),
+      counterReqs.length===0&&React.createElement(EmptyState,{msg:"No counter requests"}),
       counterReqs.map(function(r){
-        return React.createElement("div",{key:r.id,style:{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid var(--brd)"}},
-          React.createElement("div",null,
-            React.createElement("div",{style:{fontWeight:600}},r.id),
-            React.createElement("div",{style:{fontSize:12,color:"#64748b"}},r.type+" | "+r.note)
+        var isPending=r.status==="Pending";
+        var canAct=!isOps&&r.requestedBy===user.id;
+        var canNudge=isPending&&canAct&&(r.nudgeCount||0)<3;
+        var canWithdraw=isPending&&canAct;
+        var hasNudge=(r.nudgeCount||0)>0;
+        return React.createElement("div",{key:r.id,style:{padding:"10px 0",borderBottom:"1px solid var(--brd)",borderLeft:hasNudge?"3px solid #d97706":"none",paddingLeft:hasNudge?8:0}},
+          React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}},
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontWeight:600,fontSize:13}},r.id+(r.counterName?" — "+r.counterName:"")),
+              React.createElement("div",{style:{fontSize:12,color:"#64748b"}},r.type+(r.amount>0?" | "+fmt(r.amount):"")+(r.note?" | "+r.note:"")),
+              React.createElement("div",{style:{fontSize:11,color:"#94a3b8"}},r.requestedAt)
+            ),
+            React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:4}},
+              React.createElement("span",{className:statusBadge(r.status)},r.status),
+              hasNudge&&React.createElement("span",{style:{background:"#fffbeb",color:"#d97706",border:"1px solid #fde68a",padding:"2px 7px",borderRadius:10,fontSize:10,fontWeight:700}},
+                "📣 "+r.nudgeCount+"x"+(r.nudgedAt?" · "+(r.nudgedAt||"").slice(5,16):"")
+              )
+            )
           ),
-          React.createElement("span",{className:statusBadge(r.status)},r.status)
+          (canNudge||canWithdraw)&&React.createElement("div",{style:{display:"flex",gap:6,marginTop:6}},
+            canNudge&&React.createElement("button",{style:{fontSize:11,padding:"3px 9px",borderRadius:6,border:"1px solid #d97706",background:"#fffbeb",color:"#d97706",cursor:"pointer",fontWeight:600},onClick:function(){nudgeCounter(r.id)}},"📣 Nudge"),
+            canWithdraw&&React.createElement("button",{style:{fontSize:11,padding:"3px 9px",borderRadius:6,border:"1px solid #dc2626",background:"#fef2f2",color:"#dc2626",cursor:"pointer",fontWeight:600},onClick:function(){if(window.confirm("Withdraw this counter request?"))withdrawCounter(r.id)}},"✕ Withdraw")
+          )
         );
       })
     )
   );
 }
 
-function PayeesModule({user,payees,addToast}){
+function PayeesModule({user,payees,setPayees,addToast}){
+  var canToggle=["Central Ops","Business Head","Finance"].indexOf(user.role)!==-1;
+
+  function togglePayee(id){
+    setPayees(function(prev){return prev.map(function(p){
+      if(p.id!==id)return p;
+      var u={};for(var k in p)u[k]=p[k];
+      u.status=p.status==="Active"?"Inactive":"Active";return u;
+    })});
+    var p=payees.find(function(x){return x.id===id});
+    addToast("Payee "+(p?p.name:id)+" set to "+(p&&p.status==="Active"?"Inactive":"Active")+".");
+  }
+
   return React.createElement("div",null,
-    React.createElement(SectionTitle,{title:"Payees / SAP",sub:"Fetched from B2B platform"}),
+    React.createElement(SectionTitle,{title:"Payees / SAP",sub:payees.length+" payees · Fetched from B2B platform"}),
+    payees.length===0&&React.createElement(EmptyState,{msg:"No payees"}),
     payees.map(function(p){
-      return React.createElement(Card,{key:p.id,style:{marginBottom:8}},
-        React.createElement("div",{style:{display:"flex",justifyContent:"space-between"}},
+      var isActive=p.status==="Active";
+      return React.createElement(Card,{key:p.id,style:{marginBottom:8,borderLeft:"4px solid "+(isActive?"#16a34a":"#94a3b8")}},
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}},
           React.createElement("div",null,
-            React.createElement("div",{style:{fontWeight:700}},p.name),
-            React.createElement("div",{style:{fontSize:12,color:"#64748b"}},p.bank+" | A/C: ***"+p.accountNo.slice(-4)+" | PAN: "+p.pan)
+            React.createElement("div",{style:{fontWeight:700,fontSize:14}},p.name),
+            React.createElement("div",{style:{fontSize:12,color:"#64748b",marginTop:2}},p.bank+" | A/C: ***"+p.accountNo.slice(-4)+" | PAN: "+p.pan),
+            p.ifsc&&React.createElement("div",{style:{fontSize:11,color:"#94a3b8"}},"IFSC: "+p.ifsc)
           ),
-          React.createElement("span",{className:statusBadge(p.status)},p.status)
+          React.createElement("div",{style:{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:6}},
+            React.createElement("span",{className:statusBadge(p.status)},p.status),
+            canToggle&&React.createElement("button",{
+              style:{fontSize:11,padding:"3px 10px",borderRadius:6,border:"1px solid "+(isActive?"#dc2626":"#16a34a"),background:isActive?"#fef2f2":"#f0fdf4",color:isActive?"#dc2626":"#16a34a",cursor:"pointer",fontWeight:600},
+              onClick:function(){togglePayee(p.id)}
+            },isActive?"Deactivate":"Activate")
+          )
         )
       );
-    }),
-    payees.length===0&&React.createElement(EmptyState,{msg:"No payees"})
+    })
   );
 }
 
@@ -2677,47 +2774,122 @@ function PayoutsModule({user,payouts,setPayouts,addToast}){
 }
 
 function RaisePayoutModule({user,apps,payouts,setPayouts,payees,configs,addToast}){
+  var validityDays=configs&&configs.WALLET_VALIDITY_DAYS?configs.WALLET_VALIDITY_DAYS:90;
   var [f,setF]=useState({});
+  var [crossSources,setCrossSources]=useState([{appId:"",amount:""}]);
   var set=function(k,v){setF(function(p){var n={};for(var x in p)n[x]=p[x];n[k]=v;return n})};
-  var siApps=apps.filter(function(a){return a.siDone});
+
+  // Apps with valid (non-expired) wallet balance, belonging to this TM's RAs
+  var siApps=apps.filter(function(a){
+    return a.siDone&&a.walletBal>0&&walletIsValid(a.walletSIDate,validityDays);
+  });
+  // Target apps for Cross-ID: delivery done but SI not yet done, wallet=0
+  var crossTargetApps=apps.filter(function(a){return !a.siDone&&a.walletBal===0&&a.bbnp});
   var isCrossId=f.type==="Cross-ID Transfer";
-  var sourceApp=f.appId?apps.find(function(a){return a.id===f.appId}):null;
-  var targetApps=isCrossId?siApps.filter(function(a){return a.id!==f.appId}):[];
+
+  function setSrc(idx,key,val){
+    setCrossSources(function(prev){return prev.map(function(s,i){
+      if(i!==idx)return s;
+      var n={};for(var k in s)n[k]=s[k];n[key]=val;return n;
+    })});
+  }
+  function addSrc(){setCrossSources(function(p){return p.concat([{appId:"",amount:""}])})}
+  function removeSrc(idx){setCrossSources(function(p){return p.filter(function(_,i){return i!==idx})})}
+
+  var srcTotal=crossSources.reduce(function(s,r){return s+Number(r.amount||0)},0);
 
   function submitPayout(){
-    if(!f.appId||!f.amount||!f.type){addToast("Fill required fields","error");return}
-    if(isCrossId&&!f.targetAppId){addToast("Select target App ID for Cross-ID Transfer","error");return}
+    if(!f.type){addToast("Select payout type","error");return}
+    if(isCrossId){
+      if(!f.targetAppId){addToast("Select target App ID","error");return}
+      if(!f.amount||Number(f.amount)<=0){addToast("Enter release amount","error");return}
+      if(crossSources.length===0||!crossSources[0].appId){addToast("Add at least one source app","error");return}
+      if(crossSources.some(function(s){return !s.appId||!s.amount})){addToast("Fill all source app fields","error");return}
+      var total=Number(f.amount);
+      if(Math.abs(srcTotal-total)>0.01){addToast("Source amounts must sum to ₹"+total+" (currently ₹"+srcTotal+")","error");return}
+      var overErr=null;
+      crossSources.forEach(function(s){
+        var srcApp=apps.find(function(a){return a.id===s.appId});
+        if(srcApp&&Number(s.amount)>srcApp.walletBal){overErr=s.appId+" amount exceeds wallet balance"}
+      });
+      if(overErr){addToast(overErr,"error");return}
+      var srcIds=crossSources.map(function(s){return s.appId+"(₹"+s.amount+")"}).join(", ");
+      var tgtApp=apps.find(function(a){return a.id===f.targetAppId});
+      var firstSrcApp=apps.find(function(a){return a.id===crossSources[0].appId});
+      var pr={id:uid("PR"),appId:f.targetAppId,dealerId:tgtApp?tgtApp.dealerId:"",dealerName:tgtApp?tgtApp.dealerName:"",raId:tgtApp?tgtApp.raId:user.id,
+        type:"Cross-ID Transfer",amount:total,status:"Central Ops Review",requestedAt:nowTs(),processedAt:null,approvedBy:null,
+        note:"Transfer to "+f.targetAppId+" from "+srcIds+(f.note?" | "+f.note:""),
+        payeeId:f.payeeId||"",utr:null,nudgeCount:0,nudgedAt:null,withdrawnAt:null,
+        targetAppId:null,sources:crossSources.map(function(s){return {appId:s.appId,amount:Number(s.amount)}})};
+      setPayouts(function(p){return p.concat([pr])});
+      addToast("Cross-ID Transfer "+pr.id+" submitted for Central Ops review");
+      setF({});setCrossSources([{appId:"",amount:""}]);
+      return;
+    }
+    if(!f.appId||!f.amount){addToast("Fill required fields","error");return}
     var app=apps.find(function(a){return a.id===f.appId});
-    var noteText=f.note||(isCrossId?"Transfer from "+f.appId+" to "+f.targetAppId:"");
     var pr={id:uid("PR"),appId:f.appId,dealerId:app?app.dealerId:"",dealerName:app?app.dealerName:"",raId:app?app.raId:"",
       type:f.type,amount:Number(f.amount),status:"Central Ops Review",requestedAt:nowTs(),processedAt:null,approvedBy:null,
-      note:noteText,payeeId:f.payeeId||"",utr:null,nudgeCount:0,nudgedAt:null,withdrawnAt:null,
-      targetAppId:f.targetAppId||null};
+      note:f.note||"",payeeId:f.payeeId||"",utr:null,nudgeCount:0,nudgedAt:null,withdrawnAt:null,targetAppId:null};
     setPayouts(function(p){return p.concat([pr])});
     addToast("Payout "+pr.id+" submitted for Central Ops review");
     setF({});
   }
 
+  var sourceApp=f.appId?apps.find(function(a){return a.id===f.appId}):null;
+
   return React.createElement("div",null,
     React.createElement(SectionTitle,{title:"Raise Payout",sub:"All payouts route to Central Ops review"}),
     React.createElement(Card,null,
-      React.createElement(Sel,{label:"Source App ID (SI Done only)",value:f.appId,onChange:function(v){set("appId",v);set("targetAppId","")},options:siApps.map(function(a){return{value:a.id,label:a.id+" - "+a.make+" "+a.model+" ("+a.dealerName+") Wallet: "+fmt(a.walletBal)}}),required:true,placeholder:"Select source app..."}),
-      sourceApp&&React.createElement(Card,{style:{background:"#f8fafc",marginBottom:8}},
-        React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#64748b",marginBottom:4}},"Source App Details"),
-        React.createElement("div",{style:{display:"flex",gap:16,flexWrap:"wrap"}},
-          React.createElement("span",{style:{fontSize:12}},"Dealer: "+sourceApp.dealerName),
-          React.createElement("span",{style:{fontSize:12}},"Wallet: "+fmt(sourceApp.walletBal)),
-          React.createElement("span",{style:{fontSize:12}},"SI Date: "+(sourceApp.siDate||"--"))
+      React.createElement(Sel,{label:"Payout Type",value:f.type,onChange:function(v){set("type",v);set("appId","");set("targetAppId","");setCrossSources([{appId:"",amount:""}])},options:["Split","Incentive","Cross-ID Transfer"],required:true,placeholder:"Select type..."}),
+
+      // ── CROSS-ID TRANSFER FORM ──────────────────────────────────────────
+      isCrossId&&React.createElement("div",null,
+        React.createElement(Alrt,{type:"warn"},"Cross-ID Transfer moves wallet balance from one or more source apps (SI Done, valid wallet) into a target app (Delivery Done, wallet ₹0, SI not yet done)."),
+        React.createElement(Sel,{label:"Target App ID (Delivery Done · Wallet ₹0 · SI not done)",value:f.targetAppId,onChange:function(v){set("targetAppId",v)},options:crossTargetApps.map(function(a){return{value:a.id,label:a.id+" — "+a.make+" "+a.model+" ("+a.dealerName+")"}}),required:true,placeholder:"Select target app..."}),
+        f.targetAppId&&(function(){var ta=apps.find(function(a){return a.id===f.targetAppId});return ta?React.createElement("div",{style:{fontSize:12,color:"#64748b",marginBottom:8,padding:"6px 10px",background:"#f8fafc",borderRadius:6}},"Target: "+ta.dealerName+" · "+ta.make+" "+ta.model+" · "+ta.regNo):null})(),
+        React.createElement(Inp,{label:"Total Release Amount (₹)",value:f.amount,onChange:function(v){set("amount",v)},type:"number",required:true}),
+        React.createElement("div",{style:{marginTop:8}},
+          React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}},
+            React.createElement("div",{style:{fontWeight:600,fontSize:13}},"Source Apps (wallet providers)"),
+            React.createElement("button",{style:{fontSize:11,padding:"3px 10px",borderRadius:6,border:"1px solid var(--p)",background:"#fff7f0",color:"var(--p)",cursor:"pointer",fontWeight:600},onClick:addSrc},"+ Add Source")
+          ),
+          crossSources.map(function(src,idx){
+            var srcApp=src.appId?apps.find(function(a){return a.id===src.appId}):null;
+            return React.createElement("div",{key:idx,style:{background:"#f8fafc",border:"1px solid var(--brd)",borderRadius:8,padding:"10px",marginBottom:6}},
+              React.createElement("div",{style:{display:"flex",gap:8,alignItems:"flex-start"}},
+                React.createElement("div",{style:{flex:2}},
+                  React.createElement(Sel,{label:"Source App "+(idx+1),value:src.appId,onChange:function(v){setSrc(idx,"appId",v)},options:siApps.filter(function(a){return a.id!==f.targetAppId&&crossSources.every(function(s,i){return i===idx||s.appId!==a.id})}).map(function(a){return{value:a.id,label:a.id+" — "+a.make+" "+a.model+" ("+a.dealerName+") · Wallet: "+fmt(a.walletBal)}}),required:true,placeholder:"Select source..."})
+                ),
+                React.createElement("div",{style:{flex:1}},
+                  React.createElement(Inp,{label:"Amount (₹)",value:src.amount,onChange:function(v){setSrc(idx,"amount",v)},type:"number",required:true})
+                ),
+                crossSources.length>1&&React.createElement("button",{style:{marginTop:22,padding:"6px 8px",borderRadius:6,border:"1px solid #dc2626",background:"#fef2f2",color:"#dc2626",cursor:"pointer",fontSize:12},onClick:function(){removeSrc(idx)}},"✕")
+              ),
+              srcApp&&React.createElement("div",{style:{fontSize:11,color:"#64748b",marginTop:2}},"Available: "+fmt(srcApp.walletBal)+" · SI: "+srcApp.siDate)
+            );
+          }),
+          f.amount&&React.createElement("div",{style:{marginTop:6,padding:"6px 10px",borderRadius:6,background:Math.abs(srcTotal-Number(f.amount))<0.01?"#f0fdf4":"#fef9ec",border:"1px solid "+(Math.abs(srcTotal-Number(f.amount))<0.01?"#bbf7d0":"#fde68a")}},
+            React.createElement("span",{style:{fontSize:12,fontWeight:600,color:Math.abs(srcTotal-Number(f.amount))<0.01?"#16a34a":"#92400e"}},
+              "Sources total: "+fmt(srcTotal)+" / "+fmt(Number(f.amount)||0)+(Math.abs(srcTotal-Number(f.amount))<0.01?" ✓":" — must match release amount")
+            )
+          )
         )
       ),
-      React.createElement(Sel,{label:"Payout Type",value:f.type,onChange:function(v){set("type",v);set("targetAppId","")},options:["Split","Incentive","Cross-ID Transfer"],required:true,placeholder:"Select type..."}),
-      isCrossId&&React.createElement("div",null,
-        React.createElement(Alrt,{type:"warn"},"Cross-ID Transfer moves wallet balance from source app to a different app ID."),
-        React.createElement(Sel,{label:"Target App ID (destination)",value:f.targetAppId,onChange:function(v){set("targetAppId",v)},options:targetApps.map(function(a){return{value:a.id,label:a.id+" - "+a.make+" "+a.model+" ("+a.dealerName+")"}}),required:true,placeholder:"Select target app..."})
+
+      // ── SPLIT / INCENTIVE FORM ──────────────────────────────────────────
+      !isCrossId&&f.type&&React.createElement("div",null,
+        React.createElement(Sel,{label:"App ID (SI Done · Valid Wallet)",value:f.appId,onChange:function(v){set("appId",v)},options:siApps.map(function(a){return{value:a.id,label:a.id+" — "+a.make+" "+a.model+" ("+a.dealerName+") · Wallet: "+fmt(a.walletBal)}}),required:true,placeholder:"Select app..."}),
+        sourceApp&&React.createElement("div",{style:{fontSize:12,color:"#64748b",marginBottom:8,padding:"6px 10px",background:"#f8fafc",borderRadius:6}},"Dealer: "+sourceApp.dealerName+" · Wallet: "+fmt(sourceApp.walletBal)+" · SI: "+sourceApp.siDate),
+        React.createElement(Inp,{label:"Amount (₹)",value:f.amount,onChange:function(v){set("amount",v)},type:"number",required:true})
       ),
-      React.createElement(Inp,{label:"Amount",value:f.amount,onChange:function(v){set("amount",v)},type:"number",required:true}),
-      React.createElement(Sel,{label:"Payee",value:f.payeeId,onChange:function(v){set("payeeId",v)},options:payees.map(function(p){return{value:p.id,label:p.name+" - "+p.bank}}),placeholder:"Select payee..."}),
-      React.createElement(Fld,{label:"Note"},React.createElement("textarea",{value:f.note||"",onChange:function(e){set("note",e.target.value)},placeholder:isCrossId?"Reason for cross-ID transfer...":"Payout note..."})),
+
+      // ── COMMON FIELDS ───────────────────────────────────────────────────
+      f.type&&React.createElement("div",null,
+        React.createElement(Sel,{label:"Payee",value:f.payeeId,onChange:function(v){set("payeeId",v)},options:payees.map(function(p){return{value:p.id,label:p.name+" — "+p.bank}}),placeholder:"Select payee..."}),
+        React.createElement(Fld,{label:"Note (optional)"},React.createElement("textarea",{value:f.note||"",onChange:function(e){set("note",e.target.value)},style:{width:"100%",minHeight:52,fontSize:13},placeholder:isCrossId?"Additional context for approver...":"Payout note..."}))
+      ),
+
       React.createElement(Alrt,{type:"info"},"All payouts route to Central Ops for approval (no auto-approval)."),
       React.createElement("div",{style:{display:"flex",justifyContent:"flex-end",marginTop:12}},React.createElement(Btn,{onClick:submitPayout},"Submit Payout"))
     )
@@ -3421,7 +3593,7 @@ function App(){
     if(activePage==="counter")return React.createElement(CounterModule,{user:user,counters:counters,counterReqs:counterReqs,setCounterReqs:setCounterReqs,dealers:dealers,addToast:addToast});
 
     // Payees
-    if(activePage==="payees")return React.createElement(PayeesModule,{user:user,payees:payees,addToast:addToast});
+    if(activePage==="payees")return React.createElement(PayeesModule,{user:user,payees:payees,setPayees:setPayees,addToast:addToast});
 
     // Payouts
     if(activePage==="payouts"&&user.role==="TM")return React.createElement(RaisePayoutModule,{user:user,apps:apps,payouts:payouts,setPayouts:setPayouts,payees:payees,configs:configs,addToast:addToast});
@@ -3474,8 +3646,13 @@ function App(){
     React.createElement("div",{className:"sidebar"+(sidebarOpen?" open":"")},
       React.createElement("div",{className:"logo-wrap"},
         React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6}},
-          React.createElement("div",{style:{background:"#fff",borderRadius:8,padding:"4px 8px",display:"inline-flex",alignItems:"center"}},
-            React.createElement("img",{src:"cars24_logo.png",alt:"Cars24",style:{height:22,width:"auto"}})
+          React.createElement("div",{style:{background:"#fff",borderRadius:8,padding:"5px 10px",display:"inline-flex",alignItems:"center",gap:7}},
+            React.createElement("svg",{viewBox:"0 0 54 54",width:26,height:26,xmlns:"http://www.w3.org/2000/svg"},
+              React.createElement("rect",{width:54,height:54,rx:11,fill:"#3535D4"}),
+              React.createElement("path",{d:"M 27 12 A 15 15 0 1 0 12 27",stroke:"white",strokeWidth:5.5,strokeLinecap:"round",fill:"none"}),
+              React.createElement("polygon",{points:"6,21 18,21 12,32",fill:"white"})
+            ),
+            React.createElement("span",{style:{fontWeight:700,fontSize:18,color:"#3535D4",fontFamily:"DM Sans,sans-serif",letterSpacing:-0.3}},"Cars24")
           ),
           React.createElement("div",{className:"logo-sub"},"B2B Panel")
         )
